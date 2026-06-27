@@ -6,3 +6,4 @@ export { PortalResults } from './PortalResults';
 export { PortalBills } from './PortalBills';
 export { PortalMessages } from './PortalMessages';
 export { PortalPlaceholder } from './PortalPlaceholder';
+export { PortalModal, ConfirmDialog, ToastBanner } from './PortalModal';
