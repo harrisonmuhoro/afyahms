@@ -1,0 +1,318 @@
+{
+  "app": {
+    "name": "Afya HMS",
+    "tagline": "Mfumo wa Usimamizi wa Hospitali"
+  },
+  "common": {
+    "save": "Hifadhi",
+    "cancel": "Ghairi",
+    "delete": "Futa",
+    "edit": "Hariri",
+    "create": "Unda",
+    "loading": "Inapakia…",
+    "search": "Tafuta",
+    "back": "Rudi",
+    "next": "Mbele",
+    "submit": "Wasilisha",
+    "confirm": "Thibitisha",
+    "yes": "Ndiyo",
+    "no": "Hapana",
+    "actions": "Vitendo",
+    "status": "Hali",
+    "filter": "Chuja",
+    "clear": "Safisha",
+    "none": "Hakuna",
+    "select": "Chagua",
+    "all": "Zote",
+    "or": "au",
+    "and": "na",
+    "from": "kutoka",
+    "to": "kwenda",
+    "today": "Leo",
+    "yesterday": "Jana",
+    "optional": "Si lazima",
+    "required": "Lazima",
+    "remove": "Ondoa"
+  },
+  "errors": {
+    "generic": "Hitilafu fulani imetokea. Tafadhali jaribu tena.",
+    "network": "Hitilafu ya mtandao. Angalia muunganisho wako.",
+    "unauthorized": "Kikao chako kimeisha. Tafadhali ingia tena.",
+    "forbidden": "Huna ruhusa ya kufanya kitendo hiki.",
+    "not_found": "Rasilimali uliyoomba haikupatikana.",
+    "validation": "Tafadhali sahihisha sehemu zilizoangaziwa."
+  },
+  "auth": {
+    "login": {
+      "title": "Ingia",
+      "subtitle": "Tumia barua pepe na nenosiri lako la kazi",
+      "email": "Barua pepe",
+      "password": "Nenosiri",
+      "device": "Kifaa (si lazima)",
+      "submit": "Ingia",
+      "submitting": "Inaingia…",
+      "demo": "Vithibitisho vya demo vimejazwa tayari"
+    },
+    "mfa": {
+      "title": "Uthibitisho wa hatua mbili",
+      "subtitle": "Weka msimbo wa tarakimu 6 kutoka kwa programu yako ya uthibitishaji",
+      "code": "Msimbo wa TOTP",
+      "recovery": "Msimbo wa urejesho",
+      "use_recovery": "Tumia msimbo wa urejesho badala yake",
+      "submit": "Thibitisha",
+      "enroll": {
+        "title": "Weka uthibitisho wa hatua mbili",
+        "scan": "Skani msimbo wa QR kwa programu yako ya uthibitishaji, kisha weka msimbo wa tarakimu 6 hapa chini.",
+        "secret": "Au weka siri hii mwenyewe",
+        "code": "Msimbo",
+        "submit": "Washa MFA"
+      }
+    },
+    "logout": "Toka"
+  },
+  "branches": {
+    "title": "Tawi",
+    "code": "Msimbo",
+    "name": "Jina",
+    "address": "Anwani",
+    "phone": "Simu",
+    "email": "Barua pepe",
+    "timezone": "Saa za eneo",
+    "currency": "Sarafu",
+    "active": "Hai",
+    "create": "Unda tawi",
+    "switcher": "Tawi",
+    "switch": "Badilisha",
+    "view_all": "Ona matawi yote"
+  },
+  "nav": {
+    "dashboard": "Dashibodi",
+    "branches": "Matawi",
+    "patients": "Wagonjwa",
+    "appointments": "Miadi",
+    "queue": "Foleni",
+    "checkIn": "Usajili",
+    "triage": "Triage",
+    "emr": "Rekodi za Kliniki",
+    "pharmacy": "Duka la Dawa",
+    "laboratory": "Maabara",
+    "radiology": "Mionzi",
+    "billing": "Malipo",
+    "inpatient": "Wagonjwa wa Ndani",
+    "inventory": "Hisa",
+    "reports": "Ripoti",
+    "settings": "Mipangilio",
+    "audit": "Kumbukumbu za Ukaguzi"
+  },
+  "triage": {
+    "title": "Tathmini ya triage",
+    "subtitle": "Mfumo wa Triage wa Manchester (MTS) — chagua kundi kuendesha kipaumbele cha foleni",
+    "mts_label": "Kundi la ukali wa MTS",
+    "vitals_label": "Viashiria vya uhai",
+    "submit": "Hifadhi tathmini",
+    "submitting": "Inahifadhi…",
+    "target": {
+      "red": "Mara moja",
+      "orange": "≤dakika 10",
+      "yellow": "≤dakika 60",
+      "green": "≤dakika 120",
+      "blue": "≤dakika 240"
+    },
+    "vitals": {
+      "temperature_c": "Joto",
+      "pulse_bpm": "Mapigo",
+      "respiratory_rate": "Kupumua",
+      "spo2_pct": "SpO₂",
+      "bp_systolic": "Shinikizo la juu",
+      "bp_diastolic": "Shinikizo la chini",
+      "pain_score": "Maumivu"
+    },
+    "fields": {
+      "chief_complaint": "Malalamiko makuu",
+      "notes": "Maelezo"
+    },
+    "placeholders": {
+      "complaint": "Homa kwa siku 3…"
+    },
+    "errors": {
+      "no_category": "Chagua kundi la MTS kabla ya kuwasilisha."
+    }
+  },
+  "patients": {
+    "title": "Wagonjwa",
+    "subtitle": "Tafuta, sajili, na simamia rekodi za wagonjwa",
+    "create": "Sajili mgonjwa",
+    "empty": "Hakuna wagonjwa wanaolingana na vichujio vyako.",
+    "results_summary": "Inaonyesha {{from}}–{{to}} kati ya {{total}}",
+    "gender": {
+      "male": "Mwanaume",
+      "female": "Mwanamke",
+      "other": "Nyingine"
+    },
+    "badges": {
+      "active": "Hai",
+      "inactive": "Amefutwa",
+      "deceased": "Amekufa",
+      "merged": "Ameunganishwa"
+    },
+    "fields": {
+      "patient_number": "Nambari ya Mgonjwa",
+      "full_name": "Jina kamili",
+      "first_name": "Jina la kwanza",
+      "middle_name": "Jina la kati",
+      "last_name": "Jina la mwisho",
+      "gender": "Jinsia",
+      "date_of_birth": "Tarehe ya kuzaliwa",
+      "age": "Umri",
+      "blood_group": "Aina ya damu",
+      "marital_status": "Hali ya ndoa",
+      "phone": "Simu",
+      "email": "Barua pepe",
+      "national_id": "Kitambulisho cha Taifa",
+      "sha_number": "Nambari ya SHA",
+      "county": "Kaunti",
+      "sub_county": "Kaunti ndogo",
+      "address": "Anwani",
+      "occupation": "Kazi",
+      "search": "Tafuta",
+      "created_at": "Imeundwa",
+      "updated_at": "Imebadilishwa"
+    },
+    "placeholders": {
+      "search": "Jina, simu, nambari ya mgonjwa, kitambulisho…"
+    },
+    "new": {
+      "title": "Sajili mgonjwa mpya",
+      "subtitle": "Hifadhi data za msingi. Nambari ya mgonjwa itatolewa moja kwa moja.",
+      "submit": "Sajili mgonjwa",
+      "submitting": "Inasajili…",
+      "success": "Mgonjwa amesajiliwa.",
+      "duplicate_title": "Labda kuna nakala",
+      "duplicate_body": "Mgonjwa mwenye sifa zinazofanana ameshasajiliwa. Unaweza bado kusajili mtu huyu kama ni mtu mpya kweli.",
+      "duplicate_override": "Sajili hata hivyo",
+      "required_hint": "Sehemu zilizo na alama * zinahitajika."
+    },
+    "detail": {
+      "not_found": "Mgonjwa hakupatikana.",
+      "demographics": "Takwimu za kibinafsi",
+      "contact": "Mawasiliano",
+      "identification": "Utambulisho",
+      "system": "Mfumo"
+    }
+  },
+  "queue": {
+    "title": "Foleni",
+    "subtitle": "Mabodi ya kituo kwa wakati halisi na usajili wa mapokezi",
+    "desc": {
+      "rec": "Toa tiketi ya foleni anapofika",
+      "tri": "Triage ya Manchester na uwekaji wa viashiria vya uhai",
+      "doc": "Foleni ya ushauri, iliyopangwa kwa kundi la MTS",
+      "lab": "Orodha ya kazi ya maabara",
+      "rad": "Orodha ya kazi ya picha",
+      "pha": "Foleni ya utoaji wa dawa",
+      "bil": "Foleni ya malipo"
+    },
+    "status": {
+      "open": "Wazi",
+      "serving": "Inahudumiwa",
+      "paused": "Imesimamishwa",
+      "closed": "Imefungwa"
+    },
+    "check_in": {
+      "title": "Usajili wa mapokezi",
+      "subtitle": "Tafuta mgonjwa, chagua aina ya ziara, na utoe tiketi ya foleni",
+      "search_patient": "Tafuta mgonjwa",
+      "visit_type": "Aina ya ziara",
+      "visit_type_walk_in": "Kuja moja kwa moja",
+      "visit_type_appointment": "Miadi",
+      "visit_type_referral": "Rufaa",
+      "visit_type_follow_up": "Ufuatiliaji",
+      "visit_type_emergency": "Dharura",
+      "submit": "Toa tiketi",
+      "submitting": "Inatoa…",
+      "errors": {
+        "no_patient": "Chagua mgonjwa kabla ya kuwasilisha."
+      }
+    },
+    "board": {
+      "invalid_code": "Msimbo wa kituo si sahihi.",
+      "now_serving": "Anahudumiwa sasa",
+      "waiting": "Wanasubiri",
+      "empty_serving": "Hakuna tiketi inayohudumiwa kwa sasa.",
+      "empty_waiting": "Hakuna tiketi zinazosubiri.",
+      "waiting_count": "{{count}} wanasubiri",
+      "call_next": "Weka mtu anayefuata",
+      "called_next": "Mmeweka mtu anayefuata.",
+      "no_waiting": "Hakuna anayesubiri kituoni.",
+      "start": "Anza",
+      "started": "Imeanza {{ticket}}",
+      "start_failed": "Imeshindwa kuanza tiketi.",
+      "complete": "Maliza",
+      "completed": "Imemalizika {{ticket}}.",
+      "completed_next": "Imemalizika {{ticket}} → imetolewa {{next}}.",
+      "complete_failed": "Imeshindwa kumaliza tiketi.",
+      "hold": "Simamisha",
+      "held": "Imesimamishwa {{ticket}}.",
+      "no_show": "Hakufika",
+      "no_show_label": "Tiketi {{ticket}} imewekwa alama ya hakufika.",
+      "emergency": "Dharura",
+      "triage": "Triage",
+      "consult": "Ushauri"
+    }
+  },
+  "emr": {
+    "title": "Tukio la Kliniki",
+    "subtitle": "Rekodi ya kliniki (SOAP)",
+    "visit": "Ziara",
+    "patient": "Mgonjwa",
+    "no_encounter": "Hakuna tukio lililofunguliwa kwa ziara hii bado.",
+    "open_encounter": "Fungua tukio",
+    "opening": "Inafungua…",
+    "soap_note": "Noti ya SOAP",
+    "amendment": "Marekebisho",
+    "amend": "Rekebisha",
+    "save_amendment": "Hifadhi marekebisho",
+    "save_draft": "Hifadhi rasimu",
+    "sign": "Saini noti",
+    "signing": "Inasaini…",
+    "signed": "Noti imesainiwa.",
+    "saved": "Noti imehifadhiwa.",
+    "amended": "Marekebisho yameongezwa.",
+    "completed": "Tukio limekamilika.",
+    "signed_badge": "Imesainiwa",
+    "complete_encounter": "Kamilisha tukio",
+    "diagnoses": "Utambuzi",
+    "no_diagnoses": "Hakuna utambuzi uliorekodiwa.",
+    "diagnosis_search_placeholder": "Tafuta msimbo wa ICD-10 au maelezo…",
+    "no_catalog_results": "Hakuna ICD-10 inayolingana.",
+    "soap": {
+      "subjective": "Maelezo ya mgonjwa (S)",
+      "objective": "Uchunguzi (O)",
+      "assessment": "Tathmini (A)",
+      "plan": "Mpango (P)"
+    },
+    "diagnosis_type": {
+      "primary": "Msingi",
+      "secondary": "Sekondari",
+      "provisional": "Ya muda",
+      "differential": "Tofauti"
+    },
+    "disposition": {
+      "discharged": "Ruhusu",
+      "admitted": "Laza",
+      "referred": "Rejesha",
+      "followup": "Ufuatiliaji",
+      "deceased": "Amefariki",
+      "none": "Hakuna"
+    },
+    "status": {
+      "open": "Wazi",
+      "in_progress": "Inaendelea",
+      "completed": "Imekamilika",
+      "cancelled": "Imeghairiwa"
+    },
+    "errors": {
+      "no_visit": "Hakuna ziara halali iliyochaguliwa."
+    }
+  }
+}

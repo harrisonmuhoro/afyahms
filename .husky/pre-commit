@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+# Pre-commit: lint-staged + targeted tests
+. "$(dirname -- "$0")/_/husky.sh"
+
+cd backend && \
+  ./vendor/bin/pint --test || exit 1
+cd ../frontend && \
+  npx lint-staged || exit 1

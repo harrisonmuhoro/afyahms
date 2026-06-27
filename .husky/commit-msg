@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# Conventional Commits enforcement
+. "$(dirname -- "$0")/_/husky.sh"
+
+npx --no -- commitlint --edit "$1"

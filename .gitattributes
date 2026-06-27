@@ -1,0 +1,29 @@
+* text=auto eol=lf
+
+*.php    diff=php
+*.js     diff=js
+*.ts     diff=ts
+*.tsx    diff=tsx
+*.json   diff=json
+*.md     diff=markdown
+*.yml    diff=yaml
+*.yaml   diff=yaml
+
+# Binary files
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.ico     binary
+*.svg     binary
+*.woff    binary
+*.woff2   binary
+*.eot     binary
+*.ttf     binary
+
+# Exclude from archives
+.gitignore          export-ignore
+.editorconfig       export-ignore
+.github             export-ignore
+.husky              export-ignore
+docker-compose*.yml export-ignore

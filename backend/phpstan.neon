@@ -1,0 +1,19 @@
+includes:
+    - vendor/larastan/larastan/stubs/Strict.stub
+    - vendor/nesbot/carbon/extension.neon
+
+parameters:
+    level: 7
+    paths:
+        - app
+    excludePaths:
+        - app/Console/Commands
+        - database/migrations
+        - database/seeders
+    treatPhpDocTypesAsCertain: false
+    reportUnmatchedIgnoredErrors: false
+    parallel:
+        maximumNumberOfProcesses: 4
+    ignoreErrors:
+        - '#PHPDoc tag @var#'
+        - '#PHPDoc tag @param#'

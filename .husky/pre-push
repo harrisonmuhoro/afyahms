@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+# Pre-push: type-check + tests on changed paths only
+. "$(dirname -- "$0")/_/husky.sh"
+
+cd backend && ./vendor/bin/phpstan analyse --no-progress || exit 1
+cd ../frontend && npm run type-check || exit 1

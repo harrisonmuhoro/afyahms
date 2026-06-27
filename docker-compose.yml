@@ -1,0 +1,286 @@
+# ============================================================
+# Local development Docker Compose for Afya HMS
+# ------------------------------------------------------------
+# Hybrid (local-dev friendly, cloud-ready).
+# Run: `make up`  (or `docker compose up -d`)
+# ============================================================
+
+name: afya-hms
+
+services:
+  # ----------------------------------------------------------------
+  # Application (Laravel API + queue worker + scheduler + reverb)
+  # Single image; processes selected via command.
+  # ----------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+      target: dev
+    image: afya-hms-backend:${BACKEND_IMAGE_TAG:-latest}
+    container_name: afya-backend
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+      - backend_storage:/var/www/html/storage
+      - backend_cache:/var/www/html/bootstrap/cache
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      APP_KEY: ${APP_KEY:-base64:K6yJZGFkQ2VyYWVnaHRydXRoeXJzSldUb2dGTEVBYXNlYjY=}
+      APP_DEBUG: ${APP_DEBUG:-true}
+      APP_URL: http://localhost:${BACKEND_PORT:-8080}
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: afya
+      DB_USERNAME: afya
+      DB_PASSWORD: ${DB_PASSWORD:-afya}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      CACHE_STORE: redis
+      QUEUE_CONNECTION: redis
+      SESSION_DRIVER: redis
+      BROADCAST_CONNECTION: reverb
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      FILESYSTEM_DISK: local
+      LOG_CHANNEL: stack
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
+      REVERB_APP_ID: afya-reverb
+      REVERB_APP_KEY: afya-reverb-key
+      REVERB_APP_SECRET: afya-reverb-secret
+      REVERB_HOST: 0.0.0.0
+      REVERB_PORT: 8080
+      REVERB_SCHEME: http
+      VITE_API_BASE_URL: http://localhost:${BACKEND_PORT:-8080}
+      VITE_REVERB_APP_KEY: afya-reverb-key
+      VITE_REVERB_HOST: localhost
+      VITE_REVERB_PORT: 8080
+      VITE_REVERB_SCHEME: ws
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - afya
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+
+  # ----------------------------------------------------------------
+  # Queue worker (Horizon) — separate process for observability
+  # ----------------------------------------------------------------
+  horizon:
+    image: afya-hms-backend:${BACKEND_IMAGE_TAG:-latest}
+    container_name: afya-horizon
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+      - backend_storage:/var/www/html/storage
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: afya
+      DB_USERNAME: afya
+      DB_PASSWORD: ${DB_PASSWORD:-afya}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      QUEUE_CONNECTION: redis
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
+    depends_on:
+      backend:
+        condition: service_started
+    command: ["php", "artisan", "horizon"]
+    networks:
+      - afya
+
+  # ----------------------------------------------------------------
+  # Scheduler — runs `schedule:run` every minute
+  # ----------------------------------------------------------------
+  scheduler:
+    image: afya-hms-backend:${BACKEND_IMAGE_TAG:-latest}
+    container_name: afya-scheduler
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+      - backend_storage:/var/www/html/storage
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: afya
+      DB_USERNAME: afya
+      DB_PASSWORD: ${DB_PASSWORD:-afya}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
+    depends_on:
+      backend:
+        condition: service_started
+    command: ["sh", "-c", "while true; do php artisan schedule:run --no-interaction; sleep 60; done"]
+    networks:
+      - afya
+
+  # ----------------------------------------------------------------
+  # WebSocket server (Laravel Reverb)
+  # ----------------------------------------------------------------
+  reverb:
+    image: afya-hms-backend:${BACKEND_IMAGE_TAG:-latest}
+    container_name: afya-reverb
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+      - backend_storage:/var/www/html/storage
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: afya
+      DB_USERNAME: afya
+      DB_PASSWORD: ${DB_PASSWORD:-afya}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      BROADCAST_CONNECTION: reverb
+      REVERB_APP_ID: afya-reverb
+      REVERB_APP_KEY: afya-reverb-key
+      REVERB_APP_SECRET: afya-reverb-secret
+      REVERB_HOST: 0.0.0.0
+      REVERB_PORT: 8080
+      REVERB_SCHEME: http
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
+    depends_on:
+      backend:
+        condition: service_started
+    command: ["php", "artisan", "reverb:start"]
+    networks:
+      - afya
+    ports:
+      - "8080:8080"
+
+  # ----------------------------------------------------------------
+  # Nginx — public entrypoint (serves public/index.php and SPA fallback)
+  # ----------------------------------------------------------------
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: afya-nginx
+    restart: unless-stopped
+    volumes:
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./backend/public:/var/www/html/public:ro
+    depends_on:
+      - backend
+    networks:
+      - afya
+    ports:
+      - "${BACKEND_PORT:-8080}:80"
+
+  # ----------------------------------------------------------------
+  # Frontend dev server (Vite)
+  # ----------------------------------------------------------------
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+      target: dev
+    image: afya-hms-frontend:${FRONTEND_IMAGE_TAG:-latest}
+    container_name: afya-frontend
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    environment:
+      VITE_API_BASE_URL: http://localhost:${BACKEND_PORT:-8080}/api/v1
+      VITE_REVERB_APP_KEY: afya-reverb-key
+      VITE_REVERB_HOST: localhost
+      VITE_REVERB_PORT: 8080
+      VITE_REVERB_SCHEME: ws
+    depends_on:
+      - backend
+    networks:
+      - afya
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+
+  # ----------------------------------------------------------------
+  # Datastores
+  # ----------------------------------------------------------------
+  mysql:
+    image: mysql:8.0
+    container_name: afya-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: afya
+      MYSQL_USER: afya
+      MYSQL_PASSWORD: ${DB_PASSWORD:-afya}
+      TZ: Africa/Nairobi
+      MYSQL_INITDB_ARGS: "--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+03:00
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-root}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - afya
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+
+  redis:
+    image: redis:7-alpine
+    container_name: afya-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - afya
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+
+  # ----------------------------------------------------------------
+  # Local mail catcher (dev only)
+  # ----------------------------------------------------------------
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: afya-mailpit
+    restart: unless-stopped
+    networks:
+      - afya
+    ports:
+      - "${MAILPIT_PORT:-1025}:1025"
+      - "${MAILPIT_UI_PORT:-8025}:8025"
+
+networks:
+  afya:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
+  backend_storage:
+  backend_cache:
+  frontend_node_modules:

@@ -1,0 +1,156 @@
+# ============================================================
+# AFYA HMS — MONOREPO .gitignore
+# Stack: Laravel (backend/) + React/TypeScript (frontend/)
+# ============================================================
+
+
+# ============================================================
+# 🔐 SECRETS & ENVIRONMENT — NEVER PUSH THESE
+# ============================================================
+.env
+.env.*
+!.env.example
+
+backend/.env
+backend/.env.*
+backend/.env.testing
+!backend/.env.example
+
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+
+# ============================================================
+# 🤖 AI TOOL DIRECTORIES — CONTAIN CREDENTIALS/TOKENS
+# ============================================================
+.qwen/
+.claude/
+
+
+# ============================================================
+# 📦 DEPENDENCIES
+# ============================================================
+vendor/
+node_modules/
+backend/vendor/
+frontend/node_modules/
+
+
+# ============================================================
+# 🏗️ BUILD ARTIFACTS
+# ============================================================
+frontend/dist/
+frontend/build/
+frontend/tsconfig.tsbuildinfo
+frontend/vite.config.ts.timestamp-*
+
+backend/public/build/
+backend/public/hot/
+backend/public/storage/
+
+
+# ============================================================
+# ⚙️ LARAVEL CACHE & STORAGE
+# ============================================================
+backend/bootstrap/cache/*.php
+!backend/bootstrap/cache/.gitkeep
+
+backend/storage/*.key
+
+backend/storage/logs/*
+!backend/storage/logs/.gitkeep
+
+backend/storage/framework/cache/data/*
+!backend/storage/framework/cache/data/.gitkeep
+
+backend/storage/framework/sessions/*
+!backend/storage/framework/sessions/.gitkeep
+
+backend/storage/framework/views/*
+!backend/storage/framework/views/.gitkeep
+
+backend/storage/app/private/*
+!backend/storage/app/private/.gitkeep
+
+backend/storage/app/public/*
+!backend/storage/app/public/.gitkeep
+
+backend/storage/debugbar/
+
+# Composer local overrides (not for teammates)
+backend/composer.local.json
+backend/composer.original.json
+
+
+# ============================================================
+# 🧪 TESTING & COVERAGE
+# ============================================================
+backend/.phpunit.cache/
+backend/.phpunit.result.cache
+frontend/coverage/
+frontend/playwright-report/
+frontend/test-results/
+.nyc_output/
+
+
+# ============================================================
+# 🪵 LOGS
+# ============================================================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# ============================================================
+# 🗄️ DATABASE FILES
+# ============================================================
+*.sqlite
+*.sqlite3
+backend/database/*.sqlite
+
+
+# ============================================================
+# 🔑 CERTIFICATES & KEYS
+# ============================================================
+*.pem
+*.key
+*.cert
+*.p12
+*.pfx
+
+
+# ============================================================
+# 🐳 DOCKER OVERRIDES
+# ============================================================
+docker-compose.override.yml
+.docker/
+
+
+# ============================================================
+# 🖥️ IDE & OS
+# ============================================================
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+frontend/.vscode/*
+!frontend/.vscode/settings.json
+!frontend/.vscode/extensions.json
+.DS_Store
+Thumbs.db
+desktop.ini
+
+
+# ============================================================
+# 📦 PACKAGE MANAGER JUNK
+# ============================================================
+.pnp
+.pnp.js
+*.lock.bak
+
+# NOTE: Keep these — DO NOT ignore:
+# composer.lock ✅
+# frontend/package-lock.json ✅

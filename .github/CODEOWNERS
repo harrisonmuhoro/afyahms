@@ -1,0 +1,19 @@
+# Code owners — review routing per path
+# Foundation §27 — Tech Lead signs off on backend/, frontend/ changes; Delivery Lead on docs/.
+
+*                                       @delivery-lead
+
+/backend/                                @tech-lead
+/backend/app/Modules/Auth/              @tech-lead @security-engineer
+/backend/app/Modules/Admin/             @tech-lead @delivery-lead
+/backend/config/                        @tech-lead
+/backend/database/migrations/           @tech-lead
+/backend/.env.example                   @tech-lead @security-engineer
+
+/frontend/                              @frontend-lead
+/frontend/src/features/auth/            @frontend-lead @security-engineer
+/frontend/src/features/admin/           @frontend-lead @delivery-lead
+
+/docs/                                  @delivery-lead
+/docker/                                @sre
+/.github/                               @sre @delivery-lead

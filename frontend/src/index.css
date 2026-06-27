@@ -1,0 +1,268 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-bg: 250 250 249;
+    --color-fg: 12 10 9;
+    --color-muted: 120 113 108;
+    --color-border: 214 211 209;
+  }
+
+  .dark {
+    --color-bg: 12 10 9;
+    --color-fg: 250 250 249;
+    --color-muted: 168 162 158;
+    --color-border: 41 37 36;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-stone-50 text-stone-900 antialiased dark:bg-stone-950 dark:text-stone-100;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  /* Scrollbars */
+  *::-webkit-scrollbar { @apply h-1.5 w-1.5; }
+  *::-webkit-scrollbar-track { @apply bg-transparent; }
+  *::-webkit-scrollbar-thumb { @apply rounded-full bg-stone-300 dark:bg-stone-700; }
+  *::-webkit-scrollbar-thumb:hover { @apply bg-stone-400 dark:bg-stone-600; }
+
+  /* Focus rings */
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-500 ring-offset-2 ring-offset-white dark:ring-offset-stone-950;
+  }
+}
+
+@layer components {
+
+  /* ─── Buttons ────────────────────────────────────────────────────────────── */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-all
+           focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1
+           disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-brand-600 text-white shadow-sm hover:bg-brand-700 active:bg-brand-800;
+  }
+  .btn-secondary {
+    @apply btn border border-stone-200 bg-white text-stone-700 hover:bg-stone-50 hover:text-stone-900
+           dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 dark:hover:bg-stone-800;
+  }
+  .btn-danger {
+    @apply btn bg-clinical-critical text-white hover:bg-red-800;
+  }
+  .btn-ghost {
+    @apply btn text-stone-600 hover:bg-stone-100 hover:text-stone-900 dark:text-stone-300 dark:hover:bg-stone-800;
+  }
+  /* Large CTA variant used on the login panel */
+  .btn-login {
+    @apply btn w-full justify-center rounded-xl bg-brand-600 py-3 text-base font-semibold text-white
+           shadow-lg shadow-brand-600/25 hover:bg-brand-700 hover:shadow-brand-700/30
+           active:scale-[0.99] transition-all duration-150;
+  }
+
+  /* ─── Inputs ─────────────────────────────────────────────────────────────── */
+  .input {
+    @apply block w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm
+           placeholder-stone-400 transition-colors
+           focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30
+           disabled:cursor-not-allowed disabled:bg-stone-50
+           dark:border-stone-700 dark:bg-stone-900 dark:placeholder-stone-500 dark:focus:border-brand-500;
+  }
+  .input-error {
+    @apply border-clinical-critical focus:border-clinical-critical focus:ring-clinical-critical/30;
+  }
+  /* Premium floating-style login input */
+  .input-login {
+    @apply block w-full rounded-xl border border-stone-200 bg-stone-50/60 px-4 py-3 text-sm text-stone-900
+           placeholder-stone-400 backdrop-blur-sm transition-all duration-200
+           focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20
+           dark:border-stone-700 dark:bg-stone-800/60 dark:text-stone-100 dark:placeholder-stone-500
+           dark:focus:border-brand-400 dark:focus:bg-stone-800;
+  }
+
+  /* ─── Cards ──────────────────────────────────────────────────────────────── */
+  .card {
+    @apply rounded-xl border border-stone-200/80 bg-white shadow-card dark:border-stone-800 dark:bg-stone-900;
+  }
+  /* A card that responds to hover — for clickable tiles. */
+  .card-interactive {
+    @apply card cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-card-hover
+           hover:border-brand-300 dark:hover:border-brand-700;
+  }
+  /* KPI / stat tile. */
+  .stat-card {
+    @apply card flex flex-col gap-1 p-4;
+  }
+
+  /* Glassmorphism card — used on login right panel */
+  .glass-card {
+    @apply rounded-2xl border border-white/20 bg-white/80 shadow-2xl backdrop-blur-xl
+           dark:border-stone-700/50 dark:bg-stone-900/80;
+  }
+
+  /* ─── Login page ─────────────────────────────────────────────────────────── */
+  .login-left-panel {
+    background: linear-gradient(145deg, #0d9488 0%, #0f766e 35%, #134e4a 70%, #042f2e 100%);
+  }
+  .login-right-panel {
+    @apply bg-stone-50 dark:bg-stone-950;
+  }
+  .login-feature-item {
+    @apply flex items-start gap-3 text-sm text-teal-100;
+  }
+  .login-feature-dot {
+    @apply mt-0.5 h-5 w-5 shrink-0 rounded-full bg-teal-400/30 flex items-center justify-center;
+  }
+
+  /* ─── Sidebar ────────────────────────────────────────────────────────────── */
+  .sidebar {
+    background: linear-gradient(180deg, #0d9488 0%, #0f766e 40%, #115e59 75%, #134e4a 100%);
+  }
+  .sidebar-nav-link {
+    @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-teal-100/80
+           transition-all duration-150
+           hover:bg-white/10 hover:text-white;
+  }
+  .sidebar-nav-link-active {
+    @apply bg-white/15 text-white shadow-sm;
+  }
+  .sidebar-section-label {
+    @apply px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-teal-300/60;
+  }
+
+  /* ─── Top bar ────────────────────────────────────────────────────────────── */
+  .topbar {
+    @apply flex items-center justify-between border-b border-stone-200/60 bg-white/80
+           px-4 py-2 backdrop-blur-md dark:border-stone-800/60 dark:bg-stone-900/80;
+  }
+
+  /* ─── Avatar ─────────────────────────────────────────────────────────────── */
+  .avatar {
+    @apply inline-flex items-center justify-center rounded-full bg-brand-600 text-white font-semibold select-none;
+  }
+  .avatar-sm { @apply avatar h-7 w-7 text-xs; }
+  .avatar-md { @apply avatar h-9 w-9 text-sm; }
+  .avatar-lg { @apply avatar h-11 w-11 text-base; }
+
+  /* ─── Module tiles (dashboard portal) ───────────────────────────────────── */
+  /* NOTE: add 'group' class directly in JSX — @apply cannot use group/group-hover */
+  .module-tile {
+    @apply flex items-center gap-4 rounded-2xl border border-stone-200/60 bg-white p-4
+           shadow-card transition-all duration-200 cursor-pointer
+           hover:-translate-y-1 hover:shadow-card-hover
+           dark:border-stone-800/60 dark:bg-stone-900;
+  }
+  .module-tile-icon {
+    @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-transform duration-200;
+  }
+  /* Scale icon when parent tile is hovered — cannot use @apply group-hover here */
+  .group:hover .module-tile-icon {
+    transform: scale(1.1);
+  }
+
+  /* ─── Stat strip ─────────────────────────────────────────────────────────── */
+  .stat-strip {
+    @apply flex flex-col gap-0.5 rounded-2xl border border-stone-200/60 bg-white p-4 shadow-card
+           dark:border-stone-800/60 dark:bg-stone-900;
+  }
+
+  /* ─── Labels + typography ────────────────────────────────────────────────── */
+  .label {
+    @apply mb-1 block text-xs font-medium text-stone-700 dark:text-stone-300;
+  }
+  .page-title {
+    @apply text-xl font-semibold tracking-tight text-stone-900 dark:text-stone-50;
+  }
+  .section-title {
+    @apply text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400;
+  }
+
+  /* ─── Nav (legacy + shared) ──────────────────────────────────────────────── */
+  .nav-link {
+    @apply flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-stone-600
+           transition-colors hover:bg-stone-100 hover:text-stone-900
+           dark:text-stone-300 dark:hover:bg-stone-800 dark:hover:text-stone-100;
+  }
+  .nav-link-active {
+    @apply bg-brand-50 text-brand-800 hover:bg-brand-50 hover:text-brand-800
+           dark:bg-brand-950/40 dark:text-brand-200 dark:hover:bg-brand-950/40 dark:hover:text-brand-200;
+  }
+
+  /* ─── Badges / pills ─────────────────────────────────────────────────────── */
+  .badge {
+    @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-medium
+           text-stone-600 dark:bg-stone-800 dark:text-stone-300;
+  }
+
+  /* ─── Clinical triage colours ────────────────────────────────────────────── */
+  .triage-red    { @apply bg-clinical-triage_red text-white; }
+  .triage-orange { @apply bg-clinical-triage_orange text-white; }
+  .triage-yellow { @apply bg-clinical-triage_yellow text-stone-900; }
+  .triage-green  { @apply bg-clinical-triage_green text-white; }
+  .triage-blue   { @apply bg-clinical-triage_blue text-white; }
+
+  /* ─── Online pulse dot ───────────────────────────────────────────────────── */
+  .pulse-dot {
+    @apply relative inline-flex h-2.5 w-2.5;
+  }
+  .pulse-dot::before {
+    content: '';
+    @apply absolute inline-flex h-full w-full animate-ping rounded-full bg-teal-300 opacity-75;
+  }
+  .pulse-dot::after {
+    content: '';
+    @apply relative inline-flex h-2.5 w-2.5 rounded-full bg-teal-400;
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+
+  /* Shake animation for login error */
+  .animate-shake {
+    animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  }
+  /* Slow float for the decorative illustration */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  /* Stagger-friendly entrance */
+  .animate-slide-up {
+    animation: slide-up 0.5s ease-out both;
+  }
+  .animate-fade-in {
+    animation: fade-in 0.4s ease-out both;
+  }
+}
+
+/* ─── Keyframes ──────────────────────────────────────────────────────────────── */
+@keyframes shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(3px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-14px); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
