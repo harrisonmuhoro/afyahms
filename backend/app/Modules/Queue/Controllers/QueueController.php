@@ -122,6 +122,7 @@ final class QueueController extends Controller
     public function startServing(Request $request, int $ticketId): JsonResource
     {
         $ticket = QueueTicket::query()->findOrFail($ticketId);
+        $this->authorize('manage', $ticket);
         $ticket = $this->service->startServing($ticket, $request->user());
 
         return new QueueTicketResource($ticket);
@@ -131,6 +132,7 @@ final class QueueController extends Controller
     public function complete(QueueActionRequest $request, int $ticketId): JsonResource
     {
         $ticket = QueueTicket::query()->findOrFail($ticketId);
+        $this->authorize('manage', $ticket);
         $nextStation = $request->input('next_station');
         $ticket = $this->service->complete($ticket, $request->user(), $nextStation);
 
@@ -141,6 +143,7 @@ final class QueueController extends Controller
     public function hold(QueueActionRequest $request, int $ticketId): JsonResource
     {
         $ticket = QueueTicket::query()->findOrFail($ticketId);
+        $this->authorize('manage', $ticket);
         $ticket = $this->service->hold($ticket, $request->user(), $request->input('reason'));
 
         return new QueueTicketResource($ticket);
@@ -150,6 +153,7 @@ final class QueueController extends Controller
     public function resume(Request $request, int $ticketId): JsonResource
     {
         $ticket = QueueTicket::query()->findOrFail($ticketId);
+        $this->authorize('manage', $ticket);
         $ticket = $this->service->resume($ticket, $request->user());
 
         return new QueueTicketResource($ticket);
@@ -159,6 +163,7 @@ final class QueueController extends Controller
     public function noShow(QueueActionRequest $request, int $ticketId): JsonResource
     {
         $ticket = QueueTicket::query()->findOrFail($ticketId);
+        $this->authorize('manage', $ticket);
         $ticket = $this->service->markNoShow($ticket, $request->user(), $request->input('reason'));
 
         return new QueueTicketResource($ticket);

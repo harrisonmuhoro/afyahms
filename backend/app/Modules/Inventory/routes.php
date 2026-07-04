@@ -7,5 +7,6 @@ Route::middleware(['api', 'auth:sanctum'])
     ->prefix('api/v1/inventory')
     ->name('inventory.')
     ->group(function () {
-    Route::get('items', [InventoryController::class, 'getItems']);
+    Route::get('items', [InventoryController::class, 'getItems'])
+        ->middleware('permission:inventory.read');
 });

@@ -5,7 +5,8 @@ import path from 'node:path';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const apiBaseUrl = env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
+  // Backend origin used only by the dev-server proxy (must be an absolute URL).
+  const backendOrigin = env.VITE_BACKEND_URL || 'http://localhost:8080';
 
   return {
     plugins: [
@@ -62,8 +63,8 @@ export default defineConfig(({ mode }) => {
       host: true,
       port: 5173,
       proxy: {
-        '/api': { target: apiBaseUrl.replace(/\/api\/v1$/, ''), changeOrigin: true },
-        '/broadcasting': { target: apiBaseUrl.replace(/\/api\/v1$/, ''), changeOrigin: true, ws: true },
+        '/api': { target: backendOrigin, changeOrigin: true },
+        '/broadcasting': { target: backendOrigin, changeOrigin: true, ws: true },
       },
     },
 

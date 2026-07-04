@@ -14,12 +14,7 @@ interface Appointment {
   notes?: string;
 }
 
-const INITIAL_APPOINTMENTS: Appointment[] = [
-  { id: 'APT-001', date: '25 Jun 2026', day: '25', month: 'Jun', time: '10:00 AM', provider: 'Dr. Mwangi', department: 'Cardiology', status: 'upcoming', notes: 'Please arrive 15 minutes early for registration.' },
-  { id: 'APT-002', date: '10 Jul 2026', day: '10', month: 'Jul', time: '2:30 PM', provider: 'Dr. Otieno', department: 'General Practice', status: 'upcoming' },
-  { id: 'APT-003', date: '12 Jun 2026', day: '12', month: 'Jun', time: '9:00 AM', provider: 'Dr. Mwangi', department: 'Cardiology', status: 'completed' },
-  { id: 'APT-004', date: '28 May 2026', day: '28', month: 'May', time: '11:30 AM', provider: 'Dr. Achieng', department: 'Diabetology', status: 'completed' },
-];
+const INITIAL_APPOINTMENTS: Appointment[] = [];
 
 const PROVIDERS = ['Dr. Mwangi (Cardiology)', 'Dr. Otieno (General Practice)', 'Dr. Achieng (Diabetology)', 'Dr. Kamau (Nutrition)', 'Dr. Wanjiku (Dermatology)'];
 const TIMES = ['08:00 AM', '09:00 AM', '10:00 AM', '11:00 AM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM'];

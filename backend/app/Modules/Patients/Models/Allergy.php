@@ -6,6 +6,7 @@ namespace App\Modules\Patients\Models;
 
 use App\Models\User;
 use App\Modules\Tenancy\Models\Branch;
+use App\Modules\Tenancy\Scopes\BranchScope;
 use App\Support\Concerns\HasBranch;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -33,6 +34,7 @@ class Allergy extends Model
     use HasBranch;
     use HasFactory;
     use SoftDeletes;
+    use \App\Modules\Patients\Traits\HasOwnPatientDataScope;
 
     protected $table = 'allergies';
 
@@ -54,6 +56,11 @@ class Allergy extends Model
         'onset_date' => 'date',
         'is_active'  => 'boolean',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new BranchScope());
+    }
 
     public function patient(): BelongsTo
     {

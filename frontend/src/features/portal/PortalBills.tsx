@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Icon } from '@/components/icons/Icon';
 import { PortalModal, ToastBanner } from './PortalModal';
+import { useAuth } from '@/features/auth/AuthProvider';
 
 interface Invoice {
   id: string;
@@ -11,12 +12,7 @@ interface Invoice {
   status: 'paid' | 'outstanding' | 'partial';
 }
 
-const INITIAL_INVOICES: Invoice[] = [
-  { id: 'INV-2026-0041', date: '22 Jun 2026', services: ['Lab: CBC', 'Lab: Lipid Panel', 'Consultation Fee'], amount: 3800, paid: 2480, status: 'partial' },
-  { id: 'INV-2026-0038', date: '12 Jun 2026', services: ['Cardiology Consultation', 'ECG'], amount: 4500, paid: 0, status: 'outstanding' },
-  { id: 'INV-2026-0029', date: '28 May 2026', services: ['Diabetology Consultation', 'HbA1c Test'], amount: 2850, paid: 2850, status: 'paid' },
-  { id: 'INV-2026-0015', date: '15 Mar 2026', services: ['Emergency Observation (48hr)', 'Nursing Care', 'Meals'], amount: 18500, paid: 18500, status: 'paid' },
-];
+const INITIAL_INVOICES: Invoice[] = [];
 
 const STATUS_CONFIG = {
   paid: { label: 'Paid', classes: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' },
@@ -25,6 +21,9 @@ const STATUS_CONFIG = {
 };
 
 export function PortalBills(): JSX.Element {
+  const { hasPermission } = useAuth();
+  const canPay = hasPermission('portal.pay');
+
   const [invoices, setInvoices] = useState<Invoice[]>(INITIAL_INVOICES);
   const [payModal, setPayModal] = useState<{ invoiceId: string | 'ALL'; amount: number } | null>(null);
   const [phone, setPhone] = useState('0712 345 678');
@@ -74,14 +73,16 @@ export function PortalBills(): JSX.Element {
           <p className="text-sm font-medium text-teal-200">Total Outstanding Balance</p>
           <p className="mt-1 text-4xl font-black tracking-tight">KES {totalOutstanding.toLocaleString()}</p>
           <p className="mt-1 text-sm text-teal-300">Across {invoices.filter((i) => i.status !== 'paid').length} invoice(s)</p>
-          <button
-            type="button"
-            onClick={() => setPayModal({ invoiceId: 'ALL', amount: totalOutstanding })}
-            className="mt-5 flex items-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 font-bold text-white shadow-md transition-all hover:bg-emerald-400"
-          >
-            <Icon name="payments" size={18} />
-            Pay All with M-Pesa
-          </button>
+          {canPay && (
+            <button
+              type="button"
+              onClick={() => setPayModal({ invoiceId: 'ALL', amount: totalOutstanding })}
+              className="mt-5 flex items-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 font-bold text-white shadow-md transition-all hover:bg-emerald-400"
+            >
+              <Icon name="payments" size={18} />
+              Pay All with M-Pesa
+            </button>
+          )}
         </div>
       ) : (
         <div className="flex items-center gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-800 dark:bg-emerald-900/20">
@@ -135,7 +136,7 @@ export function PortalBills(): JSX.Element {
                     </div>
                   )}
                 </div>
-                {outstanding > 0 && (
+                {outstanding > 0 && canPay && (
                   <button
                     type="button"
                     onClick={() => setPayModal({ invoiceId: inv.id, amount: outstanding })}

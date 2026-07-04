@@ -118,7 +118,7 @@ src/
 │   ├── http.types.ts             # ApiError, Paginated<T>, envelope types
 │   ├── permissions.ts            # can() / hasRole() helpers
 │   ├── format.ts                 # money (KES), dates (Africa/Nairobi)
-│   ├── storage.ts                # typed localStorage wrapper
+│   ├── preferences.ts            # typed user preferences API wrapper
 │   └── env.ts                    # validated import.meta.env access
 │
 ├── hooks/                        # Global cross-feature hooks
@@ -443,8 +443,8 @@ Server state is owned by TanStack Query. Zustand holds **only** client/session/U
 | Store | State | Persisted |
 |---|---|---|
 | `auth.store` | `accessToken`, `user`, `permissions[]`, `roles[]` | token in memory; user hydrated from `/auth/me` |
-| `branch.store` | `activeBranchId`, `branches[]` | `localStorage` |
-| `theme.store` | `mode: 'light' \| 'dark' \| 'system'` | `localStorage` |
+| `branch.store` | `activeBranchId`, `branches[]` | Auth/user branch API |
+| `theme.store` | `mode: 'light' \| 'dark' \| 'system'` | Auth/user preferences API |
 | `ui.store` | `sidebarOpen`, `commandPaletteOpen`, transient modals/toasts | no |
 
 ```ts
@@ -788,7 +788,7 @@ export const NAMESPACES = [
 ] as const;
 
 void i18n
-  .use(LanguageDetector)               // localStorage → navigator
+  .use(LanguageDetector)               // user profile -> navigator
   .use(
     resourcesToBackend(
       (lng: string, ns: string) => import(`./locales/${lng}/${ns}.json`),  // lazy chunks
@@ -801,7 +801,7 @@ void i18n
     ns: ['common'],
     defaultNS: 'common',
     interpolation: { escapeValue: false },   // React already escapes
-    detection: { order: ['localStorage', 'navigator'], caches: ['localStorage'] },
+    detection: { order: ['userProfile', 'navigator'], caches: [] },
   });
 
 export default i18n;
@@ -850,7 +850,7 @@ export function LanguageSwitcher() {
 
 ## 9. Theming — light/dark
 
-Tailwind `darkMode: 'class'`. The active mode is resolved from the Zustand `theme.store` (`light` | `dark` | `system`) and applied as a class on `<html>`. Persisted in `localStorage`; respects `prefers-color-scheme` when set to `system`.
+Tailwind `darkMode: 'class'`. The active mode is resolved from the authenticated user preferences (`light` | `dark` | `system`) and applied as a class on `<html>`. Persisted on the user profile in the database; respects `prefers-color-scheme` before the authenticated profile is loaded.
 
 ```ts
 // src/features/ui/theme.store.ts

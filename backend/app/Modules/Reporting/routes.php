@@ -7,6 +7,8 @@ Route::middleware(['api', 'auth:sanctum'])
     ->prefix('api/v1/reports')
     ->name('reports.')
     ->group(function () {
-    Route::get('dashboard', [ReportingController::class, 'getDashboardStats']);
-    Route::get('{type}', [ReportingController::class, 'getReportData']);
+    Route::get('dashboard', [ReportingController::class, 'getDashboardStats'])
+        ->middleware('permission:reporting.read');
+    Route::get('{type}', [ReportingController::class, 'getReportData'])
+        ->middleware('permission:reporting.read');
 });

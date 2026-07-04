@@ -43,6 +43,19 @@ final class QueueService
         'billing'   => 'BIL',
     ];
 
+    /** Pipeline order per docs/28 §6. */
+    public const PIPELINE_ORDER = [
+        'REC' => 1,
+        'TRI' => 2,
+        'DOC' => 3,
+        'RAD' => 4,
+        'LAB' => 5,
+        'PHA' => 6,
+        'BIL' => 7,
+    ];
+
+    private const ACTIVE_TICKET_STATES = ['issued', 'waiting', 'called', 'in_service', 'held'];
+
     public function __construct(
         private readonly QueueRepository $queue,
         private readonly SequenceService $sequences,
@@ -60,6 +73,32 @@ final class QueueService
             $branchId = $this->resolveBranchId($actor);
             $patientId = (int) $visitAttributes['patient_id'];
 
+            Patient::query()->whereKey($patientId)->lockForUpdate()->firstOrFail();
+
+            // Validate profile completeness before issuing a ticket
+            if (empty($patient->first_name) || empty($patient->last_name) || empty($patient->gender) || empty($patient->date_of_birth)) {
+                throw new ValidationFailedException(
+                    'Patient profile is incomplete. Basic demographics (name, gender, date of birth) are required before a ticket can be issued.',
+                    ['code' => 'INCOMPLETE_PROFILE']
+                );
+            }
+
+            if ($patient->ageYears() < 18) {
+                if (empty($patient->guardian_name) || empty($patient->guardian_national_id) || empty($patient->guardian_relationship)) {
+                    throw new ValidationFailedException(
+                        'Patient is a minor. Guardian name, relationship, and national ID are required before a ticket can be issued.',
+                        ['code' => 'INCOMPLETE_GUARDIAN_DETAILS']
+                    );
+                }
+            } else {
+                if (empty($patient->national_id)) {
+                    throw new ValidationFailedException(
+                        'Adult patients must provide a National ID before a ticket can be issued.',
+                        ['code' => 'MISSING_NATIONAL_ID']
+                    );
+                }
+            }
+
             // Block duplicate open visit on same day.
             $existing = Visit::query()
                 ->where('patient_id', $patientId)
@@ -75,18 +114,38 @@ final class QueueService
                 );
             }
 
-            /** @var Patient $patient */
-            $patient = Patient::query()->findOrFail($patientId);
+            $issuedTicket = $this->ticketForPatientOnDate($branchId, $patientId, today()->toDateString());
+            if ($issuedTicket !== null) {
+                throw new ConflictException(
+                    'Patient has already been issued a queue ticket today. Use the existing visit instead.',
+                    409,
+                    [
+                        'code' => 'DUPLICATE_DAILY_TICKET',
+                        'ticket_id' => $issuedTicket->id,
+                        'ticket_number' => $issuedTicket->ticket_number,
+                    ],
+                );
+            }
+
+            // Generate a human-readable visit number (e.g. VIS-2026-000042).
+            // Resets annually; unique per branch per year.
+            $visitYear   = Carbon::now()->year;
+            $visitNumber = $this->sequences->next(
+                scope: "visit:{$branchId}:{$visitYear}",
+                prefix: "VIS-{$visitYear}",
+                digits: 6,
+            );
 
             /** @var Visit $visit */
             $visit = $this->queue->createVisit([
-                'public_id'    => (string) Str::uuid(),
-                'branch_id'    => $branchId,
-                'patient_id'   => $patientId,
-                'visit_date'   => today()->toDateString(),
-                'visit_type'   => $visitAttributes['visit_type'] ?? 'walk_in',
-                'status'       => 'open',
-                'registered_by'=> $actor->id,
+                'public_id'     => (string) Str::uuid(),
+                'visit_number'  => $visitNumber,
+                'branch_id'     => $branchId,
+                'patient_id'    => $patientId,
+                'visit_date'    => today()->toDateString(),
+                'visit_type'    => $visitAttributes['visit_type'] ?? 'walk_in',
+                'status'        => 'open',
+                'registered_by' => $actor->id,
             ]);
 
             // Issue ticket at Reception (entry station).
@@ -109,6 +168,8 @@ final class QueueService
     public function issueTicket(Visit $visit, string $stationCode, User $actor, array $overrides = []): QueueTicket
     {
         return DB::transaction(function () use ($visit, $stationCode, $actor, $overrides): QueueTicket {
+            /** @var Visit $visit */
+            $visit = Visit::query()->lockForUpdate()->findOrFail($visit->id);
             $branchId = (int) $visit->branch_id;
 
             /** @var QueueStation|null $station */
@@ -123,6 +184,38 @@ final class QueueService
             $date = $visit->visit_date instanceof Carbon
                 ? $visit->visit_date->toDateString()
                 : (string) $visit->visit_date;
+
+            $activeTicket = $this->activeTicketForPatient($branchId, (int) $visit->patient_id, $date);
+            if ($activeTicket !== null) {
+                throw new ConflictException(
+                    'Patient already has an active queue ticket. Complete or cancel the existing ticket before issuing another.',
+                    409,
+                    [
+                        'code' => 'DUPLICATE_ACTIVE_TICKET',
+                        'ticket_id' => $activeTicket->id,
+                        'ticket_number' => $activeTicket->ticket_number,
+                    ],
+                );
+            }
+
+            // Forward-only rule (docs/28 §6): block if completed ticket exists at same/later pipeline position.
+            $targetPosition = self::PIPELINE_ORDER[$stationCode] ?? 99;
+            $completedTickets = QueueTicket::query()
+                ->where('visit_id', $visit->id)
+                ->whereIn('state', ['completed', 'transferred'])
+                ->get();
+
+            foreach ($completedTickets as $t) {
+                $pos = self::PIPELINE_ORDER[substr($t->ticket_number, 0, 3)] ?? 0;
+                if ($pos >= $targetPosition) {
+                    if (!($actor->can('queue.void') && $actor->can('queue.override-priority') && !empty($overrides['reason']))) {
+                        throw new ValidationFailedException(
+                            "Patient has already completed a department at or past {$stationCode} on this visit.",
+                            ['code' => 'PIPELINE_FORWARD_ONLY_VIOLATION']
+                        );
+                    }
+                }
+            }
 
             // Daily-reset per-(branch,station,date): scope encodes date, prefix is just
             // the 3-letter department code (e.g. "TRI"). Sequence resets at local midnight.
@@ -258,6 +351,14 @@ final class QueueService
                         'reason'       => "advanced from {$ticket->ticket_number}",
                     ]);
                 }
+            } else {
+                // Visit auto-closure at pipeline end (docs/28 §14): system-initiated,
+                // no `visits.close` permission required. The visits.status enum has no
+                // 'closed' value — the canonical terminal state is 'completed'.
+                $visit = $ticket->visit()->first();
+                if ($visit !== null) {
+                    $visit->update(['status' => 'completed', 'closed_at' => now()]);
+                }
             }
 
             return $ticket->refresh();
@@ -283,8 +384,17 @@ final class QueueService
         return DB::transaction(function () use ($ticket, $actor): QueueTicket {
             /** @var QueueTicket $ticket */
             $ticket = $this->queue->ticketForUpdate($ticket->id);
+
+            // Calculate hold credit per docs/28 §16
+            $holdEvent = $ticket->events()->where('event_type', 'held')->latest('occurred_at')->first();
+            $holdDuration = $holdEvent ? now()->diffInSeconds($holdEvent->occurred_at) : 0;
+            $holdCredit = min($holdDuration / 2, 5400);
+
             $this->queue->updateTicket($ticket, ['state' => 'waiting']);
-            $this->recordEvent($ticket, 'resumed', 'held', 'waiting', $actor);
+            $this->recordEvent($ticket, 'resumed', 'held', 'waiting', $actor, [
+                'hold_duration_seconds' => $holdDuration,
+                'hold_credit'           => $holdCredit,
+            ]);
 
             return $ticket->refresh();
         });
@@ -424,5 +534,29 @@ final class QueueService
     private function branchCode(int $branchId): string
     {
         return (string) (\App\Modules\Tenancy\Models\Branch::query()->find($branchId)?->code ?? 'NRB');
+    }
+
+    private function activeTicketForPatient(int $branchId, int $patientId, string $date, ?int $stationId = null): ?QueueTicket
+    {
+        return QueueTicket::query()
+            ->where('branch_id', $branchId)
+            ->where('patient_id', $patientId)
+            ->whereDate('ticket_date', $date)
+            ->whereIn('state', self::ACTIVE_TICKET_STATES)
+            ->when($stationId !== null, fn ($query) => $query->where('station_id', $stationId))
+            ->lockForUpdate()
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    private function ticketForPatientOnDate(int $branchId, int $patientId, string $date): ?QueueTicket
+    {
+        return QueueTicket::query()
+            ->where('branch_id', $branchId)
+            ->where('patient_id', $patientId)
+            ->whereDate('ticket_date', $date)
+            ->lockForUpdate()
+            ->orderByDesc('id')
+            ->first();
     }
 }

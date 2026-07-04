@@ -7,6 +7,7 @@ namespace App\Modules\Triage\Models;
 use App\Modules\Tenancy\Scopes\BranchScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property int    $id
@@ -33,6 +34,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class TriageAssessment extends Model
 {
+    use SoftDeletes;
+    use \App\Modules\Patients\Traits\HasOwnPatientDataScope;
+
     protected $table = 'triage_assessments';
 
     protected $fillable = [

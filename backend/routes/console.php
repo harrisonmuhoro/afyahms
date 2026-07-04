@@ -21,3 +21,5 @@ app(Schedule::class)
     ->command('queue:prune-failed --hours=72')->daily();
 app(Schedule::class)
     ->command('cache:prune-stale-tags')->hourly();
+app(Schedule::class)
+    ->command('staff:purge-expired-contact-changes')->hourly();

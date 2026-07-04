@@ -63,6 +63,7 @@ export interface Visit {
   patient_id: number;
   patient_name: string | null;
   patient_number: string | null;
+  visit_number: string | null;
   visit_date: string;
   visit_type: 'walk_in' | 'appointment' | 'referral' | 'follow_up' | 'emergency';
   status: 'open' | 'in_progress' | 'completed' | 'cancelled';

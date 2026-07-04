@@ -10,13 +10,21 @@ class AuditController extends Controller
 {
     public function getLogs(Request $request)
     {
-        $query = DB::table('activity_log')
-            ->leftJoin('users', 'activity_log.causer_id', '=', 'users.id')
-            ->select('activity_log.*', 'users.name as causer_name')
-            ->orderBy('activity_log.created_at', 'desc');
+        $query = DB::table('audit_logs')
+            ->leftJoin('users', 'audit_logs.causer_id', '=', 'users.id')
+            ->select('audit_logs.*', 'users.name as causer_name')
+            ->orderBy('audit_logs.created_at', 'desc');
 
         if ($request->has('event')) {
-            $query->where('activity_log.event', 'like', '%' . $request->query('event') . '%');
+            $query->where('audit_logs.event', 'like', '%' . $request->query('event') . '%');
+        }
+
+        if (! $request->user()?->hasRole('superadmin')) {
+            $branchId = app()->bound('active_branch_id')
+                ? app('active_branch_id')
+                : $request->user()?->current_branch_id;
+
+            $query->where('audit_logs.branch_id', $branchId);
         }
 
         $paginated = $query->paginate(20);
@@ -27,9 +35,16 @@ class AuditController extends Controller
             return [
                 'id' => $item->id,
                 'created_at' => $item->created_at,
-                'event' => $item->event ?? $item->description,
+                'event' => $item->event,
+                'action' => $item->action ?? null,
                 'subject_type' => $item->subject_type,
                 'subject_id' => $item->subject_id,
+                'actor_role' => $item->actor_role ?? null,
+                'field_name' => $item->field_name ?? null,
+                'old_value' => $item->old_value ?? null,
+                'new_value' => $item->new_value ?? null,
+                'ip_address' => $item->ip_address ?? null,
+                'break_glass_reason' => $item->break_glass_reason ?? null,
                 'causer' => $item->causer_name ? ['name' => $item->causer_name] : null,
                 'properties' => $properties,
             ];

@@ -18,6 +18,7 @@ final class VisitResource extends JsonResource
         return [
             'id'                 => $this->id,
             'public_id'          => $this->public_id,
+            'visit_number'       => $this->visit_number,
             'branch_id'          => $this->branch_id,
             'patient_id'         => $this->patient_id,
             'patient_name'       => trim(($this->patient?->first_name ?? '').' '.($this->patient?->last_name ?? '')) ?: null,

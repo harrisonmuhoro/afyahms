@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\VerificationController;
+use App\Http\Controllers\PharmacyController;
+use App\Modules\Documents\Controllers\DocumentsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,20 +17,38 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('v1')->name('api.')->group(function () {
-    // Up health-check is auto-registered via withRouting(health: '/up').
-    
-    // Pharmacy routes
-    Route::prefix('pharmacy')->group(function () {
-        Route::get('/medications', [\App\Http\Controllers\PharmacyController::class, 'getMedications']);
-        Route::post('/medications', [\App\Http\Controllers\PharmacyController::class, 'storeMedication']);
-        Route::get('/prescriptions', [\App\Http\Controllers\PharmacyController::class, 'getPrescriptions']);
-        Route::post('/prescriptions', [\App\Http\Controllers\PharmacyController::class, 'storePrescription']);
-        Route::put('/prescriptions/{id}/status', [\App\Http\Controllers\PharmacyController::class, 'updatePrescriptionStatus']);
-    });
+
+    // ── Account & Security ─────────────────────────────────────────────────
+    Route::prefix('account')
+        ->name('account.')
+        ->middleware(['auth:sanctum', 'throttle:60,1'])
+        ->group(function () {
+            Route::post('send-otp',   [VerificationController::class, 'send'])
+                ->name('send-otp');
+            Route::post('verify-otp', [VerificationController::class, 'verify'])
+                ->name('verify-otp');
+        });
+
+    // ── Pharmacy (temporary — move to Pharmacy module) ─────────────────────
+    Route::prefix('pharmacy')
+        ->middleware(['auth:sanctum'])
+        ->group(function () {
+            Route::get('/medications', [PharmacyController::class, 'getMedications'])
+                ->middleware('permission:pharmacy.view-stock');
+            Route::post('/medications', [PharmacyController::class, 'storeMedication'])
+                ->middleware('permission:pharmacy.manage-catalog');
+            Route::get('/prescriptions', [PharmacyController::class, 'getPrescriptions'])
+                ->middleware('permission:prescriptions.read');
+            Route::post('/prescriptions', [PharmacyController::class, 'storePrescription'])
+                ->middleware('permission:prescriptions.create');
+            Route::put('/prescriptions/{id}/status', [PharmacyController::class, 'updatePrescriptionStatus'])
+                ->middleware('permission:prescriptions.dispense');
+        });
 });
 
 // Catch-all: signed document downloads via the local-disk fallback.
-Route::get('documents/signed/{disk}/{path}', [\App\Modules\Documents\Controllers\DocumentsController::class, 'show'])
+// Intentionally outside v1 prefix — signed URLs must remain stable.
+Route::get('documents/signed/{disk}/{path}', [DocumentsController::class, 'show'])
     ->middleware('signed')
     ->where('path', '.*')
     ->name('documents.signed');

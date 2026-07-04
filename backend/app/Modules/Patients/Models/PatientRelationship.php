@@ -26,6 +26,7 @@ class PatientRelationship extends Model
 {
     use HasFactory;
     use SoftDeletes;
+    use \App\Modules\Patients\Traits\HasOwnPatientDataScope;
 
     protected $table = 'patient_relationships';
 

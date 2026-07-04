@@ -38,9 +38,10 @@
     "generic": "Hitilafu fulani imetokea. Tafadhali jaribu tena.",
     "network": "Hitilafu ya mtandao. Angalia muunganisho wako.",
     "unauthorized": "Kikao chako kimeisha. Tafadhali ingia tena.",
-    "forbidden": "Huna ruhusa ya kufanya kitendo hiki.",
+    "forbidden": "Jukumu lako haliruhusiwi kufanya hili.",
     "not_found": "Rasilimali uliyoomba haikupatikana.",
-    "validation": "Tafadhali sahihisha sehemu zilizoangaziwa."
+    "validation": "Tafadhali sahihisha sehemu zilizoangaziwa.",
+    "access_denied_title": "Ufikiaji umekataliwa"
   },
   "auth": {
     "login": {
@@ -87,6 +88,8 @@
   },
   "nav": {
     "dashboard": "Dashibodi",
+    "profile": "Wasifu Wangu",
+    "staff": "Wafanyakazi",
     "branches": "Matawi",
     "patients": "Wagonjwa",
     "appointments": "Miadi",
@@ -274,6 +277,7 @@
     "save_amendment": "Hifadhi marekebisho",
     "save_draft": "Hifadhi rasimu",
     "sign": "Saini noti",
+    "sign_requires_content": "Andika maudhui ya noti kabla ya kusaini.",
     "signing": "Inasaini…",
     "signed": "Noti imesainiwa.",
     "saved": "Noti imehifadhiwa.",

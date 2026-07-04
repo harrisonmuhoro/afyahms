@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Patients\Models;
 
 use App\Modules\Tenancy\Models\Branch;
+use App\Modules\Tenancy\Scopes\BranchScope;
 use App\Support\Concerns\HasBranch;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -34,6 +35,7 @@ class PatientNextOfKin extends Model
     use HasBranch;
     use HasFactory;
     use SoftDeletes;
+    use \App\Modules\Patients\Traits\HasOwnPatientDataScope;
 
     protected $table = 'patient_next_of_kin';
 
@@ -56,6 +58,11 @@ class PatientNextOfKin extends Model
         'is_primary'   => 'boolean',
         'is_emergency' => 'boolean',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new BranchScope());
+    }
 
     public function patient(): BelongsTo
     {

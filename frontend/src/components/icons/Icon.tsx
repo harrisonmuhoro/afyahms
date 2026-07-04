@@ -39,6 +39,7 @@ import {
   Clock,
   ArrowLeft,
   MessageSquare,
+  AlertCircle,
   Download,
   type LucideIcon,
 } from 'lucide-react';
@@ -92,6 +93,9 @@ const REGISTRY = {
   calendar: Calendar,
   message: MessageSquare,
   download: Download,
+  alertCircle: AlertCircle,
+  shield: ShieldCheck,
+  medical: HeartPulse,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof REGISTRY;

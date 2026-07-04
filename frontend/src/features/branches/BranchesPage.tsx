@@ -1,11 +1,32 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useBranches } from './BranchProvider';
+import type { Branch } from './BranchProvider';
 import { Icon } from '@/components/icons/Icon';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { BranchModal } from './BranchModal';
 
 export function BranchesPage(): JSX.Element {
   const { t } = useTranslation(['branches', 'common']);
   const { branches, isLoading, error } = useBranches();
+  const { hasPermission } = useAuth();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [branchToEdit, setBranchToEdit] = useState<Branch | null>(null);
+
+  const canCreate = hasPermission('branches.create');
+  const canUpdate = hasPermission('branches.update');
+
+  const openAddModal = () => {
+    setBranchToEdit(null);
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (branch: Branch) => {
+    setBranchToEdit(branch);
+    setIsModalOpen(true);
+  };
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-12">
@@ -16,9 +37,14 @@ export function BranchesPage(): JSX.Element {
           </h1>
           <p className="mt-2 text-sm text-stone-500 font-medium">Manage hospital locations and clinics</p>
         </div>
-        <button className="px-4 py-2 bg-stone-900 dark:bg-white text-white dark:text-stone-900 rounded-xl font-medium shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
-          + Add Branch
-        </button>
+        {canCreate && (
+          <button 
+            onClick={openAddModal}
+            className="px-4 py-2 bg-stone-900 dark:bg-white text-white dark:text-stone-900 rounded-xl font-medium shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+          >
+            + Add Branch
+          </button>
+        )}
       </div>
 
       {error !== null && (
@@ -90,14 +116,19 @@ export function BranchesPage(): JSX.Element {
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-stone-100 dark:border-stone-800/80 flex gap-2 relative z-10">
-              <button className="flex-1 px-3 py-2 bg-stone-50 dark:bg-stone-800 hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-brand-500/20 text-stone-700 dark:text-stone-300 text-xs font-semibold rounded-lg transition-colors">
-                Edit Details
-              </button>
-              <button className="flex-1 px-3 py-2 bg-stone-50 dark:bg-stone-800 hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-brand-500/20 text-stone-700 dark:text-stone-300 text-xs font-semibold rounded-lg transition-colors">
-                Settings
-              </button>
-            </div>
+            {canUpdate && (
+              <div className="mt-6 pt-4 border-t border-stone-100 dark:border-stone-800/80 flex gap-2 relative z-10">
+                <button 
+                  onClick={() => openEditModal(branch)}
+                  className="flex-1 px-3 py-2 bg-stone-50 dark:bg-stone-800 hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-brand-500/20 text-stone-700 dark:text-stone-300 text-xs font-semibold rounded-lg transition-colors"
+                >
+                  Edit Details
+                </button>
+                <button className="flex-1 px-3 py-2 bg-stone-50 dark:bg-stone-800 hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-brand-500/20 text-stone-700 dark:text-stone-300 text-xs font-semibold rounded-lg transition-colors">
+                  Settings
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -107,6 +138,12 @@ export function BranchesPage(): JSX.Element {
           <Icon name="arrowLeft" size={16} /> Back to Dashboard
         </Link>
       </p>
+
+      <BranchModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        branchToEdit={branchToEdit} 
+      />
     </div>
   );
 }

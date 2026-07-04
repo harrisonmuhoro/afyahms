@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
-import { useAuth } from '@/features/auth/AuthProvider';
+import { PermissionButton } from '@/components/auth/PermissionButton';
 import {
   useAddDiagnosis,
   useAmendSoap,
@@ -22,7 +22,6 @@ export function EncounterPage(): JSX.Element {
   const { t } = useTranslation(['emr', 'common', 'errors']);
   const { visitId: visitIdRaw } = useParams<{ visitId: string }>();
   const visitId = visitIdRaw !== undefined ? Number(visitIdRaw) : NaN;
-  const { hasPermission } = useAuth();
 
   const { encounter, isLoading } = useEncounterByVisit(visitId);
   const openEncounter = useOpenEncounter();
@@ -66,11 +65,15 @@ export function EncounterPage(): JSX.Element {
       ) : encounter === null ? (
         <div className="card space-y-3 p-6 text-center">
           <p className="text-sm text-stone-600 dark:text-stone-300">{t('emr:no_encounter')}</p>
-          {hasPermission('emr.create') && (
-            <button type="button" onClick={onOpen} disabled={openEncounter.isPending} className="btn-primary text-sm disabled:opacity-50">
-              {openEncounter.isPending ? t('emr:opening') : t('emr:open_encounter')}
-            </button>
-          )}
+          <PermissionButton
+            permission="emr.create"
+            type="button"
+            onClick={onOpen}
+            disabled={openEncounter.isPending}
+            className="btn-primary text-sm disabled:opacity-50"
+          >
+            {openEncounter.isPending ? t('emr:opening') : t('emr:open_encounter')}
+          </PermissionButton>
         </div>
       ) : (
         <EncounterWorkspace encounter={encounter} />
@@ -81,7 +84,6 @@ export function EncounterPage(): JSX.Element {
 
 function EncounterWorkspace({ encounter }: { encounter: Encounter }): JSX.Element {
   const { t } = useTranslation(['emr', 'common', 'errors']);
-  const { hasPermission } = useAuth();
   const note = encounter.soap_note;
   const signed = note?.is_signed ?? false;
 
@@ -113,6 +115,7 @@ function EncounterWorkspace({ encounter }: { encounter: Encounter }): JSX.Elemen
   const complete = useCompleteEncounter(encounter.id);
 
   const readOnly = (signed && !amendMode) || encounter.status === 'completed';
+  const noteIsEmpty = ![note?.subjective, note?.objective, note?.assessment, note?.plan].some((v) => (v ?? '').trim() !== '');
 
   const handleError = (err: unknown): void => {
     setError(err instanceof Error ? err.message : t('errors:generic'));
@@ -192,45 +195,46 @@ function EncounterWorkspace({ encounter }: { encounter: Encounter }): JSX.Elemen
         <SoapField label={t('emr:soap.plan')} value={soap.plan ?? ''} readOnly={readOnly} onChange={(v) => setSoap((s) => ({ ...s, plan: v }))} />
 
         <div className="flex flex-wrap justify-end gap-2 border-t border-stone-200 pt-3 dark:border-stone-800">
-          {signed && !amendMode && hasPermission('emr.amend') && encounter.status !== 'completed' && (
-            <button type="button" onClick={() => setAmendMode(true)} className="btn-secondary text-sm">
+          {signed && !amendMode && encounter.status !== 'completed' && (
+            <PermissionButton permission="emr.amend" type="button" onClick={() => setAmendMode(true)} className="btn-secondary text-sm">
               {t('emr:amend')}
-            </button>
+            </PermissionButton>
           )}
           {amendMode && (
             <button type="button" onClick={() => setAmendMode(false)} className="btn-ghost text-sm">
               {t('common:cancel')}
             </button>
           )}
-          {!readOnly && hasPermission('emr.update') && (
-            <button type="submit" disabled={saveSoap.isPending || amendSoap.isPending} className="btn-primary text-sm disabled:opacity-50">
+          {!readOnly && (
+            <PermissionButton permission="emr.update" type="submit" disabled={saveSoap.isPending || amendSoap.isPending} className="btn-primary text-sm disabled:opacity-50">
               {amendMode ? t('emr:save_amendment') : t('emr:save_draft')}
-            </button>
+            </PermissionButton>
           )}
-          {!signed && !amendMode && hasPermission('emr.sign') && encounter.status !== 'completed' && (
-            <button type="button" onClick={onSign} disabled={signSoap.isPending} className="btn-primary text-sm disabled:opacity-50">
+          {!signed && !amendMode && encounter.status !== 'completed' && (
+            <PermissionButton permission="emr.sign" type="button" onClick={onSign} disabled={signSoap.isPending || noteIsEmpty} title={noteIsEmpty ? t('emr:sign_requires_content') : undefined} className="btn-primary text-sm disabled:opacity-50">
               {signSoap.isPending ? t('emr:signing') : t('emr:sign')}
-            </button>
+            </PermissionButton>
           )}
         </div>
       </form>
 
       <DiagnosesSection encounter={encounter} />
 
-      {encounter.status !== 'completed' && hasPermission('emr.update') && (
+      {encounter.status !== 'completed' && (
         <div className="card flex flex-wrap items-center justify-between gap-3 p-4">
           <span className="text-sm font-medium">{t('emr:complete_encounter')}</span>
           <div className="flex flex-wrap gap-2">
             {DISPOSITIONS.map((d) => (
-              <button
+              <PermissionButton
                 key={d}
+                permission="emr.update"
                 type="button"
                 onClick={() => void onComplete(d)}
                 disabled={complete.isPending}
                 className="btn-secondary text-xs disabled:opacity-50"
               >
                 {t(`emr:disposition.${d}`)}
-              </button>
+              </PermissionButton>
             ))}
           </div>
         </div>
@@ -241,14 +245,13 @@ function EncounterWorkspace({ encounter }: { encounter: Encounter }): JSX.Elemen
 
 function DiagnosesSection({ encounter }: { encounter: Encounter }): JSX.Element {
   const { t } = useTranslation(['emr', 'common', 'errors']);
-  const { hasPermission } = useAuth();
   const [term, setTerm] = useState('');
   const [error, setError] = useState<string | null>(null);
   const { results, isLoading } = useDiagnosisCatalogSearch(term);
   const addDiagnosis = useAddDiagnosis(encounter.id);
   const removeDiagnosis = useRemoveDiagnosis(encounter.id);
 
-  const canEdit = hasPermission('diagnoses.create') && encounter.status !== 'completed';
+  const editable = encounter.status !== 'completed';
 
   const onAdd = async (code: string, description: string): Promise<void> => {
     setError(null);
@@ -275,10 +278,15 @@ function DiagnosesSection({ encounter }: { encounter: Encounter }): JSX.Element 
                 <span className="ml-2 text-stone-700 dark:text-stone-200">{dx.description}</span>
                 <span className="ml-2 text-[10px] uppercase text-stone-400">{t(`emr:diagnosis_type.${dx.diagnosis_type}`)}</span>
               </span>
-              {canEdit && hasPermission('diagnoses.delete') && (
-                <button type="button" onClick={() => void removeDiagnosis.mutateAsync(dx.id)} className="btn-ghost text-xs text-red-600">
+              {editable && (
+                <PermissionButton
+                  permission="diagnoses.delete"
+                  type="button"
+                  onClick={() => void removeDiagnosis.mutateAsync(dx.id)}
+                  className="btn-ghost text-xs text-red-600"
+                >
                   {t('common:remove')}
-                </button>
+                </PermissionButton>
               )}
             </li>
           ))}
@@ -287,7 +295,7 @@ function DiagnosesSection({ encounter }: { encounter: Encounter }): JSX.Element 
 
       {error !== null && <p className="text-xs text-amber-700">{error}</p>}
 
-      {canEdit && (
+      {editable && (
         <div className="space-y-2">
           <input
             type="text"
@@ -305,7 +313,8 @@ function DiagnosesSection({ encounter }: { encounter: Encounter }): JSX.Element 
               ) : (
                 results.map((entry) => (
                   <li key={entry.id}>
-                    <button
+                    <PermissionButton
+                      permission="diagnoses.create"
                       type="button"
                       onClick={() => void onAdd(entry.code, entry.description)}
                       disabled={addDiagnosis.isPending}
@@ -313,7 +322,7 @@ function DiagnosesSection({ encounter }: { encounter: Encounter }): JSX.Element 
                     >
                       <span className="font-mono text-xs font-semibold text-brand-700 dark:text-brand-300">{entry.code}</span>
                       <span className="text-stone-700 dark:text-stone-200">{entry.description}</span>
-                    </button>
+                    </PermissionButton>
                   </li>
                 ))
               )}

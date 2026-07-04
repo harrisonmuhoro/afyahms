@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Middleware\ForceJsonResponse;
 use App\Http\Middleware\IdleSessionTimeout;
 use App\Http\Middleware\LogPhiAccess;
+use App\Http\Middleware\RequireBreakGlassReason;
 use App\Http\Middleware\SecureHeaders;
 use App\Http\Middleware\SetActiveBranch;
 use App\Http\Middleware\EnforceBranchScope;
@@ -42,9 +43,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'mfa.confirmed' => EnsureMfaConfirmed::class,
             'idle.timeout' => IdleSessionTimeout::class,
             'phi.log' => LogPhiAccess::class,
+            'break.glass' => RequireBreakGlassReason::class,
             'force.json' => ForceJsonResponse::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'profile.complete' => \App\Http\Middleware\EnsureProfileComplete::class,
         ]);
 
         $middleware->throttleApi('120,1');   // default; tightened per route

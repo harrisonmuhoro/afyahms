@@ -12,7 +12,9 @@ final class DatabaseSeeder extends Seeder
     {
         $this->call([
             InitialSeeder::class,
+            QueueStationSeeder::class,
             PatientSeeder::class,
+            InventorySeeder::class,
         ]);
     }
 }

@@ -15,6 +15,7 @@ function initials(name: string): string {
 
 const PORTAL_NAV = [
   { to: '/portal', key: 'Home' },
+  { to: '/portal/profile', key: 'My Profile' },
   { to: '/portal/appointments', key: 'Appointments' },
   { to: '/portal/records', key: 'Records' },
   { to: '/portal/results', key: 'Results' },

@@ -367,8 +367,8 @@ Fixed, `h-14`, `bg-surface`, bottom `border`, `z-nav`. Left → right:
 2. **Brand** — Afya wordmark + mark; links to dashboard. Hidden < `sm` to save room.
 3. **Global search / command palette** — input that opens the `⌘K` palette: jump to patient by number/name, navigate, run actions. `aria-label="Search patients and actions"`.
 4. **Branch switcher** (right cluster) — dropdown showing active branch code+name (foundation §4). Switching sets `active_branch_id`; triggers a confirm if unsaved work exists. Hidden/disabled for single-branch users.
-5. **Language toggle** — `EN / SW` segmented control (react-i18next). Persists to localStorage + user profile.
-6. **Theme toggle** — `light / dark / system` cycle button (`sun`/`moon`/`monitor`). Persisted (Zustand + localStorage).
+5. **Language toggle** — `EN / SW` segmented control (react-i18next). Persists to the authenticated user profile in the database.
+6. **Theme toggle** — `light / dark / system` cycle button (`sun`/`moon`/`monitor`). Persists to the authenticated user profile in the database.
 7. **Notifications** — bell with unread count badge; opens a drawer/popover list (queue calls, lab results ready, low-stock, claim status). Live via broadcasting.
 8. **User menu** — avatar + name + role; dropdown: profile, my branches, security/MFA, help, sign out.
 
@@ -1041,7 +1041,7 @@ Motion is functional — it explains spatial/state relationships and directs att
 
 ### 10.2 Internationalisation (react-i18next)
 - **No hardcoded user-facing strings** (foundation §10) — every string is a key; namespaces per feature.
-- Locales: **`en` + `sw` (Kiswahili)**; switchable at runtime via the topbar toggle, persisted (profile + localStorage), sets `<html lang>`.
+- Locales: **`en` + `sw` (Kiswahili)**; switchable at runtime via the topbar toggle, persisted on the user profile in the database, sets `<html lang>`.
 - **Pluralisation & interpolation** via ICU/i18next ("{{count}} patient / {{count}} patients" with Swahili plural rules).
 - **No string concatenation** to build sentences; use full interpolated templates so word order is translatable.
 - **Allow for text expansion** (Swahili strings often longer): never fix widths to English; truncate with tooltip, wrap gracefully; test layouts at +30–40% length.

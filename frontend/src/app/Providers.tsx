@@ -37,14 +37,14 @@ interface ProvidersProps {
 export function AppProviders({ children }: ProvidersProps): JSX.Element {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <ThemeProvider>
           <BranchProvider>
             {children}
             <Toaster />
           </BranchProvider>
-        </AuthProvider>
-      </ThemeProvider>
+        </ThemeProvider>
+      </AuthProvider>
       {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   );

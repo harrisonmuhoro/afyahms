@@ -15,6 +15,7 @@ export function CheckInPage(): JSX.Element {
     'walk_in',
   );
   const [error, setError] = useState<string | null>(null);
+  const [successData, setSuccessData] = useState<{ visitNumber: string; patientName: string } | null>(null);
 
   const patients = usePatients({ page: 1, perPage: 25, search: search !== '' ? search : undefined });
   const openVisit = useOpenVisit();
@@ -27,8 +28,17 @@ export function CheckInPage(): JSX.Element {
       return;
     }
     try {
-      await openVisit.mutateAsync({ patient_id: patientId, visit_type: visitType });
-      navigate('/queue/board/TRI');
+      const res = await openVisit.mutateAsync({ patient_id: patientId, visit_type: visitType });
+      
+      if (res.data.visit_number) {
+        setSuccessData({
+          visitNumber: res.data.visit_number,
+          patientName: res.data.patient_name || 'Patient',
+        });
+        // We will not navigate immediately, letting the user see the visit number.
+      } else {
+        navigate('/queue/board/TRI');
+      }
     } catch (err: unknown) {
       const message =
         err instanceof Error && err.message !== '' ? err.message : t('errors:generic');
@@ -59,7 +69,32 @@ export function CheckInPage(): JSX.Element {
         </div>
       )}
 
-      <form onSubmit={onSubmit} className="card space-y-4 p-4">
+      {successData !== null && (
+        <div
+          role="status"
+          className="rounded-md bg-emerald-50 px-4 py-4 text-sm text-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-100 space-y-3"
+        >
+          <div>
+            <p className="font-semibold text-lg text-emerald-800 dark:text-emerald-200">Check-in Successful!</p>
+            <p>Visit created for {successData.patientName}.</p>
+          </div>
+          <div className="bg-emerald-100 dark:bg-emerald-900/60 p-3 rounded text-center">
+            <p className="text-xs uppercase tracking-wider text-emerald-700 dark:text-emerald-300 font-bold mb-1">Visit Number</p>
+            <p className="text-2xl font-mono font-black tracking-widest text-emerald-900 dark:text-emerald-100">{successData.visitNumber}</p>
+          </div>
+          <div className="flex justify-end pt-2">
+            <button
+              onClick={() => navigate('/queue/board/TRI')}
+              className="btn-primary text-sm"
+            >
+              Go to Triage Board
+            </button>
+          </div>
+        </div>
+      )}
+
+      {successData === null && (
+        <form onSubmit={onSubmit} className="card space-y-4 p-4">
         <label className="flex flex-col text-xs font-medium text-stone-600 dark:text-stone-300">
           {t('queue:check_in.search_patient')}
           <input
@@ -133,6 +168,7 @@ export function CheckInPage(): JSX.Element {
           </button>
         </div>
       </form>
+      )}
     </div>
   );
 }

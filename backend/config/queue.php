@@ -37,4 +37,24 @@ return [
         'database' => env('DB_CONNECTION', 'mysql'),
         'table'    => 'failed_jobs',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Department Grace Windows (seconds) — docs/28-canonical-decisions §15
+    |--------------------------------------------------------------------------
+    |
+    | Grace period before a ticket is flagged overdue after being called.
+    | Values: REC 3 min, TRI 5 min, DOC 5 min, RAD 5 min,
+    |         LAB 3 min, PHA 3 min, BIL 3 min.
+    |
+    */
+    'grace_windows' => [
+        'REC' => 180,
+        'TRI' => 300,
+        'DOC' => 300,
+        'RAD' => 300,
+        'LAB' => 180,
+        'PHA' => 180,
+        'BIL' => 180,
+    ],
 ];

@@ -227,7 +227,7 @@ Maps to the 10 canonical roles (Foundation §5). MFA-required classes are flagge
 ### 3.1 User interfaces (UI)
 
 - **UI-1:** The primary UI SHALL be the React 18 SPA/PWA, responsive across desktop, tablet, and mobile.
-- **UI-2:** The UI SHALL support **light and dark** themes via Tailwind `class` strategy, persisted in `localStorage` + Zustand.
+- **UI-2:** The UI SHALL support **light and dark** themes via Tailwind `class` strategy, persisted on the authenticated user profile in the database.
 - **UI-3:** All user-facing text SHALL be internationalized via react-i18next with `en` and `sw` (Kiswahili) namespaces; **no hardcoded strings** and **no emojis** (centralized SVG icon registry instead).
 - **UI-4:** Navigation SHALL include a **branch switcher** that sets `active_branch_id` for users with multi-branch access; the current branch SHALL be visible at all times.
 - **UI-5:** Routes SHALL be guarded by `<ProtectedRoute permission="…">`; UI elements for unauthorized actions SHALL be hidden/disabled.

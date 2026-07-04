@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Patients\Controllers\AllergyController;
+use App\Modules\Patients\Controllers\DataCorrectionRequestController;
 use App\Modules\Patients\Controllers\NextOfKinController;
 use App\Modules\Patients\Controllers\PatientController;
 use App\Modules\Patients\Controllers\PatientInsuranceController;
@@ -18,6 +19,14 @@ Route::middleware(['permission:patients.merge'])
     ->post('/merge', [PatientController::class, 'merge'])
     ->name('merge');
 
+Route::middleware(['permission:data-corrections.review'])
+    ->get('/data-correction-requests', [DataCorrectionRequestController::class, 'index'])
+    ->name('data-correction-requests.index');
+
+Route::middleware(['permission:data-corrections.review'])
+    ->patch('/data-correction-requests/{correctionRequest}/review', [DataCorrectionRequestController::class, 'review'])
+    ->name('data-correction-requests.review');
+
 Route::middleware(['permission:patients.read'])
     ->get('/', [PatientController::class, 'index'])
     ->name('index');
@@ -30,6 +39,11 @@ Route::middleware(['permission:patients.read'])
     ->get('/{uuid}', [PatientController::class, 'show'])
     ->where('uuid', '[0-9a-fA-F-]{36}')
     ->name('show');
+
+Route::middleware(['permission:data-corrections.create'])
+    ->post('/{uuid}/correction-requests', [DataCorrectionRequestController::class, 'store'])
+    ->where('uuid', '[0-9a-fA-F-]{36}')
+    ->name('correction-requests.store');
 
 Route::middleware(['permission:patients.update'])
     ->patch('/{uuid}', [PatientController::class, 'update'])

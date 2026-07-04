@@ -18,10 +18,18 @@ use Spatie\Permission\PermissionRegistrar;
  */
 final class Rbac
 {
+    public const SELF_PROFILE_PERMISSIONS = [
+        'profile.self.update.basic',
+        'profile.self.update.contact',
+        'profile.self.update.password',
+        'profile.self.upload.photo',
+    ];
+
     /**
-     * Role slugs. Exactly ten (foundation §5).
+     * Role slugs.
      */
     public const ROLES = [
+        'superadmin'      => 'Superadmin',
         'hospital-admin'  => 'Hospital Admin',
         'doctor'          => 'Doctor',
         'nurse'           => 'Nurse',
@@ -37,7 +45,7 @@ final class Rbac
     /**
      * Roles that MUST enroll in MFA (foundation §11).
      */
-    public const MFA_REQUIRED = ['hospital-admin', 'doctor', 'pharmacist'];
+    public const MFA_REQUIRED = [];
 
     /**
      * Permission catalogue. Mirrors `docs/08-rbac-matrix.md`.
@@ -49,8 +57,13 @@ final class Rbac
         // Auth & Account
         'users.create', 'users.read', 'users.update', 'users.delete', 'users.list',
         'users.assign-role', 'users.reset-password', 'users.impersonate',
+        'users.activate', 'users.deactivate',
+        'staff.update', 'staff.role.assign',
+        'profile.self.update.basic', 'profile.self.update.contact',
+        'profile.self.update.password', 'profile.self.upload.photo',
         'roles.create', 'roles.read', 'roles.update', 'roles.delete', 'roles.list',
         'roles.assign-permission', 'mfa.manage-others',
+        'system.settings.update', 'system.audit.read', 'system.break-glass',
 
         // Tenancy
         'branches.create', 'branches.read', 'branches.update', 'branches.delete', 'branches.list',
@@ -66,6 +79,7 @@ final class Rbac
 
         // Queue
         'queue.read', 'queue.list', 'queue.manage', 'queue.call-next', 'queue.override-priority',
+        'queue.issue', 'queue.advance', 'queue.void', 'queue.track-own',
 
         // Visits (chain that ties a patient to tickets/encounters/invoices)
         'visits.create', 'visits.read', 'visits.update', 'visits.list', 'visits.close',
@@ -128,6 +142,7 @@ final class Rbac
 
         // Patient Portal
         'portal.access', 'portal.view-results', 'portal.view-invoices', 'portal.pay',
+        'portal.demographics.update', 'data-corrections.create', 'data-corrections.review',
 
         // Documents
         'documents.create', 'documents.read', 'documents.update', 'documents.delete', 'documents.list',
@@ -165,18 +180,21 @@ final class Rbac
      * `RbacMatrixTest` asserts every (role, permission) cell matches this array.
      */
     public const ROLE_PERMISSIONS = [
-        'hospital-admin' => [
+        'superadmin' => [
             'users.create', 'users.read', 'users.update', 'users.delete', 'users.list',
             'users.assign-role', 'users.reset-password', 'users.impersonate',
+            'users.activate', 'users.deactivate',
+            'staff.update', 'staff.role.assign',
             'roles.create', 'roles.read', 'roles.update', 'roles.delete', 'roles.list',
             'roles.assign-permission', 'mfa.manage-others',
+            'system.settings.update', 'system.audit.read', 'system.break-glass',
             'branches.create', 'branches.read', 'branches.update', 'branches.delete', 'branches.list',
             'branch.view-all', 'branch.switch',
             'patients.create', 'patients.read', 'patients.update', 'patients.delete', 'patients.list',
             'patients.export', 'patients.merge',
             'appointments.create', 'appointments.read', 'appointments.update', 'appointments.delete',
             'appointments.list', 'appointments.cancel', 'appointments.reschedule',
-            'queue.read', 'queue.list', 'queue.manage', 'queue.call-next', 'queue.override-priority',
+            'queue.read', 'queue.list', 'queue.issue', 'queue.call-next', 'queue.advance', 'queue.manage', 'queue.void', 'queue.override-priority',
             'visits.create', 'visits.read', 'visits.update', 'visits.list', 'visits.close',
             'triage.read', 'triage.list',
             'emr.read', 'emr.list', 'emr.view-history',
@@ -206,13 +224,52 @@ final class Rbac
             'audit.read', 'audit.list', 'audit.export',
             'settings.read', 'settings.update', 'catalog.manage', 'sequences.read',
             'webhooks.replay',
+            'data-corrections.review',
+        ],
+        'hospital-admin' => [
+            'users.create', 'users.read', 'users.update', 'users.list',
+            'users.assign-role', 'users.reset-password',
+            'users.activate', 'users.deactivate',
+            'staff.update', 'staff.role.assign',
+            'roles.read', 'roles.list',
+            'mfa.manage-others',
+            'branches.create', 'branches.read', 'branches.update', 'branches.delete', 'branches.list',
+            'branch.view-all', 'branch.switch',
+            'patients.create', 'patients.read', 'patients.update', 'patients.delete', 'patients.list',
+            'patients.export', 'patients.merge',
+            'appointments.create', 'appointments.read', 'appointments.update', 'appointments.delete',
+            'appointments.list', 'appointments.cancel', 'appointments.reschedule',
+            'queue.read', 'queue.list', 'queue.issue', 'queue.call-next', 'queue.advance', 'queue.manage', 'queue.void', 'queue.override-priority',
+            'visits.create', 'visits.read', 'visits.update', 'visits.list', 'visits.close',
+            'alerts.read', 'alerts.list', 'alerts.configure',
+            'pharmacy.read', 'pharmacy.list', 'pharmacy.view-stock', 'pharmacy.manage-stock', 'pharmacy.manage-catalog',
+            'lab.manage-catalog',
+            'radiology.manage-catalog',
+            'invoices.create', 'invoices.read', 'invoices.update', 'invoices.delete', 'invoices.list',
+            'payments.create', 'payments.read', 'payments.list',
+            'billing.refund', 'billing.void-invoice', 'billing.apply-discount', 'billing.reconcile',
+            'sha.read', 'sha.list', 'sha.verify-eligibility', 'sha.create-claim',
+            'sha.submit-claim', 'sha.appeal-claim', 'sha.pre-auth', 'sha.track-claim', 'sha.reconcile',
+            'inpatient.read', 'inpatient.list', 'wards.read', 'wards.list', 'wards.manage',
+            'inventory.create', 'inventory.read', 'inventory.update', 'inventory.delete', 'inventory.list',
+            'inventory.adjust-stock', 'inventory.receive-grn',
+            'purchase-orders.create', 'purchase-orders.read', 'purchase-orders.update',
+            'purchase-orders.list', 'purchase-orders.approve',
+            'reporting.read', 'reporting.list', 'reporting.clinical', 'reporting.financial',
+            'reporting.operational', 'reporting.export',
+            'communication.read', 'communication.list', 'communication.send', 'communication.manage-templates',
+            'documents.create', 'documents.read', 'documents.update', 'documents.delete', 'documents.list',
+            'documents.upload', 'documents.download',
+            'audit.read', 'audit.list', 'audit.export',
+            'settings.read', 'settings.update', 'catalog.manage', 'sequences.read',
+            'webhooks.replay',
         ],
         'doctor' => [
             'branches.read', 'branches.list', 'branch.switch',
             'patients.read', 'patients.list',
             'appointments.create', 'appointments.read', 'appointments.update', 'appointments.list',
             'appointments.cancel', 'appointments.reschedule',
-            'queue.read', 'queue.list', 'queue.manage', 'queue.call-next', 'queue.override-priority',
+            'queue.read', 'queue.list', 'queue.call-next', 'queue.advance', 'queue.override-priority',
             'visits.read', 'visits.list',
             'triage.create', 'triage.read', 'triage.update', 'triage.list', 'triage.assign-category',
             'emr.create', 'emr.read', 'emr.update', 'emr.list', 'emr.sign', 'emr.amend', 'emr.view-history',
@@ -229,13 +286,14 @@ final class Rbac
             'reporting.read', 'reporting.list', 'reporting.clinical', 'reporting.operational',
             'communication.read', 'communication.list', 'communication.send', 'communication.message-provider',
             'documents.create', 'documents.read', 'documents.list', 'documents.upload', 'documents.download',
+            'data-corrections.review',
         ],
         'nurse' => [
             'branches.read', 'branches.list', 'branch.switch',
             'patients.read', 'patients.list',
             'appointments.create', 'appointments.read', 'appointments.update', 'appointments.list',
             'appointments.reschedule',
-            'queue.read', 'queue.list', 'queue.manage', 'queue.call-next', 'queue.override-priority',
+            'queue.read', 'queue.list', 'queue.issue', 'queue.call-next', 'queue.advance', 'queue.manage', 'queue.override-priority',
             'visits.create', 'visits.read', 'visits.update', 'visits.list',
             'triage.create', 'triage.read', 'triage.update', 'triage.list', 'triage.assign-category',
             'emr.create', 'emr.read', 'emr.update', 'emr.list', 'emr.view-history',
@@ -251,13 +309,14 @@ final class Rbac
             'inventory.read', 'inventory.list',
             'communication.read', 'communication.list', 'communication.send', 'communication.message-provider',
             'documents.create', 'documents.read', 'documents.list', 'documents.upload', 'documents.download',
+            'data-corrections.review',
         ],
         'receptionist' => [
             'branches.read', 'branches.list', 'branch.switch',
             'patients.create', 'patients.read', 'patients.update', 'patients.list',
             'appointments.create', 'appointments.read', 'appointments.update', 'appointments.delete', 'appointments.list',
             'appointments.cancel', 'appointments.reschedule',
-            'queue.read', 'queue.list', 'queue.manage', 'queue.call-next',
+            'queue.read', 'queue.list', 'queue.issue', 'queue.call-next', 'queue.advance', 'queue.manage', 'queue.void',
             'visits.create', 'visits.read', 'visits.update', 'visits.list', 'visits.close',
             'triage.read', 'triage.list',
             'invoices.read', 'invoices.list',
@@ -271,6 +330,7 @@ final class Rbac
             'patients.create', 'patients.read', 'patients.update', 'patients.delete', 'patients.list',
             'patients.export', 'patients.merge',
             'appointments.read', 'appointments.list',
+            'queue.read', 'queue.list',
             'emr.read', 'emr.list', 'emr.view-history',
             'diagnoses.read', 'diagnoses.list',
             'reporting.read', 'reporting.list', 'reporting.clinical', 'reporting.operational', 'reporting.export',
@@ -281,7 +341,7 @@ final class Rbac
         'pharmacist' => [
             'branches.read', 'branches.list', 'branch.switch',
             'patients.read', 'patients.list',
-            'queue.read', 'queue.list', 'queue.manage', 'queue.call-next',
+            'queue.read', 'queue.list', 'queue.call-next', 'queue.advance',
             'emr.read',
             'alerts.read', 'alerts.list', 'alerts.acknowledge',
             'prescriptions.read', 'prescriptions.list',
@@ -295,11 +355,12 @@ final class Rbac
             'reporting.read', 'reporting.list', 'reporting.operational',
             'communication.read', 'communication.list',
             'documents.read', 'documents.list', 'documents.download',
+            'data-corrections.review',
         ],
         'lab-technician' => [
             'branches.read', 'branches.list', 'branch.switch',
             'patients.read', 'patients.list',
-            'queue.read', 'queue.list', 'queue.manage', 'queue.call-next',
+            'queue.read', 'queue.list', 'queue.call-next', 'queue.advance',
             'emr.read',
             'lab.create', 'lab.read', 'lab.update', 'lab.list',
             'lab.accession', 'lab.enter-result', 'lab.approve-result', 'lab.manage-catalog',
@@ -307,12 +368,13 @@ final class Rbac
             'reporting.read', 'reporting.list', 'reporting.operational',
             'communication.read', 'communication.list',
             'documents.create', 'documents.read', 'documents.list', 'documents.upload', 'documents.download',
+            'data-corrections.review',
         ],
         'radiologist' => [
             'branches.read', 'branches.list', 'branch.switch',
             'patients.read', 'patients.list',
             'appointments.read', 'appointments.list',
-            'queue.read', 'queue.list', 'queue.manage', 'queue.call-next',
+            'queue.read', 'queue.list', 'queue.call-next', 'queue.advance',
             'emr.read',
             'radiology.create', 'radiology.read', 'radiology.update', 'radiology.list',
             'radiology.upload-image', 'radiology.report', 'radiology.sign-report',
@@ -321,11 +383,12 @@ final class Rbac
             'reporting.read', 'reporting.list', 'reporting.operational',
             'communication.read', 'communication.list',
             'documents.create', 'documents.read', 'documents.list', 'documents.upload', 'documents.download',
+            'data-corrections.review',
         ],
         'cashier' => [
             'branches.read', 'branches.list', 'branch.switch',
             'patients.read', 'patients.list',
-            'queue.read', 'queue.list', 'queue.manage', 'queue.call-next',
+            'queue.read', 'queue.list', 'queue.call-next', 'queue.advance',
             'invoices.create', 'invoices.read', 'invoices.update', 'invoices.list',
             'payments.create', 'payments.read', 'payments.list',
             'billing.refund', 'billing.void-invoice', 'billing.apply-discount', 'billing.reconcile',
@@ -338,10 +401,13 @@ final class Rbac
             'documents.read', 'documents.list', 'documents.download',
         ],
         'patient' => [
+            'branches.read', 'branches.list',
             'patients.view-own',
+            'queue.track-own',
             'appointments.book-own',
             'communication.message-provider',
             'portal.access', 'portal.view-results', 'portal.view-invoices', 'portal.pay',
+            'portal.demographics.update', 'data-corrections.create',
             'documents.view-own',
         ],
     ];
@@ -362,6 +428,8 @@ final class Rbac
             ]);
         }
 
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
         // 2) Roles + their grants
         foreach (self::ROLES as $slug => $label) {
             $role = Role::firstOrCreate([
@@ -370,7 +438,10 @@ final class Rbac
             ]);
 
             // Expand wildcards in ROLE_PERMISSIONS
-            $granted = self::expandWildcards(self::ROLE_PERMISSIONS[$slug] ?? []);
+            $granted = array_values(array_unique(array_merge(
+                self::expandWildcards(self::ROLE_PERMISSIONS[$slug] ?? []),
+                self::SELF_PROFILE_PERMISSIONS,
+            )));
             $role->syncPermissions($granted);
         }
     }

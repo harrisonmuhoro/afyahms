@@ -4,21 +4,15 @@ declare(strict_types=1);
 
 namespace App\Modules\Tenancy\Scopes;
 
+use App\Modules\Tenancy\Services\BranchContext;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
+use Illuminate\Support\Facades\Auth;
 
 /**
- * Global Eloquent scope that auto-filters every branch-scoped query by the
- * current request's `active_branch_id`.
- *
- * Disabled when:
- *   - the operator holds `branch.view-all` permission AND has explicitly
- *     requested all branches (X-View-All-Branches header or view_all_branches query).
- *   - the model is global reference data (those don't use this scope).
- *
- * Foundation §4 + RBAC §4 — the scope is the ONLY sanctioned mechanism for
- * row-level isolation; do not filter branch_id in repositories or services.
+ * Global Eloquent scope that auto-filters branch-scoped queries by the
+ * current request's active branch.
  */
 final class BranchScope implements Scope
 {
@@ -54,9 +48,16 @@ final class BranchScope implements Scope
             return;
         }
 
-        $branchId = self::$activeBranchId ?? app('active_branch_id');
+        $user = Auth::user();
+        if ($user !== null && method_exists($user, 'hasRole') && $user->hasRole('superadmin')) {
+            return;
+        }
+
+        $branchId = self::$activeBranchId ?? app(BranchContext::class)->get();
         if ($branchId === null) {
-            return;     // no active branch resolved — return empty set defensively
+            $builder->whereRaw('1 = 0');
+
+            return;
         }
 
         $builder->where($model->qualifyColumn('branch_id'), $branchId);

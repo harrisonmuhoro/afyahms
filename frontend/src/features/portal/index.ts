@@ -5,5 +5,6 @@ export { PortalRecords } from './PortalRecords';
 export { PortalResults } from './PortalResults';
 export { PortalBills } from './PortalBills';
 export { PortalMessages } from './PortalMessages';
+export { PortalProfile } from './PortalProfile';
 export { PortalPlaceholder } from './PortalPlaceholder';
 export { PortalModal, ConfirmDialog, ToastBanner } from './PortalModal';

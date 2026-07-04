@@ -22,32 +22,7 @@ interface Result {
   reportSummary?: string;
 }
 
-const RESULTS: Result[] = [
-  {
-    id: 'RES-001', type: 'lab', name: 'Complete Blood Count (CBC)', orderedBy: 'Dr. Mwangi', date: '22 Jun 2026', status: 'available',
-    items: [
-      { name: 'Haemoglobin', value: '13.2', unit: 'g/dL', reference: '12.0 – 17.5' },
-      { name: 'White Blood Cells', value: '11.8', unit: '×10⁹/L', reference: '4.0 – 11.0', flag: 'high' },
-      { name: 'Platelets', value: '245', unit: '×10⁹/L', reference: '150 – 400' },
-      { name: 'Red Blood Cells', value: '4.6', unit: '×10¹²/L', reference: '4.2 – 5.9' },
-    ],
-  },
-  {
-    id: 'RES-002', type: 'lab', name: 'Lipid Panel', orderedBy: 'Dr. Mwangi', date: '22 Jun 2026', status: 'available',
-    items: [
-      { name: 'Total Cholesterol', value: '218', unit: 'mg/dL', reference: '< 200', flag: 'high' },
-      { name: 'LDL Cholesterol', value: '142', unit: 'mg/dL', reference: '< 130', flag: 'high' },
-      { name: 'HDL Cholesterol', value: '48', unit: 'mg/dL', reference: '> 40' },
-      { name: 'Triglycerides', value: '155', unit: 'mg/dL', reference: '< 150', flag: 'high' },
-    ],
-  },
-  {
-    id: 'RES-003', type: 'radiology', name: 'Chest X-Ray (AP/Lateral)', orderedBy: 'Dr. Otieno', date: '10 Jun 2026', status: 'available',
-    reportSummary: 'Heart size is within normal limits. Lungs are clear with no consolidation, effusion, or pneumothorax identified. No acute cardiopulmonary abnormality.',
-  },
-  { id: 'RES-004', type: 'lab', name: 'HbA1c (Glycated Haemoglobin)', orderedBy: 'Dr. Achieng', date: '25 Jun 2026', status: 'pending', turnaroundEstimate: 'Expected by 27 Jun 2026' },
-  { id: 'RES-005', type: 'radiology', name: 'Echocardiogram', orderedBy: 'Dr. Mwangi', date: '24 Jun 2026', status: 'pending', turnaroundEstimate: 'Expected by 28 Jun 2026' },
-];
+const RESULTS: Result[] = [];
 
 export function PortalResults(): JSX.Element {
   const [expandedId, setExpandedId] = useState<string | null>(null);

@@ -22,6 +22,12 @@ final class EloquentBranchRepository extends EloquentRepository implements Branc
         return $this->newQuery()->find($id);
     }
 
+    public function findByPublicId(string $publicId): ?Branch
+    {
+        /** @var Branch|null */
+        return $this->newQuery()->where('public_id', $publicId)->first();
+    }
+
     public function findByCode(string $code): ?Branch
     {
         /** @var Branch|null */

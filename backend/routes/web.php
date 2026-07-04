@@ -25,3 +25,6 @@ Route::get('/', fn () => response()->json([
     'health'  => url('/up'),
     'horizon' => url('/horizon'),
 ]));
+
+// Google Auth Callback alias to match user's GOOGLE_REDIRECT_URI configuration
+Route::get('/auth/google/callback', [\App\Modules\Auth\Controllers\GoogleAuthController::class, 'callback']);

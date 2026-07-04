@@ -17,9 +17,8 @@ final class UserMfa extends Model
 {
     protected $table = 'user_mfa';
 
-    /** @var array<int, string> */
     protected $fillable = [
-        'user_id', 'secret', 'recovery_codes', 'enabled_at',
+        'user_id', 'type', 'secret', 'recovery_codes', 'enabled_at',
     ];
 
     /** @var array<string, string> */

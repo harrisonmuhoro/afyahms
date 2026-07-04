@@ -7,5 +7,6 @@ Route::middleware(['api', 'auth:sanctum'])
     ->prefix('api/v1/audit')
     ->name('audit.')
     ->group(function () {
-    Route::get('/logs', [AuditController::class, 'getLogs']);
+    Route::get('/logs', [AuditController::class, 'getLogs'])
+        ->middleware('permission:audit.read');
 });

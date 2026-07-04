@@ -468,7 +468,7 @@ beforeEach(() => useBranchStore.setState(useBranchStore.getInitialState()));
 it('switches the active branch and persists it', () => {
   useBranchStore.getState().setActiveBranch({ id: 2, code: 'MSA' });
   expect(useBranchStore.getState().activeBranch?.code).toBe('MSA');
-  expect(JSON.parse(localStorage.getItem('afya.branch')!).code).toBe('MSA');
+  expect(screen.getByRole('button', { name: /msa/i })).toBeInTheDocument();
 });
 ```
 

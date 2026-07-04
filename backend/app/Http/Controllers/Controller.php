@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
 /**
  * Thin abstract base controller. Domain code lives in modules —
  * this class only exists so Laravel's `Route::middleware('auth')`
@@ -11,5 +13,5 @@ namespace App\Http\Controllers;
  */
 abstract class Controller
 {
-    //
+    use AuthorizesRequests; // ← Infrastructure only, not logic
 }

@@ -64,6 +64,19 @@ final class LoginHistoryService
         ])->saveQuietly();
     }
 
+    public function recordFailedPassword(User $user, int $maxAttempts, int $lockoutMinutes = 15, bool $allowLockout = true): bool
+    {
+        $attempts = $user->failed_login_attempts + 1;
+        $locked = $allowLockout && $attempts >= $maxAttempts;
+
+        $user->forceFill([
+            'failed_login_attempts' => $attempts,
+            'locked_until' => $locked ? now()->addMinutes($lockoutMinutes) : null,
+        ])->saveQuietly();
+
+        return $locked;
+    }
+
     public function clearFailures(User $user): void
     {
         $user->forceFill([

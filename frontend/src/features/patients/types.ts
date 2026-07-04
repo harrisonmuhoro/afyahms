@@ -20,6 +20,9 @@ export interface Patient {
   address: string | null;
   occupation: string | null;
   photo_path: string | null;
+  guardian_name: string | null;
+  guardian_national_id: string | null;
+  guardian_relationship: string | null;
   deceased: boolean;
   deceased_at: string | null;
   branch_id: number;

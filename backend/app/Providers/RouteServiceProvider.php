@@ -8,7 +8,6 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
-use Symfony\Component\Finder\Finder;
 
 final class RouteServiceProvider extends ServiceProvider
 {
@@ -17,7 +16,9 @@ final class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureRateLimiting();
-        $this->loadModuleRoutes();
+        // ❌ REMOVED: $this->loadModuleRoutes()
+        // Each module's ServiceProvider loads its own routes with
+        // correct prefix and middleware. No central loader needed.
     }
 
     protected function configureRateLimiting(): void
@@ -28,36 +29,24 @@ final class RouteServiceProvider extends ServiceProvider
             ];
         });
 
-        // Tightened limits for sensitive flows
         RateLimiter::for('auth', fn (Request $r) => [
             Limit::perMinute(10)->by($r->input('email').'|'.$r->ip()),
         ]);
+
         RateLimiter::for('mpesa-stk', fn (Request $r) => [
             Limit::perMinute(20)->by(optional($r->user())->id ?: $r->ip()),
         ]);
+
         RateLimiter::for('mfa-verify', fn (Request $r) => [
             Limit::perMinute(5)->by(optional($r->user())->id ?: $r->ip()),
         ]);
+
         RateLimiter::for('webhooks', fn (Request $r) => [
             Limit::perMinute(600)->by($r->ip()),
         ]);
-    }
 
-    /**
-     * Auto-load route files for every Modules/{Module}/routes.php.
-     * Each module registers its own API routes under its prefix.
-     */
-    protected function loadModuleRoutes(): void
-    {
-        $modulesPath = app_path('Modules');
-
-        if (! is_dir($modulesPath)) {
-            return;
-        }
-
-        foreach (Finder::create()->files()->in($modulesPath)->name('routes.php') as $file) {
-            // Route file is responsible for its own prefix / middleware
-            require $file->getRealPath();
-        }
+        RateLimiter::for('portal-api', fn (Request $r) => [
+            Limit::perMinute(60)->by(optional($r->user())->id ?: $r->ip()),
+        ]);
     }
 }

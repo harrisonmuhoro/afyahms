@@ -14,8 +14,10 @@ use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use App\Modules\Auth\Models\UserMfa;
+use App\Modules\Patients\Models\Patient;
 use App\Modules\Tenancy\Models\Branch;
 use App\Modules\Tenancy\Models\UserBranchAccess;
+use App\Modules\Queue\Models\QueueStation;
 
 /**
  * The single User model used by the entire application. Branch access and
@@ -40,10 +42,16 @@ class User extends Authenticatable
     /** @var array<int, string> */
     protected $fillable = [
         'name', 'email', 'phone',
-        'home_branch_id', 'current_branch_id',
+        'address', 'next_of_kin_name', 'next_of_kin_phone', 'profile_photo_path',
+        'national_id', 'date_of_birth', 'staff_id', 'department', 'specialization',
+        'license_number', 'employment_type', 'employment_start_date',
+        'home_branch_id', 'current_branch_id', 'current_station_id',
+        'locale', 'theme',
         'password',
         'mfa_enabled', 'mfa_confirmed_at', 'last_seen_at',
         'failed_login_attempts', 'locked_until',
+        'is_active', 'deactivated_at', 'deactivated_reason', 'deactivated_by',
+        'google_id', 'profile_complete',
     ];
 
     /** @var array<string, string> */
@@ -61,6 +69,11 @@ class User extends Authenticatable
         'last_seen_at'       => 'datetime',
         'locked_until'       => 'datetime',
         'failed_login_attempts' => 'integer',
+        'is_active'          => 'boolean',
+        'deactivated_at'     => 'datetime',
+        'date_of_birth'      => 'date',
+        'employment_start_date' => 'date',
+        'national_id'        => 'encrypted',
     ];
 
     public function branches(): BelongsToMany
@@ -77,6 +90,21 @@ class User extends Authenticatable
     public function currentBranch()
     {
         return $this->belongsTo(Branch::class, 'current_branch_id');
+    }
+
+    public function currentStation()
+    {
+        return $this->belongsTo(QueueStation::class, 'current_station_id');
+    }
+
+    public function patient()
+    {
+        return $this->hasOne(Patient::class, 'portal_user_id');
+    }
+
+    public function deactivatedBy()
+    {
+        return $this->belongsTo(self::class, 'deactivated_by');
     }
 
     public function mfa(): HasMany
@@ -106,6 +134,20 @@ class User extends Authenticatable
     {
         return $this->locked_until !== null && $this->locked_until->isFuture();
     }
+
+    public function isDeactivated(): bool
+    {
+        return $this->is_active === false || $this->deactivated_at !== null;
+    }
+
+    public function doctorProfiles(): HasMany { return $this->hasMany(\App\Models\Profiles\DoctorProfile::class); }
+    public function nurseProfiles(): HasMany { return $this->hasMany(\App\Models\Profiles\NurseProfile::class); }
+    public function receptionistProfiles(): HasMany { return $this->hasMany(\App\Models\Profiles\ReceptionistProfile::class); }
+    public function recordsOfficerProfiles(): HasMany { return $this->hasMany(\App\Models\Profiles\RecordsOfficerProfile::class); }
+    public function pharmacistProfiles(): HasMany { return $this->hasMany(\App\Models\Profiles\PharmacistProfile::class); }
+    public function labTechnicianProfiles(): HasMany { return $this->hasMany(\App\Models\Profiles\LabTechnicianProfile::class); }
+    public function radiologistProfiles(): HasMany { return $this->hasMany(\App\Models\Profiles\RadiologistProfile::class); }
+    public function cashierProfiles(): HasMany { return $this->hasMany(\App\Models\Profiles\CashierProfile::class); }
 
     protected static function booted(): void
     {

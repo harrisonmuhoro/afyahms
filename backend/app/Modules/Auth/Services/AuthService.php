@@ -8,7 +8,9 @@ use App\Exceptions\Domain\ForbiddenException;
 use App\Exceptions\Domain\ValidationFailedException;
 use App\Models\User;
 use App\Modules\Auth\Models\LoginHistory;
+use App\Modules\Auth\Services\LoginHistoryService;
 use App\Modules\Tenancy\Models\Branch;
+use App\Services\OtpService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -22,8 +24,9 @@ use Illuminate\Support\Facades\Hash;
 final class AuthService
 {
     public function __construct(
-        private readonly LoginHistoryService $history,
         private readonly MfaService $mfa,
+        private readonly LoginHistoryService $history,
+        private readonly OtpService $otpService,
     ) {}
 
     /**
@@ -33,42 +36,78 @@ final class AuthService
      */
     public function login(string $email, string $password, Request $request): array
     {
-        // Lockout check (early)
-        $recent = $this->history->recentAttemptsFor($email, 1);
-        $maxAttempts = (int) config('auth.login.max_attempts_per_minute', 5);
-        if ($recent >= $maxAttempts) {
-            $this->history->record(null, $request, LoginHistory::STATUS_LOCKED);
-
-            throw new ForbiddenException(
-                'Too many attempts. Please wait and try again.',
-                ['retry_after_seconds' => 60],
-            );
-        }
-
         /** @var User|null $user */
         $user = User::query()->where('email', $email)->first();
 
-        if ($user === null || ! Hash::check($password, $user->password)) {
-            if ($user !== null) {
-                $this->history->lockUser($user, (int) config('auth.login.lockout_minutes', 15));
-            }
-            $this->history->record($user, $request, LoginHistory::STATUS_FAILED_PASSWORD);
-
-            throw new ForbiddenException('Invalid credentials.');
-        }
-
-        if ($user->isLocked()) {
+        if ($user?->isDeactivated()) {
             $this->history->record($user, $request, LoginHistory::STATUS_LOCKED);
 
             throw new ForbiddenException(
-                'Account locked. Try again later.',
+                'This account has been deactivated. Contact your hospital administrator for help.',
+                ['deactivated_at' => $user->deactivated_at?->toIso8601String()],
+            );
+        }
+
+        if ($user !== null && $user->locked_until !== null && ! $user->isLocked()) {
+            $this->history->clearFailures($user);
+            $user->refresh();
+        }
+
+        if ($user?->isLocked()) {
+            $this->history->record($user, $request, LoginHistory::STATUS_LOCKED);
+
+            throw new ForbiddenException(
+                $this->accountLockedMessage($user),
                 ['locked_until' => $user->locked_until?->toIso8601String()],
             );
         }
 
+        // Short-window throttle check.
+        $recent = $this->history->recentAttemptsFor($email, 1);
+        $maxAttempts = (int) config('auth.login.max_attempts_per_minute', 5);
+        if ($recent >= $maxAttempts && ! $this->bypassesAccountLockout($user)) {
+            $this->history->record($user, $request, LoginHistory::STATUS_LOCKED);
+
+            throw new ForbiddenException(
+                'Too many sign-in attempts. Please wait 1 minute before trying again.',
+                ['retry_after_seconds' => 60],
+            );
+        }
+
+        if ($user === null) {
+            $this->history->record($user, $request, LoginHistory::STATUS_FAILED_PASSWORD);
+            throw new ForbiddenException('This account does not exist in the system.');
+        }
+
+        if (! Hash::check($password, $user->password)) {
+            $locked = $this->history->recordFailedPassword(
+                user: $user,
+                maxAttempts: $maxAttempts,
+                lockoutMinutes: (int) config('auth.login.lockout_minutes', 15),
+                allowLockout: ! $this->bypassesAccountLockout($user),
+            );
+            $user->refresh();
+            
+            $this->history->record($user, $request, LoginHistory::STATUS_FAILED_PASSWORD);
+
+            if ($locked ?? false) {
+                throw new ForbiddenException(
+                    $this->accountLockedMessage($user),
+                    ['locked_until' => $user->locked_until?->toIso8601String()],
+                );
+            }
+
+            throw new ForbiddenException('Invalid password. Please try again.');
+        }
+
         $this->history->clearFailures($user);
 
-        $requiresMfa = $user->mfa_enabled;
+        $requiresMfaStep = $user->mfa_enabled && ! $this->bypassesLoginMfa($user);
+        $mfaType = $requiresMfaStep ? $user->activeMfa()?->type : null;
+
+        if ($requiresMfaStep && $mfaType === 'email') {
+            $this->otpService->send($user, $user->email, 'mfa_login');
+        }
 
         // Issue a "password-only" token (no MFA confirmed yet).
         // Routes protected by EnsureMfaConfirmed will reject until confirm.
@@ -78,9 +117,11 @@ final class AuthService
         $this->history->record($user, $request, LoginHistory::STATUS_SUCCESS, mfaUsed: false);
 
         return [
-            'user'         => $user->load(['roles', 'branches']),
-            'token'        => $token->plainTextToken,
-            'requires_mfa' => $requiresMfa,
+            'user'                    => $user->load(['roles', 'branches']),
+            'token'                   => $token->plainTextToken,
+            'requires_mfa'            => $requiresMfaStep,
+            'mfa_type'                => $requiresMfaStep ? $user->activeMfa()?->type : null,
+            'requires_mfa_enrollment' => false,
         ];
     }
 
@@ -143,5 +184,44 @@ final class AuthService
         $perms[] = 'branch.switch';
 
         return array_values(array_unique($perms));
+    }
+
+    private function accountLockedMessage(User $user): string
+    {
+        $seconds = $user->locked_until === null
+            ? 60
+            : max(1, $user->locked_until->getTimestamp() - now()->getTimestamp());
+
+        return sprintf(
+            'Your account is temporarily locked because there were too many incorrect password attempts. Try again in %s.',
+            $this->formatDuration($seconds),
+        );
+    }
+
+    private function bypassesAccountLockout(?User $user): bool
+    {
+        return $user?->hasRole('superadmin') ?? false;
+    }
+
+    private function bypassesLoginMfa(User $user): bool
+    {
+        return $user->hasAnyRole(['superadmin', 'hospital-admin', 'doctor']);
+    }
+
+    private function formatDuration(int $seconds): string
+    {
+        if ($seconds >= 3600) {
+            $hours = (int) ceil($seconds / 3600);
+
+            return $hours.' '.str('hour')->plural($hours);
+        }
+
+        if ($seconds >= 60) {
+            $minutes = (int) ceil($seconds / 60);
+
+            return $minutes.' '.str('minute')->plural($minutes);
+        }
+
+        return $seconds.' '.str('second')->plural($seconds);
     }
 }

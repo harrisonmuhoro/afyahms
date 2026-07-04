@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
+import { useAuth } from '@/features/auth/AuthProvider';
 
 export type Theme = 'light' | 'dark';
 
@@ -9,18 +10,11 @@ interface ThemeContextValue {
   toggleTheme: () => void;
 }
 
-const STORAGE_KEY = 'afya.theme';
-
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function readInitialTheme(): Theme {
   if (typeof window === 'undefined') {
     return 'light';
-  }
-
-  const stored = window.localStorage.getItem(STORAGE_KEY);
-  if (stored === 'light' || stored === 'dark') {
-    return stored;
   }
 
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -41,20 +35,37 @@ interface ThemeProviderProps {
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps): JSX.Element {
+  const { isAuthenticated, updatePreferences, user } = useAuth();
   const [theme, setThemeState] = useState<Theme>(() => readInitialTheme());
 
   useEffect(() => {
     applyTheme(theme);
-    window.localStorage.setItem(STORAGE_KEY, theme);
   }, [theme]);
+
+  useEffect(() => {
+    if (user?.theme === 'light' || user?.theme === 'dark') {
+      setThemeState(user.theme);
+    }
+  }, [user?.theme]);
 
   const setTheme = useCallback((next: Theme) => {
     setThemeState(next);
-  }, []);
+
+    if (isAuthenticated) {
+      void updatePreferences({ theme: next });
+    }
+  }, [isAuthenticated, updatePreferences]);
 
   const toggleTheme = useCallback(() => {
-    setThemeState((current) => (current === 'dark' ? 'light' : 'dark'));
-  }, []);
+    setThemeState((current) => {
+      const next = current === 'dark' ? 'light' : 'dark';
+      if (isAuthenticated) {
+        void updatePreferences({ theme: next });
+      }
+
+      return next;
+    });
+  }, [isAuthenticated, updatePreferences]);
 
   const value = useMemo<ThemeContextValue>(
     () => ({ theme, setTheme, toggleTheme }),

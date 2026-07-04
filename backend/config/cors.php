@@ -11,5 +11,7 @@ return [
     'allowed_headers'    => ['*'],
     'exposed_headers'    => ['X-Request-Id'],
     'max_age'    => 86400,
-    'supports_credentials' => true,
+    // Must be false when allowed_origins contains '*'.
+    // The app uses stateless Bearer tokens — no cookies needed.
+    'supports_credentials' => false,
 ];

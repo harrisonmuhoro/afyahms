@@ -25,12 +25,9 @@ final class BranchController extends Controller
         return BranchResource::collection($branches);
     }
 
-    public function show(int $id): JsonResource
+    public function show(string $id): JsonResource
     {
-        $branch = $this->branches
-            ->listForUser(request()->user())
-            ->firstWhere('id', $id)
-            ?? $this->branches->listForUser(request()->user())->firstWhere('public_id', $id);
+        $branch = $this->branches->findAccessibleForUser(request()->user(), $id);
 
         abort_unless($branch, 404, 'Branch not found or not accessible.');
 
@@ -46,10 +43,11 @@ final class BranchController extends Controller
             ->setStatusCode(201);
     }
 
-    public function update(UpdateBranchRequest $request, int $id): JsonResource
+    public function update(UpdateBranchRequest $request, string $id): JsonResource
     {
-        $branch = app(\App\Modules\Tenancy\Repositories\Contracts\BranchRepository::class)->find($id);
-        abort_unless($branch, 404);
+        $branch = $this->branches->findAccessibleForUser($request->user(), $id);
+        abort_unless($branch, 404, 'Branch not found or not accessible.');
+
         $branch = $this->branches->update($branch, $request->validated());
 
         return new BranchResource($branch);

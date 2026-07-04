@@ -17,17 +17,19 @@ final class AuthServiceProvider extends ServiceProvider
         $this->registerSpatieGateHook();
     }
 
-    /**
-     * Bridge Spatie permissions into Laravel's Gate so `$user->can('x')`
-     * and the `permission:` middleware resolve correctly even when no
-     * Policy class is registered for the model.
-     */
     protected function registerSpatieGateHook(): void
     {
         Gate::before(function ($user, string $ability): ?bool {
             if ($user === null) {
                 return null;
             }
+
+            // Only intercept Spatie dot-notation permissions (e.g. queue.advance)
+            // Policy abilities (manage, view, create, delete) have no dot — skip them
+            if (! str_contains($ability, '.')) {
+                return null;
+            }
+
             if (method_exists($user, 'hasPermissionTo') && $user->hasPermissionTo($ability)) {
                 return true;
             }
@@ -51,8 +53,6 @@ final class AuthServiceProvider extends ServiceProvider
         foreach (Finder::create()->files()->in($modulesPath)->name('*Policy.php') as $file) {
             $class = $this->classFromPath($file->getRealPath());
             if ($class !== null && class_exists($class)) {
-                // ModuleServiceProvider will register policies explicitly;
-                // this auto-discovery is a safety net for forgotten bindings.
                 Gate::policy(
                     $this->guessModelForPolicy($class),
                     $class,
@@ -76,8 +76,6 @@ final class AuthServiceProvider extends ServiceProvider
 
     private function guessModelForPolicy(string $policyClass): string
     {
-        // Map PatientsPolicy -> App\Modules\Patients\Models\Patient by convention.
-        // If unknown, returns the policy class itself as a no-op.
         $ns = preg_replace('/Policies\\\\(\w+)Policy$/', 'Models\\\\$1', $policyClass, 1, $count);
 
         return $count === 1 && class_exists($ns) ? $ns : $policyClass;

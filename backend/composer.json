@@ -1,7 +1,7 @@
 {
     "name": "afya/hms-backend",
     "type": "project",
-    "description": "Afya HMS — Modular Monolith Backend (Laravel 11).",
+   "description": "Afya HMS — Modular Monolith Backend (Laravel 12).",
     "keywords": ["hospital", "laravel", "hms", "afya", "kenya"],
     "license": "proprietary",
     "require": {
@@ -16,36 +16,38 @@
         "ext-pdo_mysql": "*",
         "ext-xml": "*",
         "ext-zip": "*",
-        "laravel/framework": "^11.31",
-        "laravel/sanctum": "^4.0",
-        "laravel/tinker": "^2.9",
-        "laravel/scout": "^10.11",
+        "bacon/bacon-qr-code": "^3.0",
+        "barryvdh/laravel-dompdf": "^3.0",
+        "firebase/php-jwt": "^7.0",
         "inertiajs/inertia-laravel": "^2.0",
+        "laravel/framework": "^12.60",
+        "laravel/sanctum": "^4.0",
+        "laravel/scout": "^10.11",
+        "laravel/socialite": "^5.28",
+        "laravel/tinker": "^2.9",
+        "maatwebsite/excel": "^3.1",
         "nunomaduro/collision": "^8.1",
-        "spatie/laravel-permission": "^6.10",
+        "pragmarx/google2fa-laravel": "^2.2",
+        "predis/predis": "^2.2",
+        "resend/resend-laravel": "^1.4",
         "spatie/laravel-activitylog": "^4.8",
         "spatie/laravel-data": "^4.7",
         "spatie/laravel-medialibrary": "^11.6",
+        "spatie/laravel-permission": "^6.10",
         "spatie/laravel-query-builder": "^6.2",
-        "pragmarx/google2fa-laravel": "^2.2",
-        "bacon/bacon-qr-code": "^3.0",
-        "predis/predis": "^2.2",
-        "firebase/php-jwt": "^6.10",
-        "barryvdh/laravel-dompdf": "^3.0",
-        "maatwebsite/excel": "^3.1",
         "symfony/http-client": "^7.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
+        "larastan/larastan": "^3.2",
         "laravel/pail": "^1.1",
         "laravel/pint": "^1.13",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.1",
         "pestphp/pest": "^3.4",
-        "pestphp/pest-plugin-laravel": "^3.0",
         "pestphp/pest-plugin-arch": "^3.0",
-        "phpunit/phpunit": "^11.0",
-        "larastan/larastan": "^2.9"
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "phpunit/phpunit": "^11.0"
     },
     "autoload": {
         "psr-4": {
@@ -90,22 +92,19 @@
         }
     },
     "config": {
-        "optimize-autoloader": true,
-        "preferred-install": "dist",
-        "sort-packages": true,
-        "allow-plugins": {
-            "pestphp/pest-plugin": true,
-            "php-http/discovery": true
-        },
-        "audit": {
-            "abandoned": "ignore"
-        },
-        "policy": {
-            "advisories": {
-                "block": false
-            }
-        }
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "sort-packages": true,
+    "allow-plugins": {
+        "pestphp/pest-plugin": true,
+        "php-http/discovery": true
     },
+    "policy": {
+        "advisories": {
+            "block": true
+        }
+    }
+},
     "minimum-stability": "stable",
     "prefer-stable": true
 }

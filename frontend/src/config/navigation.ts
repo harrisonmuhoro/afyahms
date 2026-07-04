@@ -23,6 +23,10 @@ export interface NavItem {
    * may see (e.g. the dashboard). When set, matched against user.permissions.
    */
   permission?: string;
+  /** Hide this item when the signed-in user has any of these roles. */
+  hiddenForRoles?: string[];
+  /** Show this item only when the signed-in user has at least one of these roles. */
+  onlyRoles?: string[];
   /** Exact-match active state (used for the root dashboard link). */
   end?: boolean;
 }
@@ -33,26 +37,28 @@ export interface NavItem {
  */
 export const NAV_ITEMS: NavItem[] = [
   { to: '/', key: 'nav:dashboard', icon: 'dashboard', end: true },
+  { to: '/profile', key: 'nav:profile', icon: 'user', hiddenForRoles: ['patient'] },
 
   // Intake / front desk
-  { to: '/queue/check-in', key: 'nav:checkIn', icon: 'plus', permission: 'visits.create' },
-  { to: '/queue', key: 'nav:queue', icon: 'queue', permission: 'queue.read' },
-  { to: '/queue/board/TRI', key: 'nav:triage', icon: 'triage', permission: 'triage.create' },
-  { to: '/patients', key: 'nav:patients', icon: 'patients', permission: 'patients.read' },
+  { to: '/queue/check-in', key: 'nav:checkIn', icon: 'plus', permission: 'visits.create', hiddenForRoles: ['superadmin'] },
+  { to: '/queue', key: 'nav:queue', icon: 'queue', permission: 'queue.read', hiddenForRoles: ['superadmin'] },
+  { to: '/queue/board/TRI', key: 'nav:triage', icon: 'triage', permission: 'triage.create', hiddenForRoles: ['superadmin'] },
+  { to: '/patients', key: 'nav:patients', icon: 'patients', permission: 'patients.read', hiddenForRoles: ['superadmin'] },
 
   // Clinical
-  { to: '/queue/board/DOC', key: 'nav:emr', icon: 'emr', permission: 'emr.read' },
+  { to: '/queue/board/DOC', key: 'nav:emr', icon: 'emr', permission: 'emr.read', hiddenForRoles: ['superadmin'] },
 
   // Diagnostics & dispensing
-  { to: '/queue/board/LAB', key: 'nav:laboratory', icon: 'laboratory', permission: 'lab.read' },
-  { to: '/queue/board/RAD', key: 'nav:radiology', icon: 'radiology', permission: 'radiology.read' },
-  { to: '/queue/board/PHA', key: 'nav:pharmacy', icon: 'pharmacy', permission: 'pharmacy.read' },
+  { to: '/queue/board/LAB', key: 'nav:laboratory', icon: 'laboratory', permission: 'lab.read', hiddenForRoles: ['superadmin'] },
+  { to: '/queue/board/RAD', key: 'nav:radiology', icon: 'radiology', permission: 'radiology.read', hiddenForRoles: ['superadmin'] },
+  { to: '/queue/board/PHA', key: 'nav:pharmacy', icon: 'pharmacy', permission: 'pharmacy.read', hiddenForRoles: ['superadmin'] },
 
   // Money
-  { to: '/queue/board/BIL', key: 'nav:billing', icon: 'billing', permission: 'invoices.read' },
+  { to: '/queue/board/BIL', key: 'nav:billing', icon: 'billing', permission: 'invoices.read', hiddenForRoles: ['superadmin'] },
 
   // Back office
-  { to: '/inventory', key: 'nav:inventory', icon: 'inventory', permission: 'inventory.read' },
+  { to: '/inventory', key: 'nav:inventory', icon: 'inventory', permission: 'inventory.read', hiddenForRoles: ['superadmin'] },
+  { to: '/admin/staff', key: 'nav:staff', icon: 'users', permission: 'staff.update' },
   { to: '/reports', key: 'nav:reports', icon: 'reports', permission: 'reporting.read' },
   { to: '/branches', key: 'nav:branches', icon: 'branches', permission: 'branches.read' },
   { to: '/audit', key: 'nav:audit', icon: 'audit', permission: 'audit.read' },
@@ -65,6 +71,7 @@ export const NAV_ITEMS: NavItem[] = [
  * the clinical board they use day to day.
  */
 const ROLE_HOME: Record<string, string> = {
+  superadmin: '/',
   'hospital-admin': '/',
   doctor: '/queue/board/DOC',
   nurse: '/queue/board/TRI',
@@ -79,6 +86,7 @@ const ROLE_HOME: Record<string, string> = {
 
 /** Priority order for resolving a home when a user holds multiple roles. */
 const ROLE_PRIORITY: string[] = [
+  'superadmin',
   'doctor',
   'nurse',
   'pharmacist',
@@ -103,4 +111,20 @@ export function resolveHomeRoute(roles: readonly string[]): string {
   }
 
   return '/';
+}
+
+export function isNavItemVisible(
+  item: NavItem,
+  roles: readonly string[],
+  hasPermission: (permission: string) => boolean,
+): boolean {
+  if (item.onlyRoles !== undefined && !item.onlyRoles.some((role) => roles.includes(role))) {
+    return false;
+  }
+
+  if (item.hiddenForRoles !== undefined && item.hiddenForRoles.some((role) => roles.includes(role))) {
+    return false;
+  }
+
+  return item.permission === undefined || hasPermission(item.permission);
 }

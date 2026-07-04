@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { cn } from '@/lib/cn';
-import { useAuth } from '@/features/auth/AuthProvider';
+import { PermissionButton } from '@/components/auth/PermissionButton';
 import {
   useBoard,
   useCallNext,
@@ -11,10 +11,15 @@ import {
   useNoShowTicket,
   useStartTicket,
 } from './api';
+import { useBillStatus } from './billingApi';
 import type { MtsCategory, QueueTicket, StationCode } from './types';
 
 
 const VALID_CODES: StationCode[] = ['REC', 'TRI', 'DOC', 'LAB', 'RAD', 'PHA', 'BIL'];
+
+const PERM_MANAGE = 'queue.manage';
+const PERM_ASSIGN_CATEGORY = 'triage.assign-category';
+const PERM_CONSULT = 'emr.read';
 
 const MTS_COLOR: Record<MtsCategory, string> = {
   red: 'bg-red-100 text-red-900 ring-red-300 dark:bg-red-950/50 dark:text-red-200 dark:ring-red-800',
@@ -54,7 +59,6 @@ export function BoardPage(): JSX.Element {
   const { code: rawCode } = useParams<{ code: string }>();
   const code = isStationCode(rawCode) ? rawCode : null;
   const navigate = useNavigate();
-  const { hasPermission } = useAuth();
 
   const { snapshot, isLoading } = useBoard(code ?? 'REC');
   const startTicket = useStartTicket();
@@ -72,11 +76,6 @@ export function BoardPage(): JSX.Element {
       </div>
     );
   }
-
-  const canCall = hasPermission('queue.call-next');
-  const canManage = hasPermission('queue.manage');
-  const canAssignCategory = hasPermission('triage.assign-category');
-  const canConsult = hasPermission('emr.read');
 
   const onCallNext = async (): Promise<void> => {
     if (snapshot === null) return;
@@ -157,16 +156,15 @@ export function BoardPage(): JSX.Element {
           <Link to="/queue/check-in" className="btn-secondary text-xs">
             {t('queue:check_in.title')}
           </Link>
-          {canCall && (
-            <button
-              type="button"
-              onClick={onCallNext}
-              disabled={callNext.isPending || snapshot === null}
-              className="btn-primary text-xs disabled:opacity-50"
-            >
-              {t('queue:board.call_next')}
-            </button>
-          )}
+          <PermissionButton
+            type="button"
+            permission="queue.call-next"
+            onClick={onCallNext}
+            disabled={callNext.isPending || snapshot === null}
+            className="btn-primary text-xs disabled:opacity-50"
+          >
+            {t('queue:board.call_next')}
+          </PermissionButton>
         </div>
       </div>
 
@@ -209,12 +207,12 @@ export function BoardPage(): JSX.Element {
           <TicketRow
             ticket={snapshot.in_service}
             inService
-            canStart={false}
-            canComplete={canManage}
-            canHold={canManage}
-            canNoShow={canManage}
-            canTriage={false}
-            canConsult={canConsult && snapshot.in_service.station_code === 'DOC'}
+            showStart={false}
+            showComplete
+            showHold
+            showNoShow
+            showTriage={false}
+            showConsult={snapshot.in_service.station_code === 'DOC'}
             onStart={onStart}
             onComplete={onComplete}
             onHold={onHold}
@@ -243,12 +241,12 @@ export function BoardPage(): JSX.Element {
             <li key={ticket.id} className="px-4 py-3">
               <TicketRow
                 ticket={ticket}
-                canStart={canManage}
-                canComplete={false}
-                canHold={canManage}
-                canNoShow={canManage}
-                canTriage={canAssignCategory && ticket.station_code === 'TRI'}
-                canConsult={canConsult && ticket.station_code === 'DOC'}
+                showStart
+                showComplete={false}
+                showHold
+                showNoShow
+                showTriage={ticket.station_code === 'TRI'}
+                showConsult={ticket.station_code === 'DOC'}
                 onStart={onStart}
                 onComplete={onComplete}
                 onHold={onHold}
@@ -267,12 +265,18 @@ export function BoardPage(): JSX.Element {
 interface RowProps {
   ticket: QueueTicket;
   inService?: boolean;
-  canStart: boolean;
-  canComplete: boolean;
-  canHold: boolean;
-  canNoShow: boolean;
-  canTriage: boolean;
-  canConsult?: boolean;
+  /** Whether the Start action applies in this context (visibility, not permission). */
+  showStart: boolean;
+  /** Whether the Complete action applies in this context. */
+  showComplete: boolean;
+  /** Whether the Hold action applies in this context. */
+  showHold: boolean;
+  /** Whether the No-show action applies in this context. */
+  showNoShow: boolean;
+  /** Whether the Triage action applies in this context (e.g. station is TRI). */
+  showTriage: boolean;
+  /** Whether the Consult action applies in this context (e.g. station is DOC). */
+  showConsult: boolean;
   onStart: (ticket: QueueTicket) => void;
   onComplete: (ticket: QueueTicket) => void;
   onHold: (ticket: QueueTicket) => void;
@@ -290,6 +294,12 @@ function TicketRow(props: RowProps): JSX.Element {
       : ticket.state === 'called'
         ? 'ring-2 ring-amber-300 dark:ring-amber-700'
         : '';
+
+  const isBillingComplete = ticket.station_code === 'BIL' && props.showComplete && ticket.state === 'in_service';
+  const { isCleared, isLoading: isBillLoading } = useBillStatus(isBillingComplete ? ticket.visit_id : null);
+  const [billAcknowledged, setBillAcknowledged] = useState(false);
+
+  const canComplete = !isBillingComplete || isCleared || billAcknowledged;
 
   return (
     <div className={cn('flex flex-wrap items-center justify-between gap-3 rounded-md p-2', stateClass)}>
@@ -315,59 +325,80 @@ function TicketRow(props: RowProps): JSX.Element {
         <span className="text-[10px] uppercase text-stone-400">{ticket.state}</span>
       </div>
       <div className="flex flex-wrap gap-1">
-        {props.canStart && ticket.state !== 'in_service' && ticket.state !== 'completed' && (
-          <button
+        {props.showStart && ticket.state !== 'in_service' && ticket.state !== 'completed' && (
+          <PermissionButton
             type="button"
+            permission={PERM_MANAGE}
             onClick={() => props.onStart(ticket)}
             className="btn-secondary text-[11px]"
           >
             {t('queue:board.start')}
-          </button>
+          </PermissionButton>
         )}
-        {props.canComplete && ticket.state === 'in_service' && (
-          <button
-            type="button"
-            onClick={() => props.onComplete(ticket)}
-            className="btn-primary text-[11px]"
-          >
-            {t('queue:board.complete')}
-          </button>
+        {props.showComplete && ticket.state === 'in_service' && (
+          <div className="flex items-center gap-2">
+            {isBillingComplete && (
+              <label className="flex items-center gap-1 text-[11px] text-stone-600 dark:text-stone-300 bg-stone-100 dark:bg-stone-800 px-2 py-1 rounded">
+                <input
+                  type="checkbox"
+                  checked={billAcknowledged || (isCleared ?? false)}
+                  disabled={isBillLoading || (isCleared ?? false)}
+                  onChange={(e) => setBillAcknowledged(e.target.checked)}
+                  className="rounded border-stone-300 text-brand-600 focus:ring-brand-600"
+                />
+                Bill Cleared
+              </label>
+            )}
+            <PermissionButton
+              type="button"
+              permission={PERM_MANAGE}
+              onClick={() => props.onComplete(ticket)}
+              disabled={!canComplete}
+              className="btn-primary text-[11px] disabled:opacity-50"
+            >
+              {t('queue:board.complete')}
+            </PermissionButton>
+          </div>
         )}
-        {props.canHold && (ticket.state === 'waiting' || ticket.state === 'called') && (
-          <button
+        {props.showHold && (ticket.state === 'waiting' || ticket.state === 'called') && (
+          <PermissionButton
             type="button"
+            permission={PERM_MANAGE}
             onClick={() => props.onHold(ticket)}
             className="btn-ghost text-[11px]"
           >
             {t('queue:board.hold')}
-          </button>
+          </PermissionButton>
         )}
-        {props.canNoShow && ticket.state !== 'completed' && ticket.state !== 'no_show' && (
-          <button
+        {props.showNoShow && ticket.state !== 'completed' && ticket.state !== 'no_show' && (
+          <PermissionButton
             type="button"
+            permission={PERM_MANAGE}
             onClick={() => props.onNoShow(ticket)}
             className="btn-ghost text-[11px] text-clinical-critical"
           >
             {t('queue:board.no_show')}
-          </button>
+          </PermissionButton>
         )}
-        {props.canTriage && (
-          <button
+        {props.showTriage && (
+          <PermissionButton
             type="button"
+            permission={PERM_ASSIGN_CATEGORY}
             onClick={() => props.onTriage(ticket)}
             className="btn-secondary text-[11px]"
           >
             {t('queue:board.triage')}
-          </button>
+          </PermissionButton>
         )}
-        {props.canConsult === true && props.onConsult !== undefined && ticket.state !== 'no_show' && (
-          <button
+        {props.showConsult && props.onConsult !== undefined && ticket.state !== 'no_show' && (
+          <PermissionButton
             type="button"
+            permission={PERM_CONSULT}
             onClick={() => props.onConsult?.(ticket)}
             className="btn-secondary text-[11px]"
           >
             {t('queue:board.consult')}
-          </button>
+          </PermissionButton>
         )}
       </div>
     </div>

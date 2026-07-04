@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\Medication;
 use App\Models\Prescription;
 use App\Models\PrescriptionItem;
@@ -45,7 +46,6 @@ class PharmacyController extends Controller
     {
         $validated = $request->validate([
             'patient_id' => 'required|integer',
-            'doctor_id' => 'required|integer',
             'notes' => 'nullable|string',
             'items' => 'required|array',
             'items.*.medication_id' => 'required|exists:medications,id',
@@ -55,7 +55,7 @@ class PharmacyController extends Controller
 
         $prescription = Prescription::create([
             'patient_id' => $validated['patient_id'],
-            'doctor_id' => $validated['doctor_id'],
+            'doctor_id' => $request->user()->id,
             'notes' => $validated['notes'] ?? null,
             'status' => 'pending'
         ]);
@@ -74,21 +74,24 @@ class PharmacyController extends Controller
 
     public function updatePrescriptionStatus(Request $request, $id)
     {
-        $validated = $request->validate([
-            'status' => 'required|in:pending,dispensed,cancelled'
+        $request->validate([
+            'status' => 'required|in:dispensed'
         ]);
 
-        $prescription = Prescription::findOrFail($id);
-        $prescription->update(['status' => $validated['status']]);
+        $prescription = Prescription::with(['items.medication'])->findOrFail($id);
+        if ($prescription->status !== 'pending') {
+            abort(409, 'Only pending prescriptions can be dispensed.');
+        }
 
-        // If dispensed, decrement stock (basic implementation)
-        if ($validated['status'] === 'dispensed') {
+        DB::transaction(function () use ($prescription): void {
+            $prescription->update(['status' => 'dispensed']);
+
             foreach ($prescription->items as $item) {
                 $medication = $item->medication;
                 $medication->decrement('stock_quantity', $item->quantity);
             }
-        }
+        });
 
-        return response()->json($prescription);
+        return response()->json($prescription->fresh(['items.medication', 'doctor']));
     }
 }

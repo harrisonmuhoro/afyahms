@@ -88,13 +88,11 @@ final class DocumentService
         return $url;
     }
 
-    public function delete(Document $doc): void
+    public function archive(Document $doc): void
     {
-        $disk = $this->storage->disk($this->logicalNameFromDriver($doc->disk));
-        $disk->delete($doc->path);
         $doc->delete();
 
-        $this->audit->record('document.deleted', auth()->user(), null, $doc);
+        $this->audit->record('document.archived', auth()->user(), null, $doc);
     }
 
     private function validate(UploadedFile $file): void

@@ -6,8 +6,8 @@ namespace App\Modules\Patients\Models;
 
 use App\Models\User;
 use App\Modules\Tenancy\Models\Branch;
+use App\Modules\Tenancy\Scopes\BranchScope;
 use App\Support\Concerns\HasAuditTrail;
-use App\Support\Concerns\HasBranch;
 use App\Support\Concerns\HasPublicId;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -30,16 +31,16 @@ use Spatie\Activitylog\Traits\LogsActivity;
  *   supplied; we therefore index the encrypted ciphertext and rely on the
  *   service layer's dedupe matcher for fuzzy lookups).
  *
- * @property int    $id
+ * @property int $id
  * @property string $public_id
  * @property string $patient_number
- * @property int    $branch_id
+ * @property int $branch_id
  * @property string $first_name
  * @property ?string $middle_name
  * @property string $last_name
  * @property ?string $national_id
  * @property ?string $sha_number
- * @property ?\Illuminate\Support\Carbon $date_of_birth
+ * @property ?Carbon $date_of_birth
  * @property string $gender
  * @property string $marital_status
  * @property string $blood_group
@@ -50,18 +51,17 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property ?string $address
  * @property ?string $occupation
  * @property ?string $photo_path
- * @property bool   $deceased
- * @property ?\Illuminate\Support\Carbon $deceased_at
- * @property ?int   $portal_user_id
- * @property bool   $is_active
- * @property ?int   $registered_by
+ * @property bool $deceased
+ * @property ?Carbon $deceased_at
+ * @property ?int $portal_user_id
+ * @property bool $is_active
+ * @property ?int $registered_by
  * @property ?string $merged_into_public_id
- * @property ?\Illuminate\Support\Carbon $merged_at
+ * @property ?Carbon $merged_at
  */
 class Patient extends Model
 {
     use HasAuditTrail;
-    use HasBranch;
     use HasFactory;
     use HasPublicId;
     use LogsActivity;
@@ -78,6 +78,9 @@ class Patient extends Model
         'middle_name',
         'last_name',
         'national_id',
+        'guardian_name',
+        'guardian_national_id',
+        'guardian_relationship',
         'sha_number',
         'date_of_birth',
         'gender',
@@ -101,17 +104,23 @@ class Patient extends Model
 
     /** @var array<string, string> */
     protected $casts = [
-        'date_of_birth'        => 'date',
-        'deceased_at'          => 'date',
-        'merged_at'            => 'datetime',
-        'national_id'          => 'encrypted',
-        'sha_number'           => 'encrypted',
-        'deceased'             => 'boolean',
-        'is_active'            => 'boolean',
+        'date_of_birth' => 'date',
+        'deceased_at' => 'date',
+        'merged_at' => 'datetime',
+        'national_id' => 'encrypted',
+        'guardian_national_id' => 'encrypted',
+        'sha_number' => 'encrypted',
+        'deceased' => 'boolean',
+        'is_active' => 'boolean',
     ];
 
     /** @var array<int, string> */
     protected $hidden = [];
+
+    protected static function booted(): void
+    {
+        // BranchScope removed: Patients are global
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

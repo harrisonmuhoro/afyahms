@@ -38,16 +38,9 @@ final class DocumentsController extends Controller
     public function destroy(Document $document): JsonResponse
     {
         $this->authorize('delete', $document);
-        $this->documents->delete($document);
 
-        return response()->json(['message' => 'Document deleted.']);
-    }
+        $this->documents->archive($document);
 
-    private function authorize(string $ability, Document $document): void
-    {
-        $user = request()->user();
-        if ($user?->cannot('documents.read')) {
-            abort(403);
-        }
+        return response()->json(['message' => 'Document archived. Clinical file retained per retention policy.']);
     }
 }

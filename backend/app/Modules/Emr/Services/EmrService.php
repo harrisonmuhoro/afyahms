@@ -130,6 +130,13 @@ final class EmrService
             if ($note->isSigned()) {
                 throw new ConflictException('SOAP note is already signed.', 409, ['code' => 'ALREADY_SIGNED']);
             }
+            if ($this->isSoapNoteEmpty($note)) {
+                throw new ConflictException(
+                    'Cannot sign an empty note. Enter at least one of Subjective, Objective, Assessment, or Plan.',
+                    409,
+                    ['code' => 'EMPTY_NOTE'],
+                );
+            }
 
             /** @var SoapNote */
             return $this->encounters->updateSoapNote($note, [
@@ -242,6 +249,17 @@ final class EmrService
                 'closed_at'   => now(),
             ]);
         });
+    }
+
+    /** True when every SOAP field is null or whitespace-only. */
+    private function isSoapNoteEmpty(SoapNote $note): bool
+    {
+        $combined = trim((string) $note->subjective)
+            . trim((string) $note->objective)
+            . trim((string) $note->assessment)
+            . trim((string) $note->plan);
+
+        return $combined === '';
     }
 
     private function requireEncounter(int $encounterId): Encounter

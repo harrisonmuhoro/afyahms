@@ -18,6 +18,339 @@ Sections are reverse-chronological. **Latest at top.** Each entry has:
 
 ---
 
+## 2026-07-04 - Google Sign-In Fixes & Patient Portal Profile Flow
+
+**Status:** ✅ shipped
+
+### 1. Google Sign-In & Auth Callbacks
+- Fixed a `404 Not Found` error during the Google OAuth redirect by ensuring `FRONTEND_URL` is correctly configured in the backend `.env` file, pointing to the local Vite dev server port.
+- Fixed an issue where seeded users mapping to Google emails caused a `403 Forbidden` (`No patient record is linked to this account`) because of missing linking between the User and Patient models.
+- Updated `UpdateOwnDemographicsRequest` and `PortalDemographicsController` to bypass the "current password" validation for users registered via Google OAuth who do not possess an initial password.
+
+### 2. Patient Portal Profile Relaxation
+- Removed the strict `profile.complete` middleware check from Patient Portal routes and the `AuthCallbackPage.tsx` redirect.
+- Patients can now successfully log in and access the portal dashboard regardless of their profile completeness status.
+- Expanded `PortalProfile.tsx` to include previously hidden/restricted fields (Date of Birth, National ID, Guardian Name, Guardian National ID, Guardian Relationship) so patients can fill in their missing data directly from the UI.
+
+### 3. Queue & Ticketing Strict Validation
+- Added strict business logic validation to `QueueService::openVisit` to enforce that Receptionists cannot issue Queue Tickets if a patient's fundamental profile is incomplete.
+- Adults (18+) must have Name, Gender, DOB, and National ID filled.
+- Minors (<18) must have Name, Gender, DOB, Guardian Name, Guardian National ID, and Guardian Relationship filled.
+
+### 4. Cleanup
+- Purged temporary AI configuration/cache directories (`.claude`, `.qwen`, `.agents`) and `.tmp`.
+- Removed debug scripts and backup `.json` files.
+
+### 5. UI Quality & Auth Hardening
+- **Router Future Flags:** Re-enabled `v7_startTransition` and `v7_relativeSplatPath` in React Router config in `main.tsx` to eliminate console warnings.
+- **Global Show/Hide Passwords:** Implemented an eye-icon toggle on all password input fields across the portal for enhanced user experience (applied to `SettingsPage`, `StaffProfilePage`, `PortalProfile`, and `ForgotPasswordPage`, matching the existing ones in Login and Admin creation).
+- **Specific Login Errors:** Updated `AuthService::login()` to split the generic "Invalid credentials" error into two distinct and helpful errors:
+  - `"This account does not exist in the system."` (if the email is unregistered, preventing user confusion).
+  - `"Invalid password. Please try again."` (if the hash check fails).
+
+---
+
+## 2026-07-02 - Superadmin/Admin Split and User Data Editing Policy
+
+**Status:** Implemented backend policy layer, API surfaces, and frontend role-scoped portal distinction.
+
+Implemented the canonical rules from `roles/19-roles-admin-vs-superadmin.md`, `roles/20-user-data-editing-policy.md`, and `docs/28-canonical-decisions.md`.
+
+### 1. Superadmin vs Hospital Admin Separation
+
+- Added a distinct `superadmin` role while keeping `hospital-admin` as the operational hospital admin role.
+- Seeded `superadmin@afya.local` separately from `admin@afya.local`.
+- Blocked Hospital Admin from assigning/promoting `superadmin` or `hospital-admin`.
+- Removed Hospital Admin access to role-template mutation and system/break-glass permissions.
+- Added last-active-superadmin protection, no self-deactivation, and reason-required deactivate/reactivate flows.
+- Split the frontend shell/dashboard view so `superadmin` sees system administration modules while `hospital-admin` remains on the hospital operations portal.
+
+### 2. Account Lifecycle and Auth Safety
+
+- Added account lifecycle fields to users: `is_active`, `deactivated_at`, `deactivated_reason`, `deactivated_by`.
+- Login now blocks deactivated accounts separately from temporary lockout.
+- Temporary lockout keeps the friendly message and duration visible to the login page.
+- Superadmin failed-password attempts are still recorded, but do not set account-level `locked_until`, preserving the canonical "cannot be locked out" rule while route throttling still limits abuse.
+- Password changes now invalidate other Sanctum tokens/sessions and write immutable audit entries without storing password values.
+- Split account checks into explicit view/manage/role-change rules so Hospital Admin cannot view or manage Superadmin accounts, cannot manage Hospital Admin accounts, and no user can change their own roles through the admin endpoint.
+- User creation, profile updates, and role changes now write immutable audit entries.
+
+### 3. User Data Editing Policy
+
+- Added explicit audit fields for actor role, action, field, old/new values, IP, user agent, and break-glass reason.
+- Demographic edits now write field-level audit records and require confirmation for sensitive fields like DOB/National ID.
+- Patient portal demographic update requires current-password reauthentication.
+- Patient role can update only own demographics and can request clinical corrections, not edit clinical records.
+
+### 4. Data Correction Workflow
+
+- Added `data_correction_requests` table, model, resource, requests, service, and controllers.
+- Added patient portal endpoints for own correction request listing/submission.
+- Added staff review endpoints for authorized clinical reviewers.
+- Protected patient correction requests at the service layer so patient users cannot submit against another patient record.
+- Added durable database notifications for data-correction review outcomes.
+
+### 4.1 Notifications
+
+- Added the standard Laravel `notifications` table for durable in-app notification records.
+- Account reactivation now creates a database notification for the reactivated user, including actor, timestamp, and reason.
+- External SMS/email delivery is intentionally left for the Communication channel implementation because the referenced SMS/email channel classes are not present yet.
+
+### 5. Break-Glass and Audit Access
+
+- Added break-glass middleware for Superadmin clinical access on EMR/Triage routes requiring a documented reason.
+- Break-glass access writes an immutable audit event.
+- Audit listing now reads from the immutable `audit_logs` table and branch-scopes non-superadmin access.
+
+### 6. RBAC/Test Updates
+
+- Updated seeded permissions for queue canonical names and patient portal correction/demographic actions.
+- Added policy assertions that Hospital Admin does not receive excluded clinical authoring permissions.
+- Added focused tests for Hospital Admin vs Superadmin account boundaries and Superadmin lockout protection.
+- Skipped obsolete exact-match checks against the old Doc 08 wildcard model because Doc 28 now supersedes it.
+- Fixed `TriageAssessment` model trait import so the clinical model can load correctly during policy/test execution.
+- Fixed RBAC seeding cache refresh so newly added permissions such as `users.activate` are visible before role permission sync.
+- Applied pending live migrations and reran the idempotent initial seeder; verified `superadmin@afya.local` and `admin@afya.local` both authenticate with the seeded default password and resolve to separate roles.
+- Frontend type-check passes after the role-aware dashboard/stat-card and navigation visibility changes.
+
+**Key files changed:** `backend/app/Modules/Admin/Rbac.php`, `backend/app/Modules/Admin/Services/UserAccountService.php`, `backend/app/Modules/Admin/Controllers/UsersController.php`, `backend/app/Modules/Admin/Services/RolePermissionService.php`, `backend/app/Modules/Auth/Services/AuthService.php`, `backend/app/Modules/Auth/Services/LoginHistoryService.php`, `backend/app/Modules/Auth/Controllers/AuthController.php`, `backend/app/Modules/Audit/Services/AuditLogService.php`, `backend/app/Http/Middleware/RequireBreakGlassReason.php`, `backend/app/Modules/Patients/Services/DataCorrectionRequestService.php`, `backend/app/Modules/PatientPortal/routes.php`, `backend/app/Modules/Triage/Models/TriageAssessment.php`, `backend/app/Notifications/AccountReactivatedNotification.php`, `backend/app/Notifications/DataCorrectionReviewedNotification.php`, `backend/database/migrations/2026_07_01_010300_create_notifications_table.php`, `frontend/src/features/auth/LoginPage.tsx`, `frontend/src/config/navigation.ts`, `frontend/src/components/layout/AppShell.tsx`, `frontend/src/features/dashboard/DashboardPage.tsx`.
+
+---
+
+## 2026-07-01 - Auth/RBAC Hardening, Branch/Queue Fixes, and DB-backed Preferences
+
+**Status:** Implemented and verified where the local environment allows.
+
+This entry covers the work completed after reviewing the 11 role markdown files and comparing them against the current portals/modules. The main theme was removing unsafe client-side persistence, tightening route permissions, fixing branch editing, making auth lockout clearer, and enforcing queue ticket invariants in the backend.
+
+### 1. Role Docs Review and Route Guard Alignment
+
+Read all 11 files under `roles/` and used them as the role/permission reference before making changes. Applied least-privilege route guards and removed duplicate/unguarded access paths.
+
+- **`backend/app/Modules/Admin/routes.php`** - settings and admin routes now use explicit permission middleware.
+- **`backend/app/Modules/Audit/routes.php`** - audit routes guarded.
+- **`backend/app/Modules/Inventory/routes.php`** - inventory routes guarded.
+- **`backend/app/Modules/Reporting/routes.php`** - reporting routes guarded.
+- **`backend/app/Modules/Queue/routes.php`** - queue ticket actions aligned to `queue.advance`; ticket issue/check-in guarded separately.
+- **`backend/routes/api.php`** - temporary pharmacy routes now require `auth:sanctum` plus specific pharmacy/prescription permissions.
+- **`backend/app/Providers/RouteServiceProvider.php`** - module route loading updated so the new module route files are registered consistently.
+
+### 2. Friendly Account Lockout Handling
+
+Improved temporary lockout behavior for failed password attempts.
+
+- **`backend/app/Modules/Auth/Services/AuthService.php`** - locked accounts now return a friendly message explaining that the account was locked because of too many incorrect password attempts, including the remaining duration.
+- **`backend/app/Modules/Auth/Services/LoginHistoryService.php`** - lockout/failure tracking kept as the source of truth.
+- **`backend/tests/Feature/Auth/LoginTest.php`** - login lockout coverage updated, but full execution is still blocked locally by the missing MySQL database `afya_test`.
+- **Frontend login flow** - surfaces the backend lockout message instead of a generic forbidden/login failure.
+
+### 3. Branch Save/Edit 500 Fix
+
+Fixed the branch edit failure where the frontend sent a public UUID but the backend update path expected a numeric ID.
+
+- **`backend/app/Modules/Tenancy/Controllers/BranchController.php`**
+- **`backend/app/Modules/Tenancy/Services/BranchService.php`**
+- **`backend/app/Modules/Tenancy/Repositories/Contracts/BranchRepository.php`**
+- **`backend/app/Modules/Tenancy/Repositories/Eloquent/EloquentBranchRepository.php`**
+
+Branch show/update now accept public UUIDs as well as numeric internal IDs.
+
+### 4. Duplicate Patient Ticket Prevention
+
+Added backend protection so a patient cannot be issued another queue ticket for the same branch/date once already checked in.
+
+- **`backend/app/Modules/Queue/Services/QueueService.php`**
+  - Locks the patient row during check-in.
+  - Prevents duplicate same-day same-branch ticket issuance.
+  - Blocks active duplicate queue tickets.
+  - Keeps legitimate forward station advancement intact.
+
+### 5. Documents, Pharmacy, and Clinical Data Safety
+
+Applied supporting backend hardening from the role/routing review.
+
+- **`backend/app/Modules/Documents/Models/Document.php`** - documents now use soft deletes.
+- **`backend/app/Modules/Documents/Services/DocumentService.php`** - document removal archives records instead of deleting storage/DB data outright.
+- **`backend/app/Http/Controllers/PharmacyController.php`** - prescription creation uses the authenticated user as doctor.
+- **`backend/app/Http/Controllers/PharmacyController.php`** - dispensing only accepts `status=dispensed`, only from pending prescriptions, inside a DB transaction.
+
+### 6. Removed Browser Storage and Moved Preferences to DB
+
+Removed every runtime/source instance of `localStorage` and `sessionStorage`. Final repo-wide search returns no matches.
+
+- **`frontend/src/lib/http.ts`** - bearer token is now kept in memory only, not browser storage.
+- **`frontend/src/i18n/index.ts`** - locale detection no longer reads `localStorage`.
+- **`frontend/src/features/theme/ThemeProvider.tsx`** - theme no longer reads/writes `localStorage`; it syncs from authenticated user preferences.
+- **`frontend/src/features/auth/AuthProvider.tsx`** - auth user now includes `locale` and `theme`; added `updatePreferences()`.
+- **`frontend/src/features/settings/SettingsPage.tsx`** - language and theme changes save through the authenticated preferences API.
+- **`frontend/src/app/Providers.tsx`** - provider order updated so `ThemeProvider` can consume auth/user preferences.
+- **`backend/database/migrations/2026_07_01_000000_add_preferences_to_users_table.php`** [NEW] - adds `users.locale` and `users.theme`.
+- **`backend/app/Modules/Auth/Requests/UpdatePreferencesRequest.php`** [NEW] - validates preference updates.
+- **`backend/app/Modules/Auth/Controllers/AuthController.php`** - added `updatePreferences()`.
+- **`backend/app/Modules/Auth/routes.php`** - added `PATCH /api/v1/auth/preferences`.
+- **`backend/app/Modules/Auth/Resources/UserResource.php`** and **`backend/app/Resources/UserResource.php`** - expose preference fields.
+- **`backend/app/Models/User.php`** - `locale` and `theme` added to fillable fields.
+- **Docs updated:** `docs/00-foundation.md`, `docs/03-srs.md`, `docs/14-frontend-architecture.md`, `docs/15-uiux-design-system.md`, `docs/16-folder-structure.md`, `docs/24-testing-strategy.md`.
+
+Important behavior change: because the app still uses stateless Sanctum bearer tokens and no browser storage, login does not survive a page refresh. Persistent login without browser storage requires a separate cookie/session-based auth design.
+
+### 7. Verification
+
+- `npm run type-check` - passed.
+- `npm run build` - passed after allowing Vite/esbuild to spawn its helper process.
+- PHP syntax checks passed for touched Auth/User/preference files.
+- `php artisan route:list --path=api/v1/auth` confirms `PATCH api/v1/auth/preferences`.
+- `rg -n "localStorage|sessionStorage" .` - no matches.
+
+### Deployment Notes
+
+- Run migrations before using DB-backed preferences:
+  ```bash
+  D:\wamp2\bin\php\php8.4.15\php.exe artisan migrate
+  ```
+- Backend auth tests still need a real MySQL test database named `afya_test` before the lockout test suite can run locally.
+
+---
+
+## 2026-06-27 — 28 Canonical Decisions: RBAC + Queue Pipeline Overhaul
+
+**Status:** ✅ Implemented.
+
+Implemented all architectural mandates from `docs/28-canonical-decisions.md`, the secondary source of truth for the system. Changes span RBAC reconciliation, queue pipeline enforcement, department-context security, and station check-in for staff.
+
+### 1. `current_station_id` — Staff Station Assignment
+
+Added a new FK column so the system knows which queue station a logged-in staff member is actively working at. This is the basis for the department-context enforcement rule (§8.3 of canonical decisions).
+
+- **`database/migrations/2026_06_27_203700_add_current_station_id_to_users_table.php`** [NEW] — adds `current_station_id BIGINT UNSIGNED NULL` with a FK to `queue_stations`, null-on-delete.
+- **`app/Models/User.php`** — `current_station_id` added to `$fillable`; `currentStation()` `BelongsTo` relation added.
+- **`app/Modules/Auth/Resources/UserResource.php`** — exposes `current_station` (id, code, name) in the `/me` response so the frontend always knows where the user is checked in.
+
+### 2. Station Check-in API
+
+New dedicated API for staff to check in or out of a station before handling tickets. Required to populate `current_station_id`.
+
+- **`app/Modules/Queue/Controllers/StationCheckInController.php`** [NEW] — `checkIn()` sets `current_station_id`, `checkOut()` clears it. Validates the station belongs to the user's active branch.
+- **Routes added to `app/Modules/Queue/routes.php`**:
+  - `POST /api/v1/queue/stations/{id}/check-in`
+  - `POST /api/v1/queue/stations/{id}/check-out`
+
+### 3. RBAC: 4 New Canonical Queue Permissions
+
+Added the four permissions mandated by canonical decisions §4, updating both the permissions registry and every role's permission matrix.
+
+- **`app/Modules/Admin/Rbac.php`**:
+  - Added to `PERMISSIONS`: `queue.issue`, `queue.advance`, `queue.void`, `queue.track-own`.
+  - Updated `ROLE_PERMISSIONS` for every role:
+    | Role | Queue Permissions |
+    |---|---|
+    | `hospital-admin` | `issue`, `call-next`, `advance`, `manage`, `void`, `override-priority` |
+    | `doctor` | `call-next`, `advance`, `override-priority` |
+    | `nurse` | `issue`, `call-next`, `advance`, `manage`, `override-priority` |
+    | `receptionist` | `issue`, `call-next`, `advance`, `manage`, `void` |
+    | `records-officer` | `read`, `list` (read-only, no management) |
+    | `pharmacist` | `call-next`, `advance` |
+    | `lab-technician` | `call-next`, `advance` |
+    | `radiologist` | `call-next`, `advance` |
+    | `cashier` | `call-next`, `advance` |
+    | `patient` | `track-own` (portal queue position only) |
+
+### 4. Queue Pipeline Logic
+
+Implemented three core pipeline invariants from canonical decisions §6 and §16.
+
+- **`app/Modules/Queue/Services/QueueService.php`**:
+  - Added `PIPELINE_ORDER` constant (REC=1, TRI=2, DOC=3, RAD=4, LAB=5, PHA=6, BIL=7).
+  - **Forward-Only Rule** (`issueTicket`): checks if the visit already has a `completed` or `transferred` ticket at the same or later pipeline position. Throws `PIPELINE_FORWARD_ONLY_VIOLATION` (422) unless the actor has both `queue.void` + `queue.override-priority` AND provides a reason override.
+  - **Visit Auto-Closure** (`complete`): when a ticket is completed with no `next_station`, the parent visit is automatically updated to `status = closed, closed_at = now()`.
+  - **Hold-Credit Scoring** (`resume`): calculates hold credit as `min(hold_duration / 2, 5400)` seconds and records `hold_duration_seconds` + `hold_credit` in the queue event ledger.
+
+### 5. Department-Context Enforcement (Policy)
+
+Ensures a staff member can only manage tickets at the station they are checked in to.
+
+- **`app/Modules/Queue/Policies/QueueTicketPolicy.php`** [NEW] — `manage()` gate:
+  - `hospital-admin` role: always allowed (bypass).
+  - Users with `queue.manage`: always allowed (supervisor bypass).
+  - All others: `current_station_id` must match `ticket.station_id`.
+- **`app/Modules/Queue/Providers/QueueServiceProvider.php`** — policy registered via `Gate::policy(QueueTicket::class, QueueTicketPolicy::class)`.
+- **`app/Modules/Queue/Controllers/QueueController.php`** — `$this->authorize('manage', $ticket)` added to `startServing`, `complete`, `hold`, `resume`, and `noShow` methods.
+
+### 6. Route Permission Updates
+
+Aligned route middleware with the new canonical permissions.
+
+- **`app/Modules/Queue/routes.php`** — ticket action routes (`/start`, `/complete`, `/hold`, `/resume`, `/no-show`) now require `permission:queue.advance` instead of the retired `permission:queue.manage`.
+
+### 7. Configuration: Department Grace Windows
+
+- **`config/queue.php`** — added `grace_windows` block (seconds before a called ticket is flagged overdue), per canonical decisions §15:
+  - REC: 180s · TRI: 300s · DOC: 300s · RAD: 300s · LAB: 180s · PHA: 180s · BIL: 180s.
+
+> **Deployment note:** Run `php artisan migrate` then `php artisan db:seed --class=InitialSeeder` to apply the DB schema change and sync the updated RBAC matrix.
+
+---
+
+## 2026-06-27 — Branch Action Permissions
+
+
+**Status:** ✅ Implemented.
+
+### 1. Branch UI Action Protection
+Conditionally rendered branch management actions in the frontend based on the user's role permissions.
+- **`frontend/src/features/branches/BranchesPage.tsx`**: 
+  - Hid the `+ Add Branch` button behind the `branches.create` permission (Admin only).
+  - Hid the `Edit Details` and `Settings` buttons behind the `branches.update` permission (Admin only).
+
+### 2. Branch Modal Implementation
+Implemented the actual form dialog to allow adding and editing branches.
+- **`frontend/src/features/branches/BranchModal.tsx`** [NEW]: Added a React Hook Form modal with Zod validation to match the backend `CreateBranchRequest` and `UpdateBranchRequest` constraints. It handles creating new branches and editing existing ones.
+- Wired the new modal up to the `BranchesPage.tsx` buttons so they now open the dialog and save data correctly via the API.
+
+---
+
+## 2026-06-27 — Portal Restrictions Implementation
+
+**Status:** ✅ All items implemented. TypeScript type-check passes clean.
+
+### 1. Own-Data-Only Global Scope (Option A)
+Implemented an Eloquent Global Scope that automatically filters all patient-owned records when the authenticated user has the `patient` role.
+
+- **`app/Modules/Patients/Scopes/OwnPatientDataScope.php`** [NEW] — `implements Scope`. Checks if the current user has the `patient` role, then applies `WHERE patient_id = {user.patient_id}` automatically. If the user has no `patient_id`, it returns an empty set defensively (`whereRaw('1 = 0')`).
+- **`app/Modules/Patients/Traits/HasOwnPatientDataScope.php`** [NEW] — Trait that calls `static::addGlobalScope(new OwnPatientDataScope())` in `bootHasOwnPatientDataScope()`.
+
+**Applied to models:**
+| Model | File |
+|---|---|
+| `Encounter` | `app/Modules/Emr/Models/Encounter.php` |
+| `Visit` | `app/Modules/Queue/Models/Visit.php` |
+| `QueueTicket` | `app/Modules/Queue/Models/QueueTicket.php` |
+| `TriageAssessment` | `app/Modules/Triage/Models/TriageAssessment.php` |
+| `Allergy` | `app/Modules/Patients/Models/Allergy.php` |
+| `PatientInsurance` | `app/Modules/Patients/Models/PatientInsurance.php` |
+| `PatientNextOfKin` | `app/Modules/Patients/Models/PatientNextOfKin.php` |
+| `PatientRelationship` | `app/Modules/Patients/Models/PatientRelationship.php` |
+
+> Child records with `encounter_id` FK (e.g. `SoapNote`, `Diagnosis`) are protected transitively through the `Encounter` scope.
+
+### 2. Stricter Rate Limiting
+- **`app/Providers/RouteServiceProvider.php`** — Added `portal-api` rate limiter: **60 requests/minute** per user ID (falling back to IP for unauthenticated requests).
+
+### 3. Role & Permission Guards
+- **`app/Modules/PatientPortal/routes.php`** [NEW] — Patient portal API route group applying `auth:sanctum`, `throttle:portal-api`, `role:patient`, and `permission:portal.access` middleware to all portal endpoints.
+- **`app/Modules/Auth/routes.php`** — Added `throttle:auth` middleware to the `/login` route (10 requests/min per email+IP), enforcing the brute-force lockout policy.
+
+### 4. Frontend Permission Gating (Client-side UX)
+- **`frontend/src/app/App.tsx`** — Portal routes now use `<ProtectedRoute>` with specific permission props:
+  - `/portal` top-level requires `portal.access`
+  - `/portal/results` requires `portal.view-results`
+  - `/portal/bills` requires `portal.view-invoices` **or** `portal.pay`
+- **`frontend/src/features/portal/PortalBills.tsx`** — Pay buttons (hero "Pay All" + per-invoice) are conditionally hidden when the user lacks `portal.pay`. This is UX-only; the server enforces this independently.
+
+> **Note:** Primary enforcement is always server-side (Spatie policies + route middleware). Frontend gating is UX sugar only.
+
+---
+
 ## 2026-06-26 (later) — Cleared the three auth follow-ups
 
 **Status:** ✅ All three fixed and verified against the running API.
@@ -324,6 +657,7 @@ The Queue + Triage slice is feature-complete at the API and UI level. Things sti
 
 ### After EMR
 
+
 - **Pharmacy dispense** (UC-PHA-01) — reads EMR prescriptions, FEFO stock decrement.
 - **Lab orders → sample → result → release** (UC-LAB-01) — `LAB-{BRANCH}-YYMMDD-0001` sample IDs.
 - **Billing + M-Pesa STK Push** (UC-BIL-01) — invoice generation + `MpesaDarajaGateway`.
@@ -453,3 +787,17 @@ Patients generated by `PatientSeeder` can log into the portal. A sample account:
 | Patient | `patient@afya.local` | `ChangeMe!2025` |
 
 All seeded patient accounts (20 total) follow the pattern `[firstname].[lastname]@patient.afya.local` with the same default password.
+
+### Authentication & Security Overhaul
+- **Multi-Factor Authentication (MFA)**: 
+  - Added a `type` column to the `user_mfa` table to support both `totp` (Authenticator App) and `email` MFA options.
+  - Revamped the "Account & Security" section in `StaffProfilePage` to allow users to securely enroll in their preferred MFA type.
+  - Implemented the `qrcode.react` package on the frontend to reliably render scannable QR Code SVGs for Authenticator App setups (fixing previous `otpauth://` image loading errors).
+  - Updated the authentication lifecycle (`AuthService`) to intelligently dispatch an Email OTP immediately upon a valid password submission if the user has `email` MFA enabled.
+- **Forgot Password SPA Flow**:
+  - Replaced the default Laravel session-based password reset architecture with a fully headless, OTP-driven approach optimized for the React SPA.
+  - Built a seamless 3-step React wizard (`ForgotPasswordPage.tsx`) covering Request, Verify, and Reset stages.
+  - Created `ForgotPasswordController` to manage the request/verify/reset endpoints and safely store hashed short-lived (15 min) verification tokens in the database.
+- **Admin Password Resets**:
+  - Rewrote the "Send password reset" functionality in the Admin staff dashboard (`StaffAdminController`) to decouple it from Laravel's obsolete `Password` broker.
+  - It now integrates securely with the custom `OtpService`, instantly generating and emailing a 6-digit OTP code to the targeted staff member to begin the SPA reset flow.

@@ -20,6 +20,7 @@ use App\Modules\Insurance\Module as InsuranceModule;
 use App\Modules\Inpatient\Module as InpatientModule;
 use App\Modules\Inventory\Module as InventoryModule;
 use App\Modules\Reporting\Module as ReportingModule;
+use App\Modules\Staff\Module as StaffModule;
 use App\Modules\Communication\Module as CommunicationModule;
 use App\Modules\PatientPortal\Module as PatientPortalModule;
 use App\Modules\Documents\Module as DocumentsModule;
@@ -54,6 +55,7 @@ final class ModuleServiceProvider extends ServiceProvider
         InpatientModule::class,
         InventoryModule::class,
         ReportingModule::class,
+        StaffModule::class,
         PatientPortalModule::class,
         AdminModule::class,
     ];

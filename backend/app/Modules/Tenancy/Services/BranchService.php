@@ -34,6 +34,25 @@ final class BranchService
         return $this->branches->update($branch, $attributes);
     }
 
+    public function findAccessibleForUser(User $user, string|int $id): ?Branch
+    {
+        if (! is_string($id) || ctype_digit($id)) {
+            $branch = $this->branches->find((int) $id);
+        } else {
+            $branch = $this->branches->findByPublicId($id);
+        }
+
+        if ($branch === null || ! $branch->is_active) {
+            return null;
+        }
+
+        if ($user->can('branch.view-all')) {
+            return $branch;
+        }
+
+        return in_array($branch->id, $user->accessibleBranchIds(), true) ? $branch : null;
+    }
+
     public function listForUser(User $user): Collection
     {
         if ($user->can('branch.view-all')) {

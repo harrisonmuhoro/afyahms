@@ -1,7 +1,26 @@
 import axios, { type AxiosError, type AxiosInstance, type AxiosRequestConfig } from 'axios';
+import { i18n } from '../i18n';
 import type { ApiError, ApiErrorEnvelope } from './types';
 
-const STORAGE_KEY = 'afya.token';
+const FORBIDDEN_TOAST_DEDUPE_MS = 3000;
+let lastForbiddenToastAt = -Infinity;
+let bearerToken: string | null = null;
+
+function notifyForbidden(): void {
+  const now = performance.now();
+  if (now - lastForbiddenToastAt < FORBIDDEN_TOAST_DEDUPE_MS) {
+    return;
+  }
+  lastForbiddenToastAt = now;
+
+  const title = i18n?.t
+    ? i18n.t('errors:forbidden')
+    : "Your role isn't permitted to do this.";
+
+  window.dispatchEvent(
+    new CustomEvent('afya:toast', { detail: { title, variant: 'error' } }),
+  );
+}
 
 export class HttpError extends Error {
   constructor(
@@ -53,7 +72,14 @@ class HttpClientImpl {
 
     this.instance.interceptors.response.use(
       (r) => r,
-      (err: AxiosError<ApiErrorEnvelope>) => Promise.reject(HttpError.fromAxios(err)),
+      (err: AxiosError<ApiErrorEnvelope>) => {
+        const httpError = HttpError.fromAxios(err);
+        if (httpError.status === 403 && !err.config?.url?.startsWith('/auth/')) {
+          notifyForbidden();
+        }
+
+        return Promise.reject(httpError);
+      },
     );
   }
 
@@ -62,15 +88,11 @@ class HttpClientImpl {
   }
 
   getToken(): string | null {
-    return localStorage.getItem(STORAGE_KEY);
+    return bearerToken;
   }
 
   setToken(token: string | null): void {
-    if (token) {
-      localStorage.setItem(STORAGE_KEY, token);
-    } else {
-      localStorage.removeItem(STORAGE_KEY);
-    }
+    bearerToken = token;
   }
 
   async get<T>(url: string, options: RequestOptions = {}): Promise<T> {

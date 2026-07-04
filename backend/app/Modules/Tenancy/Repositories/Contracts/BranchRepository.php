@@ -12,6 +12,8 @@ interface BranchRepository
 {
     public function find(mixed $id): ?Branch;
 
+    public function findByPublicId(string $publicId): ?Branch;
+
     public function findByCode(string $code): ?Branch;
 
     public function listActive(): Collection;

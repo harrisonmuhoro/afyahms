@@ -31,10 +31,10 @@ final class RolesController extends Controller
             'permissions.*' => ['string'],
         ]);
 
-        /** @var Role $role */
-        $role = Role::findOrFail($role);
-        $this->service->syncPermissions($role, $request->input('permissions'));
+        /** @var Role $roleModel */
+        $roleModel = Role::query()->where('name', $role)->firstOrFail();
+        $this->service->syncPermissions($roleModel, $request->input('permissions'));
 
-        return response()->json(['message' => 'Permissions updated.', 'role' => $role->fresh()]);
+        return response()->json(['message' => 'Permissions updated.', 'role' => $roleModel->fresh()]);
     }
 }

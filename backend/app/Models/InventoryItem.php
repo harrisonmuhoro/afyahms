@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Modules\Tenancy\Models\Branch;
+use App\Modules\Tenancy\Scopes\BranchScope;
+use Illuminate\Database\Eloquent\Model;
 
 class InventoryItem extends Model
 {
@@ -11,6 +12,11 @@ class InventoryItem extends Model
         'sku', 'name', 'category', 'unit', 'quantity_on_hand', 
         'reorder_level', 'unit_cost', 'expiry_date', 'branch_id'
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new BranchScope());
+    }
 
     public function branch()
     {

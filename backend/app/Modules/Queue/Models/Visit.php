@@ -8,6 +8,7 @@ use App\Modules\Tenancy\Scopes\BranchScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property int    $id
@@ -23,10 +24,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Visit extends Model
 {
+    use SoftDeletes;
+    use \App\Modules\Patients\Traits\HasOwnPatientDataScope;
+
     protected $table = 'visits';
 
     protected $fillable = [
-        'public_id', 'branch_id', 'patient_id',
+        'public_id', 'visit_number', 'branch_id', 'patient_id',
         'appointment_id', 'encounter_id',
         'visit_date', 'visit_type', 'status',
         'current_department', 'registered_by', 'registered_at', 'closed_at',
@@ -36,6 +40,7 @@ class Visit extends Model
         'visit_date'    => 'date',
         'registered_at'  => 'datetime',
         'closed_at'      => 'datetime',
+        'deleted_at'    => 'datetime',
     ];
 
     protected static function booted(): void

@@ -6,7 +6,9 @@ namespace App\Modules\Admin\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Modules\Audit\Services\AuditLogService;
 use App\Modules\Admin\Services\RolePermissionService;
+use App\Modules\Admin\Services\UserAccountService;
 use App\Modules\Auth\Resources\UserResource;
 use App\Modules\Tenancy\Services\BranchService;
 use Illuminate\Http\JsonResponse;
@@ -18,12 +20,17 @@ final class UsersController extends Controller
     public function __construct(
         private readonly RolePermissionService $rbac,
         private readonly BranchService $branches,
+        private readonly UserAccountService $accounts,
+        private readonly AuditLogService $audit,
     ) {}
 
     public function index(Request $request): JsonResponse
     {
+        $actor = $request->user();
+
         $users = User::query()
             ->with(['roles', 'branches'])
+            ->when(! $actor?->hasRole('superadmin'), fn ($q) => $q->whereDoesntHave('roles', fn ($r) => $r->where('name', 'superadmin')))
             ->when($request->filled('q'), fn ($q) => $q->where(fn ($w) => $w
                 ->where('name', 'like', "%{$request->string('q')}%")
                 ->orWhere('email', 'like', "%{$request->string('q')}%")
@@ -46,6 +53,8 @@ final class UsersController extends Controller
 
     public function show(User $user): JsonResponse
     {
+        $this->accounts->assertCanView(request()->user(), $user);
+
         return response()->json(['user' => (new UserResource($user->load(['roles', 'branches'])))->resolve(request())]);
     }
 
@@ -62,6 +71,8 @@ final class UsersController extends Controller
             'branch_ids'  => ['nullable', 'array'],
             'branch_ids.*'=> ['integer', 'exists:branches,id'],
         ]);
+
+        $this->accounts->assertAssignableRoles($request->user(), $data['roles']);
 
         $user = User::create([
             'name'      => $data['name'],
@@ -80,6 +91,19 @@ final class UsersController extends Controller
             }
         }
 
+        $this->audit->record(
+            event: 'user.created',
+            actor: $request->user(),
+            request: $request,
+            subject: $user,
+            context: [
+                'action' => 'created',
+                'roles' => $data['roles'],
+                'home_branch_id' => $data['home_branch_id'] ?? null,
+                'branch_ids' => $data['branch_ids'] ?? [],
+            ],
+        );
+
         return response()->json(['user' => (new UserResource($user->fresh()->load(['roles', 'branches'])))->resolve($request)], 201);
     }
 
@@ -92,11 +116,42 @@ final class UsersController extends Controller
             'roles.*'  => ['string', Rule::in(array_keys(\App\Modules\Admin\Rbac::ROLES))],
         ]);
 
+        if (isset($data['roles'])) {
+            $this->accounts->assertCanChangeRoles($request->user(), $user, $data['roles']);
+        } elseif ($request->user()->id !== $user->id) {
+            $this->accounts->assertCanManage($request->user(), $user);
+        }
+
+        $before = $user->only(['name', 'phone']);
+        $previousRoles = $user->getRoleNames()->all();
         $user->fill(\Illuminate\Support\Arr::only($data, ['name', 'phone']));
         $user->save();
+        $after = $user->fresh()->only(['name', 'phone']);
+
+        $this->audit->recordFieldChanges(
+            event: 'user.updated',
+            actor: $request->user(),
+            request: $request,
+            subject: $user,
+            before: $before,
+            after: $after,
+            context: ['action' => 'updated'],
+        );
 
         if (isset($data['roles'])) {
             $this->rbac->syncUserRoles($user, $data['roles']);
+
+            $this->audit->record(
+                event: 'user.roles_changed',
+                actor: $request->user(),
+                request: $request,
+                subject: $user,
+                context: [
+                    'action' => 'roles_changed',
+                    'old_value' => $previousRoles,
+                    'new_value' => $data['roles'],
+                ],
+            );
         }
 
         return response()->json(['user' => (new UserResource($user->fresh()->load(['roles', 'branches'])))->resolve($request)]);
@@ -104,8 +159,36 @@ final class UsersController extends Controller
 
     public function destroy(User $user): JsonResponse
     {
-        $user->delete();
+        abort(405, 'Use account deactivation instead of deleting users.');
 
-        return response()->json(['message' => 'User archived.']);
+        return response()->json(['message' => 'Use account deactivation instead of deleting users.'], 405);
+    }
+
+    public function deactivate(Request $request, User $user): JsonResponse
+    {
+        $data = $request->validate([
+            'reason' => ['required', 'string', 'min:5', 'max:2000'],
+        ]);
+
+        $updated = $this->accounts->deactivate($request->user(), $user, $data['reason'], $request);
+
+        return response()->json([
+            'message' => 'User deactivated.',
+            'user' => (new UserResource($updated))->resolve($request),
+        ]);
+    }
+
+    public function reactivate(Request $request, User $user): JsonResponse
+    {
+        $data = $request->validate([
+            'reason' => ['required', 'string', 'min:5', 'max:2000'],
+        ]);
+
+        $updated = $this->accounts->reactivate($request->user(), $user, $data['reason'], $request);
+
+        return response()->json([
+            'message' => 'User reactivated.',
+            'user' => (new UserResource($updated))->resolve($request),
+        ]);
     }
 }

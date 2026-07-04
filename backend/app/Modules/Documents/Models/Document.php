@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Modules\Documents\Models;
 
 use App\Models\User;
+use App\Modules\Tenancy\Scopes\BranchScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * A document stored via StorageManager. Models can be related via morphTo.
@@ -16,6 +18,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 final class Document extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'documents';
 
     /** @var array<int, string> */
@@ -30,6 +34,11 @@ final class Document extends Model
         'metadata'    => 'encrypted:array',
         'size_bytes'  => 'integer',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new BranchScope());
+    }
 
     public function getRouteKeyName(): string
     {

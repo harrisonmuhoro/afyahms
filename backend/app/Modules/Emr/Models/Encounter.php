@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Encounter extends Model
 {
     use SoftDeletes;
+    use \App\Modules\Patients\Traits\HasOwnPatientDataScope;
 
     protected $table = 'encounters';
 

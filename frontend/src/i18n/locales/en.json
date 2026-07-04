@@ -38,9 +38,10 @@
     "generic": "Something went wrong. Please try again.",
     "network": "Network error. Check your connection.",
     "unauthorized": "Your session has expired. Please log in again.",
-    "forbidden": "You do not have permission to perform this action.",
+    "forbidden": "Your role isn't permitted to do this.",
     "not_found": "The requested resource was not found.",
-    "validation": "Please correct the highlighted fields."
+    "validation": "Please correct the highlighted fields.",
+    "access_denied_title": "Access denied"
   },
   "auth": {
     "login": {
@@ -87,6 +88,8 @@
   },
   "nav": {
     "dashboard": "Dashboard",
+    "profile": "My Profile",
+    "staff": "Staff",
     "branches": "Branches",
     "patients": "Patients",
     "appointments": "Appointments",
@@ -274,6 +277,7 @@
     "save_amendment": "Save amendment",
     "save_draft": "Save draft",
     "sign": "Sign note",
+    "sign_requires_content": "Add note content before signing.",
     "signing": "Signing…",
     "signed": "Note signed.",
     "saved": "Note saved.",

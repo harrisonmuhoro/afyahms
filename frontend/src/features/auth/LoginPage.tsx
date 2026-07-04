@@ -1,10 +1,11 @@
 import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
 import { HttpError } from '@/lib/http';
 import { resolveHomeRoute } from '@/config/navigation';
 import { Icon } from '@/components/icons/Icon';
+import { GoogleSignInButton } from './GoogleSignInButton';
 
 interface LocationState {
   from?: string;
@@ -75,13 +76,19 @@ export function LoginPage(): JSX.Element {
   const { t } = useTranslation(['auth', 'errors', 'common', 'app']);
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, confirmMfa } = useAuth();
 
   const [email, setEmail] = useState('admin@afya.local');
   const [password, setPassword] = useState('ChangeMe!2025');
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // MFA Flow States
+  const [mfaStep, setMfaStep] = useState<'none' | 'verify'>('none');
+  const [mfaCode, setMfaCode] = useState('');
+  // We need to keep track of the destination after MFA succeeds
+  const [pendingDestination, setPendingDestination] = useState<string | null>(null);
 
   const from = (location.state as LocationState | null)?.from;
 
@@ -93,10 +100,42 @@ export function LoginPage(): JSX.Element {
     try {
       const response = await login(email, password);
       const destination = from ?? resolveHomeRoute(response.user.roles);
-      navigate(destination, { replace: true });
+      
+      if (response.requires_mfa) {
+        setPendingDestination(destination);
+        setMfaStep('verify');
+      } else {
+        navigate(destination, { replace: true });
+      }
     } catch (err) {
       if (err instanceof HttpError && err.status === 401) {
         setError(t('errors:unauthorized', 'Invalid credentials. Please check your email and password.'));
+      } else if (err instanceof HttpError && err.status === 403) {
+        setError(err.message || t('errors:forbidden', "Your role isn't permitted to do this."));
+      } else if (err instanceof HttpError) {
+        setError(err.message || t('errors:generic'));
+      } else {
+        setError(t('errors:generic'));
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleMfaVerify = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
+    event.preventDefault();
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      await confirmMfa(mfaCode);
+      
+      if (pendingDestination) {
+        navigate(pendingDestination, { replace: true });
+      }
+    } catch (err) {
+      if (err instanceof HttpError && err.status === 403) {
+        setError('Invalid authentication code. Please try again.');
       } else if (err instanceof HttpError) {
         setError(err.message || t('errors:generic'));
       } else {
@@ -187,90 +226,171 @@ export function LoginPage(): JSX.Element {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} noValidate className="space-y-5">
-            {/* Email */}
-            <div className="space-y-1.5">
-              <label htmlFor="email" className="block text-sm font-medium text-stone-700 dark:text-stone-300">
-                {t('auth:login.email', 'Email address')}
-              </label>
-              <div className="relative">
-                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-stone-400">
-                  <Icon name="mail" size={16} />
-                </span>
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  autoComplete="username"
-                  placeholder="you@hospital.com"
-                  className="input-login pl-10"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+          {mfaStep === 'none' ? (
+            <form onSubmit={handleSubmit} noValidate className="space-y-5">
+              {/* Email */}
+              <div className="space-y-1.5">
+                <label htmlFor="email" className="block text-sm font-medium text-stone-700 dark:text-stone-300">
+                  {t('auth:login.email', 'Email address')}
+                </label>
+                <div className="relative">
+                  <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-stone-400">
+                    <Icon name="mail" size={16} />
+                  </span>
+                  <input
+                    id="email"
+                    type="email"
+                    required
+                    autoComplete="username"
+                    placeholder="you@hospital.com"
+                    className="input-login pl-10"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Password */}
-            <div className="space-y-1.5">
-              <label htmlFor="password" className="block text-sm font-medium text-stone-700 dark:text-stone-300">
-                {t('auth:login.password', 'Password')}
-              </label>
-              <div className="relative">
-                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-stone-400">
-                  <Icon name="lock" size={16} />
-                </span>
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                  className="input-login pl-10 pr-11"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <button
-                  type="button"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute inset-y-0 right-3 flex items-center text-stone-400 transition-colors hover:text-stone-600"
+              {/* Password */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label htmlFor="password" className="block text-sm font-medium text-stone-700 dark:text-stone-300">
+                    {t('auth:login.password', 'Password')}
+                  </label>
+                  <Link
+                    to="/forgot-password"
+                    className="text-sm font-medium text-teal-600 hover:text-teal-500 dark:text-teal-400 dark:hover:text-teal-300"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+                <div className="relative">
+                  <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-stone-400">
+                    <Icon name="lock" size={16} />
+                  </span>
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    autoComplete="current-password"
+                    placeholder="••••••••"
+                    className="input-login pl-10 pr-11"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute inset-y-0 right-3 flex items-center text-stone-400 transition-colors hover:text-stone-600"
+                  >
+                    <Icon name={showPassword ? 'eyeOff' : 'eye'} size={16} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Error */}
+              {error !== null && (
+                <div
+                  role="alert"
+                  className="animate-shake flex items-start gap-2 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400"
                 >
-                  <Icon name={showPassword ? 'eyeOff' : 'eye'} size={16} />
-                </button>
-              </div>
-            </div>
-
-            {/* Error */}
-            {error !== null && (
-              <div
-                role="alert"
-                className="animate-shake flex items-start gap-2 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400"
-              >
-                <Icon name="close" size={15} className="mt-0.5 shrink-0 text-red-500" />
-                {error}
-              </div>
-            )}
-
-            {/* Submit */}
-            <button
-              type="submit"
-              id="login-submit"
-              className="btn-login"
-              disabled={submitting}
-            >
-              {submitting ? (
-                <>
-                  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden>
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-                  </svg>
-                  {t('auth:login.submitting', 'Signing in…')}
-                </>
-              ) : (
-                t('auth:login.submit', 'Sign in')
+                  <Icon name="close" size={15} className="mt-0.5 shrink-0 text-red-500" />
+                  {error}
+                </div>
               )}
-            </button>
-          </form>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                id="login-submit"
+                className="btn-login"
+                disabled={submitting}
+              >
+                {submitting ? (
+                  <>
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden>
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                    </svg>
+                    {t('auth:login.submitting', 'Signing in…')}
+                  </>
+                ) : (
+                  t('auth:login.submit', 'Sign in')
+                )}
+              </button>
+
+              {/* Patient Access Section */}
+              <div className="mt-8 pt-6 border-t border-stone-200 dark:border-stone-800">
+                <div className="relative flex items-center justify-center mb-6">
+                  <span className="absolute bg-stone-50 dark:bg-stone-950 px-2 text-sm text-stone-500 font-medium">
+                    Are you a patient?
+                  </span>
+                </div>
+                <div className="space-y-3">
+                  <GoogleSignInButton />
+                </div>
+              </div>
+            </form>
+          ) : (
+            <form onSubmit={handleMfaVerify} noValidate className="space-y-5 animate-fade-in">
+              <div className="mb-4">
+                <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">
+                  Two-Factor Authentication
+                </h2>
+                <p className="mt-1.5 text-sm text-stone-500">
+                  Enter the 6-digit code from your authenticator app.
+                </p>
+              </div>
+
+              <div className="space-y-1.5">
+                <label htmlFor="mfaCode" className="block text-sm font-medium text-stone-700 dark:text-stone-300">
+                  Authentication Code
+                </label>
+                <input
+                  id="mfaCode"
+                  type="text"
+                  required
+                  autoFocus
+                  autoComplete="one-time-code"
+                  placeholder="123456"
+                  className="input-login text-center tracking-widest text-lg font-mono"
+                  value={mfaCode}
+                  onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                />
+              </div>
+
+              {error !== null && (
+                <div
+                  role="alert"
+                  className="animate-shake flex items-start gap-2 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400"
+                >
+                  <Icon name="close" size={15} className="mt-0.5 shrink-0 text-red-500" />
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="btn-login"
+                disabled={submitting || mfaCode.length < 6}
+              >
+                {submitting ? 'Verifying…' : 'Verify & Continue'}
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => {
+                  setMfaStep('none');
+                  setError(null);
+                  setMfaCode('');
+                }}
+                className="w-full mt-2 py-2 text-sm text-stone-500 hover:text-stone-700 dark:hover:text-stone-300 transition-colors"
+                disabled={submitting}
+              >
+                Cancel and return to login
+              </button>
+            </form>
+          )}
 
           {/* Demo hint */}
           <div className="mt-6 rounded-xl border border-stone-200 bg-stone-50 p-4 dark:border-stone-800 dark:bg-stone-900/50">

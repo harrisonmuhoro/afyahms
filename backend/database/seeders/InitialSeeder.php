@@ -15,8 +15,8 @@ use Spatie\Permission\PermissionRegistrar;
 /**
  * Idempotent Phase-0 seeder:
  *   - Branches: default NRB (Nairobi HQ)
- *   - 10 roles + full permission matrix
- *   - Default hospital-admin user (admin@afya.local / ChangeMe!2025)
+ *   - Superadmin + hospital roles + full permission matrix
+ *   - Default superadmin and hospital-admin users
  *   - One user per remaining role for local testing
  */
 final class InitialSeeder extends Seeder
@@ -57,15 +57,35 @@ final class InitialSeeder extends Seeder
     {
         $branch = Branch::findByCode('NRB');
 
-        // Hospital Admin
+        // Superadmin: system/root role, not for daily hospital operations.
+        $superadmin = User::updateOrCreate(
+            ['email' => 'superadmin@afya.local'],
+            [
+                'name'       => 'Superadmin',
+                'phone'      => '+254700000000',
+                'password'   => Hash::make('ChangeMe!2025'),
+                'home_branch_id' => $branch->id,
+                'current_branch_id' => $branch->id,
+                'is_active' => true,
+                'mfa_enabled' => false,
+            ],
+        );
+        $superadmin->syncRoles(['superadmin']);
+        DB::table('user_branch_access')->updateOrInsert(
+            ['user_id' => $superadmin->id, 'branch_id' => $branch->id],
+            ['is_home' => true, 'granted_at' => now(), 'created_at' => now(), 'updated_at' => now()],
+        );
+
+        // Hospital Admin: operational hospital administrator.
         $admin = User::updateOrCreate(
             ['email' => 'admin@afya.local'],
             [
-                'name'       => 'System Administrator',
+                'name'       => 'Hospital Administrator',
                 'phone'      => '+254700000001',
                 'password'   => Hash::make('ChangeMe!2025'),
                 'home_branch_id' => $branch->id,
                 'current_branch_id' => $branch->id,
+                'is_active' => true,
             ],
         );
         $admin->syncRoles(['hospital-admin']);
@@ -76,7 +96,7 @@ final class InitialSeeder extends Seeder
 
         // One user per remaining role (for local testing)
         $samples = [
-            ['doctor@afya.local',          'Dr. Test Doctor',          'doctor',         true],
+            ['doctor@afya.local',          'Dr. Test Doctor',          'doctor',         false],
             ['nurse@afya.local',           'Nurse Test',               'nurse',          false],
             ['receptionist@afya.local',    'Reception Test',           'receptionist',   false],
             ['records@afya.local',         'Records Officer',          'records-officer',false],

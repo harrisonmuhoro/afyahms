@@ -22,18 +22,9 @@ interface ClinicalRecord {
   summary: string;
 }
 
-const PRESCRIPTIONS: Prescription[] = [
-  { id: 'RX-001', name: 'Amoxicillin 500mg', dosage: '1 capsule', instructions: '3 times a day for 7 days. Take with food.', prescribedBy: 'Dr. Mwangi', startDate: '20 Jun 2026', endDate: '27 Jun 2026', status: 'active', refillsLeft: 0 },
-  { id: 'RX-002', name: 'Atorvastatin 20mg', dosage: '1 tablet', instructions: 'Once daily at bedtime. Avoid grapefruit.', prescribedBy: 'Dr. Mwangi', startDate: '12 Jun 2026', status: 'active', refillsLeft: 2 },
-  { id: 'RX-003', name: 'Metformin 500mg', dosage: '1 tablet', instructions: 'Twice daily with meals.', prescribedBy: 'Dr. Achieng', startDate: '28 May 2026', status: 'active', refillsLeft: 1 },
-  { id: 'RX-004', name: 'Ibuprofen 400mg', dosage: '1 tablet', instructions: 'As needed for pain. Max 3 times per day.', prescribedBy: 'Dr. Otieno', startDate: '01 Apr 2026', endDate: '10 Apr 2026', status: 'completed' },
-];
+const PRESCRIPTIONS: Prescription[] = [];
 
-const CLINICAL_RECORDS: ClinicalRecord[] = [
-  { id: 'DOC-001', type: 'Consultation Note', date: '12 Jun 2026', provider: 'Dr. Mwangi', summary: 'Follow-up visit for hypertension management. Blood pressure readings stable. Continued current medication regimen.' },
-  { id: 'DOC-002', type: 'Referral Letter', date: '10 May 2026', provider: 'Dr. Otieno', summary: 'Referred to Cardiology for further evaluation of palpitations. Patient reports occasional chest tightness on exertion.' },
-  { id: 'DOC-003', type: 'Discharge Summary', date: '15 Mar 2026', provider: 'Dr. Achieng', summary: 'Admitted for 48-hour observation. Discharged in stable condition. Follow-up in 4 weeks.' },
-];
+const CLINICAL_RECORDS: ClinicalRecord[] = [];
 
 const STATUS_CONFIG = {
   active: { label: 'Active', classes: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' },
@@ -51,12 +42,21 @@ export function PortalRecords(): JSX.Element {
     setTimeout(() => setToast(null), 4000);
   };
 
-  const handleDownload = (id: string, name: string): void => {
+  const handleDownload = (id: string, name: string, content: string): void => {
     setDownloading(id);
     setTimeout(() => {
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${name.replace(/\s+/g, '_')}_${id}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
       setDownloading(null);
       showToast(`"${name}" downloaded successfully.`);
-    }, 1500);
+    }, 1000);
   };
 
   return (
@@ -95,7 +95,21 @@ export function PortalRecords(): JSX.Element {
                       <p className="text-sm text-stone-500">{rx.dosage}</p>
                     </div>
                   </div>
-                  <span className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${cfg.classes}`}>{cfg.label}</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleDownload(
+                        rx.id, 
+                        rx.name, 
+                        `Prescription: ${rx.name}\nDosage: ${rx.dosage}\nInstructions: ${rx.instructions}\nPrescribed by: ${rx.prescribedBy}\nStarted: ${rx.startDate}\nStatus: ${rx.status}`
+                      )}
+                      disabled={downloading === rx.id}
+                      className="flex shrink-0 items-center gap-1.5 rounded-lg border border-stone-200 px-3 py-1 text-xs font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-50 dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800"
+                    >
+                      {downloading === rx.id ? '...' : <><Icon name="download" size={14} /> Download</>}
+                    </button>
+                    <span className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${cfg.classes}`}>{cfg.label}</span>
+                  </div>
                 </div>
                 <div className="rounded-xl bg-stone-50 p-4 dark:bg-stone-800/50">
                   <p className="text-sm text-stone-700 dark:text-stone-300">{rx.instructions}</p>
@@ -133,7 +147,11 @@ export function PortalRecords(): JSX.Element {
                 </div>
                 <button
                   type="button"
-                  onClick={() => handleDownload(doc.id, doc.type)}
+                  onClick={() => handleDownload(
+                    doc.id, 
+                    doc.type, 
+                    `Document: ${doc.type}\nDate: ${doc.date}\nProvider: ${doc.provider}\n\nSummary:\n${doc.summary}`
+                  )}
                   disabled={downloading === doc.id}
                   className="flex shrink-0 items-center gap-1.5 rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-50 dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800"
                 >

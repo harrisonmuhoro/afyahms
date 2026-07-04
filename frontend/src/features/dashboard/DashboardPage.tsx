@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useBranches } from '@/features/branches/BranchProvider';
 import { Icon } from '@/components/icons/Icon';
-import { NAV_ITEMS, type NavItem } from '@/config/navigation';
+import { NAV_ITEMS, isNavItemVisible, type NavItem } from '@/config/navigation';
 import type { IconName } from '@/components/icons/Icon';
 
 /* ─── Module category metadata ──────────────────────────────────────────────── */
@@ -213,10 +213,71 @@ export function DashboardPage(): JSX.Element {
   const { t } = useTranslation(['nav', 'app']);
   const { user, hasPermission } = useAuth();
   const { activeBranch } = useBranches();
+  const roles = user?.roles ?? [];
+  const isSuperadmin = roles.includes('superadmin');
+  const firstName = user?.name.split(' ')[0] ?? null;
+  const primaryRoleLabel = isSuperadmin
+    ? 'Superadmin - system root'
+    : user?.roles[0]?.replace(/-/g, ' ') ?? null;
+  const dashboardTitle = isSuperadmin
+    ? 'System administration'
+    : user !== null && firstName !== null
+      ? `${greetingPrefix()}, ${firstName}`
+      : t('app:name');
+  const dashboardSubtitle = isSuperadmin
+    ? 'Global configuration, audit, reports, and hospital setup'
+    : activeBranch?.name ?? 'Hospital operations';
+  const statCards = isSuperadmin
+    ? [
+        {
+          icon: 'branches' as const,
+          label: 'Configured branches',
+          value: '—',
+          iconBg: 'bg-sky-50 dark:bg-sky-950/50',
+          iconClass: 'text-sky-600 dark:text-sky-400',
+        },
+        {
+          icon: 'audit' as const,
+          label: 'Security events',
+          value: '—',
+          iconBg: 'bg-rose-50 dark:bg-rose-950/50',
+          iconClass: 'text-rose-600 dark:text-rose-400',
+        },
+        {
+          icon: 'settings' as const,
+          label: 'System controls',
+          value: '—',
+          iconBg: 'bg-stone-100 dark:bg-stone-900',
+          iconClass: 'text-stone-600 dark:text-stone-300',
+        },
+      ]
+    : [
+        {
+          icon: 'queue' as const,
+          label: 'Active queue tickets',
+          value: '—',
+          iconBg: 'bg-teal-50 dark:bg-teal-950/50',
+          iconClass: 'text-teal-600 dark:text-teal-400',
+        },
+        {
+          icon: 'patients' as const,
+          label: 'Patients seen today',
+          value: '—',
+          iconBg: 'bg-sky-50 dark:bg-sky-950/50',
+          iconClass: 'text-sky-600 dark:text-sky-400',
+        },
+        {
+          icon: 'triage' as const,
+          label: 'Awaiting triage',
+          value: '—',
+          iconBg: 'bg-orange-50 dark:bg-orange-950/50',
+          iconClass: 'text-orange-600 dark:text-orange-400',
+        },
+      ];
 
   // Everything the user can reach, minus the dashboard tile itself.
   const tiles = NAV_ITEMS.filter(
-    (item) => item.to !== '/' && (item.permission === undefined || hasPermission(item.permission)),
+    (item) => item.to !== '/' && isNavItemVisible(item, roles, hasPermission),
   );
 
   // Group tiles by module category
@@ -246,14 +307,17 @@ export function DashboardPage(): JSX.Element {
           )}
           <div>
             <h1 className="text-2xl font-bold text-stone-900 dark:text-stone-50">
-              {user !== null ? `${greetingPrefix()}, ${user.name.split(' ')[0]}` : t('app:name')}
+              {dashboardTitle}
             </h1>
+            <p className="mt-1 text-sm font-medium text-stone-500 dark:text-stone-400">
+              {dashboardSubtitle}
+            </p>
             <div className="mt-1 flex flex-wrap items-center gap-2">
               {/* Role badge */}
-              {user?.roles[0] !== undefined && (
+              {primaryRoleLabel !== null && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700 ring-1 ring-brand-200 dark:bg-brand-950/50 dark:text-brand-300 dark:ring-brand-800">
                   <Icon name="user" size={10} />
-                  {user.roles[0].replace(/-/g, ' ')}
+                  {primaryRoleLabel}
                 </span>
               )}
               {/* Branch badge */}
@@ -281,27 +345,16 @@ export function DashboardPage(): JSX.Element {
 
       {/* ── Stat strip ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard
-          icon="queue"
-          label="Active queue tickets"
-          value="—"
-          iconBg="bg-teal-50 dark:bg-teal-950/50"
-          iconClass="text-teal-600 dark:text-teal-400"
-        />
-        <StatCard
-          icon="patients"
-          label="Patients seen today"
-          value="—"
-          iconBg="bg-sky-50 dark:bg-sky-950/50"
-          iconClass="text-sky-600 dark:text-sky-400"
-        />
-        <StatCard
-          icon="triage"
-          label="Awaiting triage"
-          value="—"
-          iconBg="bg-orange-50 dark:bg-orange-950/50"
-          iconClass="text-orange-600 dark:text-orange-400"
-        />
+        {statCards.map((stat) => (
+          <StatCard
+            key={stat.label}
+            icon={stat.icon}
+            label={stat.label}
+            value={stat.value}
+            iconBg={stat.iconBg}
+            iconClass={stat.iconClass}
+          />
+        ))}
       </div>
 
       {/* ── Module groups ────────────────────────────────────────────────── */}

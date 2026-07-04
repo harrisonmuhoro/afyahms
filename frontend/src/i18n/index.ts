@@ -11,12 +11,7 @@ const SUPPORTED_LOCALES = (import.meta.env.VITE_SUPPORTED_LOCALES || 'en,sw').sp
 const NAMESPACES = Object.keys(en);
 
 function detectInitialLocale(): string {
-  const saved = localStorage.getItem('afya.locale');
-  if (saved && SUPPORTED_LOCALES.includes(saved)) {
-    return saved;
-  }
-
-  const browser = navigator.language.split('-')[0];
+  const browser = typeof navigator === 'undefined' ? '' : navigator.language.split('-')[0];
   if (SUPPORTED_LOCALES.includes(browser)) {
     return browser;
   }

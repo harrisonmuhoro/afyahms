@@ -128,7 +128,7 @@ Events fire side-effects (notifications, audit, alerts) via Listeners/Queues.
 - **Forms:** React Hook Form + **Zod** resolvers. Zod schemas mirror backend FormRequests.
 - **Routing:** React Router v6, route-level code splitting, `<ProtectedRoute permission="...">` guards.
 - **i18n:** react-i18next, namespaces per feature, `en` + `sw` (Kiswahili). No hardcoded user-facing strings.
-- **Theme:** light/dark via Tailwind `class` strategy, persisted in `localStorage` + Zustand.
+- **Theme:** light/dark via Tailwind `class` strategy, persisted on the authenticated user profile in the database.
 - **Icons:** centralized SVG icon registry (`src/components/icons`), one `<Icon name="..."/>` component. **No emojis.**
 - **No inline CSS, no inline JS handlers with logic.** Tailwind utility classes + extracted hooks.
 - **PWA:** Vite PWA plugin, service worker, offline shell + cached read data, background sync for queued writes.

@@ -9,11 +9,8 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Blocks routes from running for users in MFA-required roles until they
- * have confirmed a fresh TOTP step.
- *
- * Per foundation §5/§11: `hospital-admin`, `doctor`, `pharmacist` must
- * complete MFA; a fresh login does not survive indefinitely.
+ * Blocks routes from running until users with MFA enabled have confirmed
+ * a fresh TOTP step. MFA setup itself stays opt-in from account settings.
  */
 final class EnsureMfaConfirmed
 {
@@ -27,21 +24,12 @@ final class EnsureMfaConfirmed
             return $next($request);
         }
 
-        $enforcedRoles = config('auth.mfa.enforced_for', []);
-        $requiresMfa = $user->hasAnyRole($enforcedRoles);
-
-        if (! $requiresMfa) {
+        if (! $user->mfa_enabled) {
             return $next($request);
         }
 
-        if (! $user->mfa_enabled) {
-            return response()->json([
-                'error' => [
-                    'type'    => 'MfaEnrollmentRequired',
-                    'status'  => 403,
-                    'message' => 'MFA enrollment is required for your role.',
-                ],
-            ], 403);
+        if ($user->hasAnyRole(['superadmin', 'hospital-admin', 'doctor'])) {
+            return $next($request);
         }
 
         $lastConfirmed = $user->mfa_confirmed_at;

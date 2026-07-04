@@ -5,7 +5,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { useTheme } from '@/features/theme/ThemeProvider';
 import { useBranches } from '@/features/branches/BranchProvider';
 import { Icon } from '@/components/icons/Icon';
-import { NAV_ITEMS } from '@/config/navigation';
+import { NAV_ITEMS, isNavItemVisible } from '@/config/navigation';
 
 /* ─── helpers ───────────────────────────────────────────────────────────────── */
 function initials(name: string): string {
@@ -42,9 +42,7 @@ export function AppShell(): JSX.Element {
     navigate('/login', { replace: true });
   };
 
-  const visibleItems = NAV_ITEMS.filter(
-    (item) => item.permission === undefined || hasPermission(item.permission),
-  );
+  const visibleItems = NAV_ITEMS.filter((item) => isNavItemVisible(item, user?.roles ?? [], hasPermission));
 
   /* Derive page title from current nav item */
   const currentItem = visibleItems.find((item) => {

@@ -20,29 +20,7 @@ interface Message {
   thread: ThreadMessage[];
 }
 
-const INITIAL_MESSAGES: Message[] = [
-  {
-    id: 'MSG-001', from: 'Dr. Mwangi', role: 'Cardiology', preview: 'Your CBC results are in. The white blood cell count is slightly elevated…', date: 'Today', unread: true,
-    thread: [
-      { id: 't1', sender: 'Dr. Mwangi', isPatient: false, text: 'Hello! Your CBC results are now available. Your white blood cell count is slightly elevated at 11.8 × 10⁹/L (normal is up to 11.0). This can be a sign of a minor infection or inflammation. I have prescribed a short course of Amoxicillin. Please complete the full course and we will recheck in one week. Let me know if you have any questions.', timestamp: 'Today, 11:42 AM' },
-      { id: 't2', sender: 'You', isPatient: true, text: 'Thank you, Dr. Mwangi. I will start the medication today. Should I be concerned about anything in particular?', timestamp: 'Today, 12:05 PM' },
-      { id: 't3', sender: 'Dr. Mwangi', isPatient: false, text: 'Not at all — this is quite common and should resolve with the antibiotics. Please make sure to take the medication with food to avoid any stomach discomfort. If you develop a rash, difficulty breathing, or your symptoms worsen, please visit the emergency department immediately.', timestamp: 'Today, 12:30 PM' },
-    ],
-  },
-  {
-    id: 'MSG-002', from: 'Appointments Desk', role: 'Administration', preview: 'Your appointment on 25 Jun has been confirmed. Please remember to bring…', date: '23 Jun', unread: false,
-    thread: [
-      { id: 't4', sender: 'Appointments Desk', isPatient: false, text: 'Dear Patient, your appointment with Dr. Mwangi on 25 Jun 2026 at 10:00 AM has been confirmed. Please remember to bring your ID, insurance card (if applicable), and any previous test results. Kindly arrive 15 minutes early for registration.', timestamp: '23 Jun, 9:00 AM' },
-    ],
-  },
-  {
-    id: 'MSG-003', from: 'Dr. Achieng', role: 'Diabetology', preview: 'Following up on your Metformin prescription — how are you feeling?', date: '30 May', unread: false,
-    thread: [
-      { id: 't5', sender: 'Dr. Achieng', isPatient: false, text: 'Hi, I wanted to follow up on the Metformin we started last week. Are you experiencing any side effects, particularly any nausea or stomach upset? These are common in the first week but typically resolve.', timestamp: '30 May, 3:15 PM' },
-      { id: 't6', sender: 'You', isPatient: true, text: 'Hello Dr. Achieng. I had some mild nausea the first two days but it has since settled. Feeling much better now!', timestamp: '30 May, 5:00 PM' },
-    ],
-  },
-];
+const INITIAL_MESSAGES: Message[] = [];
 
 const PROVIDERS = ['General Enquiries', 'Dr. Mwangi (Cardiology)', 'Dr. Achieng (Diabetology)', 'Dr. Otieno (General Practice)', 'Appointments Desk', 'Billing Team'];
 
@@ -52,7 +30,7 @@ function now(): string {
 
 export function PortalMessages(): JSX.Element {
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
-  const [selectedId, setSelectedId] = useState<string | null>(INITIAL_MESSAGES[0].id);
+  const [selectedId, setSelectedId] = useState<string | null>(INITIAL_MESSAGES[0]?.id ?? null);
   const [replyText, setReplyText] = useState('');
   const [showNewForm, setShowNewForm] = useState(false);
   const [newTo, setNewTo] = useState(PROVIDERS[0]);

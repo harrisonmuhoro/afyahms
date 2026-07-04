@@ -9,6 +9,7 @@ use App\Exceptions\Domain\ForbiddenException;
 use App\Exceptions\Domain\NotFoundException;
 use App\Exceptions\Domain\ValidationFailedException;
 use App\Models\User;
+use App\Modules\Audit\Services\AuditLogService;
 use App\Modules\Patients\Dto\PatientDto;
 use App\Modules\Patients\Models\Patient;
 use App\Modules\Patients\Repositories\Contracts\PatientRepository;
@@ -16,6 +17,7 @@ use App\Modules\Tenancy\Services\BranchContext;
 use App\Support\Sequences\SequenceService;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 /**
@@ -29,6 +31,7 @@ final class PatientService
         private readonly DedupeMatcher $dedupe,
         private readonly SequenceService $sequences,
         private readonly BranchContext $branchContext,
+        private readonly AuditLogService $audit,
     ) {}
 
     /**
@@ -83,8 +86,10 @@ final class PatientService
      *
      * @param  array<string, mixed>  $attributes
      */
-    public function update(Patient $patient, array $attributes): Patient
+    public function update(Patient $patient, array $attributes, ?User $actor = null, ?Request $request = null): Patient
     {
+        unset($attributes['confirmation_reason'], $attributes['current_password']);
+
         $current = $patient->only([
             'first_name', 'middle_name', 'last_name',
             'national_id', 'sha_number', 'date_of_birth',
@@ -97,8 +102,32 @@ final class PatientService
         }
 
         $dto = PatientDto::fromArray($attributes + $current);
+        $payload = $dto->toModelAttributes($patient->branch_id, null);
+        $before = $patient->only(array_keys($payload));
 
-        return $this->patients->update($patient, $dto->toModelAttributes($patient->branch_id, null));
+        if (($before['date_of_birth'] ?? null) instanceof \DateTimeInterface) {
+            $before['date_of_birth'] = $before['date_of_birth']->format('Y-m-d');
+        }
+
+        $updated = $this->patients->update($patient, $payload);
+
+        $action = match (true) {
+            $actor !== null && (int) $patient->portal_user_id === (int) $actor->id => 'self_updated',
+            $actor !== null && $actor->hasRole('superadmin') => 'superadmin_updated',
+            default => 'admin_updated',
+        };
+
+        $this->audit->recordFieldChanges(
+            event: 'patient.demographics.updated',
+            actor: $actor,
+            request: $request,
+            subject: $updated,
+            before: $before,
+            after: $payload,
+            context: ['action' => $action],
+        );
+
+        return $updated;
     }
 
     /**

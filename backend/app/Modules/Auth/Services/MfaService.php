@@ -7,6 +7,7 @@ namespace App\Modules\Auth\Services;
 use App\Exceptions\Domain\ForbiddenException;
 use App\Models\User;
 use App\Modules\Auth\Models\UserMfa;
+use App\Services\OtpService;
 use Illuminate\Support\Str;
 use PragmaRX\Google2FA\Google2FA;
 
@@ -18,32 +19,65 @@ use PragmaRX\Google2FA\Google2FA;
 final class MfaService
 {
     private Google2FA $google2fa;
+    private OtpService $otpService;
 
-    public function __construct()
+    public function __construct(OtpService $otpService)
     {
         $this->google2fa = new Google2FA();
         $this->google2fa->setWindow((int) config('auth.mfa.window', 1));
+        $this->otpService = $otpService;
     }
 
     /**
      * Begin MFA enrollment. Returns a fresh secret + QR code URL + recovery codes.
      * Enrollment is committed when the user verifies the first TOTP code.
      *
-     * @return array{secret: string, qr_url: string, recovery_codes: array<int, string>}
+     * @return array{secret: string|null, qr_url: string|null, recovery_codes: array<int, string>}
      */
-    public function beginEnrollment(User $user): array
+    public function beginEnrollment(User $user, string $type = 'totp'): array
     {
-        $secret = $this->google2fa->generateSecretKey();
+        if ($user->mfa_enabled && $user->activeMfa() !== null) {
+            throw new ForbiddenException('MFA is already enabled for this account.');
+        }
+
+        $user->mfa()->whereNull('enabled_at')->delete();
+
         $recoveryCodes = $this->generateRecoveryCodes();
 
+        if ($type === 'email') {
+            $mfa = UserMfa::create([
+                'user_id'        => $user->id,
+                'type'           => 'email',
+                'secret'         => null,
+                'recovery_codes' => array_map(
+                    fn (string $code) => HashRecoveryCode($code),
+                    $recoveryCodes,
+                ),
+            ]);
+
+            $this->otpService->send($user, $user->email, 'mfa_enrollment');
+
+            return [
+                'secret'         => null,
+                'qr_url'         => null,
+                'recovery_codes' => $recoveryCodes,
+                'id'             => $mfa->id,
+            ];
+        }
+
+        $secret = $this->google2fa->generateSecretKey(32);
+        $issuer = (string) config('auth.mfa.issuer', 'AfyaHMS');
+        $issuerSafe = str_replace(' ', '', $issuer);
+
         $otpauthUrl = $this->google2fa->getQRCodeUrl(
-            company: (string) config('auth.mfa.issuer', 'Afya HMS'),
+            company: $issuerSafe,
             holder: $user->email,
             secret: $secret,
         );
 
         $mfa = UserMfa::create([
             'user_id'        => $user->id,
+            'type'           => 'totp',
             'secret'         => $secret,
             'recovery_codes' => array_map(
                 fn (string $code) => HashRecoveryCode($code),
@@ -64,10 +98,16 @@ final class MfaService
      */
     public function confirmEnrollment(User $user, string $code): UserMfa
     {
-        $mfa = $user->activeMfa() ?? throw new ForbiddenException('No MFA setup in progress.');
+        $mfa = $user->mfa()->whereNull('enabled_at')->latest()->first()
+            ?? throw new ForbiddenException('No MFA setup in progress.');
 
-        if (! $this->verifyTotp($mfa->secret, $code)) {
-            throw new ForbiddenException('Invalid TOTP code.');
+        if ($mfa->type === 'email') {
+            // This throws ValidationException if invalid
+            $this->otpService->verify($user, 'mfa_enrollment', $code);
+        } else {
+            if (! $this->verifyTotp((string) $mfa->secret, $code)) {
+                throw new ForbiddenException('Invalid TOTP code.');
+            }
         }
 
         $mfa->update(['enabled_at' => now()]);
@@ -105,7 +145,17 @@ final class MfaService
             return false;
         }
 
-        return $this->verifyTotp($mfa->secret, $code);
+        if ($mfa->type === 'email') {
+            try {
+                // For login verification
+                $this->otpService->verify($user, 'mfa_login', $code);
+                return true;
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                return false;
+            }
+        }
+
+        return $this->verifyTotp((string) $mfa->secret, $code);
     }
 
     /**

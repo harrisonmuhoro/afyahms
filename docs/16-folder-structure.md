@@ -691,7 +691,7 @@ frontend/src/
 │   └── useOnlineStatus.ts             # PWA online/offline awareness.
 │
 ├── providers/                         # React context providers (global state wiring).
-│   ├── ThemeProvider.tsx              # light/dark via Tailwind class + Zustand + localStorage.
+│   ├── ThemeProvider.tsx              # light/dark via Tailwind class + user profile preferences.
 │   ├── AuthProvider.tsx               # Session/user/permissions context.
 │   ├── BranchProvider.tsx             # Active branch context + switcher state.
 │   ├── QueryProvider.tsx              # TanStack QueryClientProvider.

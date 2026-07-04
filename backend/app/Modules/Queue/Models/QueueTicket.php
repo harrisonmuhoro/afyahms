@@ -8,6 +8,7 @@ use App\Modules\Tenancy\Scopes\BranchScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property int    $id
@@ -26,6 +27,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class QueueTicket extends Model
 {
+    use SoftDeletes;
+    use \App\Modules\Patients\Traits\HasOwnPatientDataScope;
+
     protected $table = 'queue_tickets';
 
     protected $fillable = [
