@@ -23,8 +23,11 @@ final class PatientSeeder extends Seeder
 
         $faker = \Faker\Factory::create('en_KE'); // Use Kenyan locale for realistic names/phones
 
-        DB::transaction(function () use ($faker, $branch) {
-            for ($i = 0; $i < 20; $i++) {
+        $year = date('Y');
+        $count = 20;
+
+        DB::transaction(function () use ($faker, $branch, $year, $count) {
+            for ($i = 0; $i < $count; $i++) {
                 $gender = $faker->randomElement(['Male', 'Female']);
                 $firstName = $gender === 'Male' ? $faker->firstNameMale : $faker->firstNameFemale;
                 $lastName = $faker->lastName;
@@ -55,7 +58,7 @@ final class PatientSeeder extends Seeder
                 // 2. Create the Patient Record
                 $patient = Patient::create([
                     'public_id' => Str::uuid()->toString(),
-                    'patient_number' => 'PAT-' . date('Y') . '-' . str_pad((string)($i + 1), 6, '0', STR_PAD_LEFT),
+                    'patient_number' => 'PAT-' . $year . '-' . str_pad((string)($i + 1), 6, '0', STR_PAD_LEFT),
                     'branch_id' => $branch->id,
                     'first_name' => $firstName,
                     'last_name' => $lastName,
@@ -72,6 +75,18 @@ final class PatientSeeder extends Seeder
                     'county' => 'Nairobi',
                 ]);
             }
+
+            // Keep the patient-number sequence in step with the rows we just
+            // inserted. SequenceService::next() returns the stored value + 1,
+            // so storing `value = $count` makes the next real allocation
+            // ("PAT-{year}-000021") skip past the seeded records instead of
+            // colliding with them. Never lower an already-higher counter.
+            $scope = "patient:{$year}";
+            $current = (int) (DB::table('sequences')->where('scope', $scope)->value('value') ?? 0);
+            DB::table('sequences')->updateOrInsert(
+                ['scope' => $scope],
+                ['value' => max($current, $count), 'updated_at' => now(), 'created_at' => now()],
+            );
         });
     }
 }

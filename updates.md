@@ -206,7 +206,7 @@ Important behavior change: because the app still uses stateless Sanctum bearer t
 
 - Run migrations before using DB-backed preferences:
   ```bash
-  D:\wamp2\bin\php\php8.4.15\php.exe artisan migrate
+  D:\wamp\bin\php\php8.4.15\php.exe artisan migrate
   ```
 - Backend auth tests still need a real MySQL test database named `afya_test` before the lockout test suite can run locally.
 
