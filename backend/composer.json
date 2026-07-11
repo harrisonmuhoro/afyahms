@@ -19,7 +19,7 @@
         "bacon/bacon-qr-code": "^3.0",
         "barryvdh/laravel-dompdf": "^3.0",
         "firebase/php-jwt": "^7.0",
-        "inertiajs/inertia-laravel": "^2.0",
+        "inertiajs/inertia-laravel": "^3.1",
         "laravel/framework": "^12.60",
         "laravel/sanctum": "^4.0",
         "laravel/scout": "^10.11",
