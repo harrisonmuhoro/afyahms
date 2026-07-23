@@ -80,6 +80,16 @@ final class BillingController extends Controller
             (string) ($validated['method'] ?? 'cash'),
             $request->user(),
         );
+        
+        // Trigger High Value Payment Alert if amount > 50,000
+        $amount = (float) $validated['amount'];
+        if ($amount > 50000) {
+            $admins = \App\Models\User::role(['superadmin', 'billing_admin'])->get();
+            if ($admins->isNotEmpty()) {
+                \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\HighValuePaymentAlert($bill, $amount));
+            }
+        }
+        
         $bill->load('items');
 
         return response()->json(['data' => $this->billData($bill)]);

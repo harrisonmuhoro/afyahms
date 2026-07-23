@@ -42,7 +42,7 @@ final class BranchService
             $branch = $this->branches->findByPublicId($id);
         }
 
-        if ($branch === null || ! $branch->is_active) {
+        if ($branch === null) {
             return null;
         }
 
@@ -50,13 +50,18 @@ final class BranchService
             return $branch;
         }
 
+        if (! $branch->is_active) {
+            return null;
+        }
+
+
         return in_array($branch->id, $user->accessibleBranchIds(), true) ? $branch : null;
     }
 
     public function listForUser(User $user): Collection
     {
         if ($user->can('branch.view-all')) {
-            return $this->branches->listActive();
+            return $this->branches->listAll();
         }
 
         return $user->branches()

@@ -16,6 +16,8 @@ interface BranchRepository
 
     public function findByCode(string $code): ?Branch;
 
+    public function listAll(): Collection;
+
     public function listActive(): Collection;
 
     /**

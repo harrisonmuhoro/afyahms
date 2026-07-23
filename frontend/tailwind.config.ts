@@ -1,4 +1,6 @@
 import type { Config } from 'tailwindcss';
+import forms from '@tailwindcss/forms';
+import containerQueries from '@tailwindcss/container-queries';
 
 const config: Config = {
   darkMode: 'class',
@@ -29,14 +31,89 @@ const config: Config = {
           warning:       '#D97706',
           info:          '#0284C7',
         },
+        // Design System Colors
+        "surface-bright": "#f5faf8",
+        "tertiary": "#525e5c",
+        "surface-tint": "#006a61",
+        "primary-container": "#008378",
+        "inverse-on-surface": "#edf2f0",
+        "inverse-primary": "#6bd8cb",
+        "secondary-container": "#6df5e1",
+        "background": "#f5faf8",
+        "on-tertiary-container": "#f3fffc",
+        "on-surface": "#171d1c",
+        "on-secondary-container": "#006f64",
+        "on-primary-fixed-variant": "#005049",
+        "inverse-surface": "#2c3130",
+        "on-background": "#171d1c",
+        "tertiary-container": "#6b7775",
+        "surface-container": "#eaefed",
+        "secondary": "#006b5f",
+        "on-error": "#ffffff",
+        "error": "#ba1a1a",
+        "surface-container-low": "#f0f5f2",
+        "surface-variant": "#dee4e1",
+        "on-tertiary-fixed-variant": "#3d4947",
+        "tertiary-fixed": "#d8e5e2",
+        "secondary-fixed": "#71f8e4",
+        "surface": "#f5faf8",
+        "on-secondary-fixed": "#00201c",
+        "on-surface-variant": "#3d4947",
+        "on-primary-fixed": "#00201d",
+        "on-tertiary-fixed": "#121e1c",
+        "primary-fixed": "#89f5e7",
+        "surface-container-highest": "#dee4e1",
+        "outline": "#6d7a77",
+        "surface-container-lowest": "#ffffff",
+        "on-primary": "#ffffff",
+        "primary-fixed-dim": "#6bd8cb",
+        "primary": "#00685f",
+        "on-primary-container": "#f4fffc",
+        "outline-variant": "#bcc9c6",
+        "on-error-container": "#93000a",
+        "surface-container-high": "#e4e9e7",
+        "on-secondary": "#ffffff",
+        "error-container": "#ffdad6",
+        "on-tertiary": "#ffffff",
+        "tertiary-fixed-dim": "#bcc9c6",
+        "on-secondary-fixed-variant": "#005048",
+        "secondary-fixed-dim": "#4fdbc8",
+        "surface-dim": "#d6dbd9"
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+        "body-sm": ["Inter"],
+        "body-md": ["Inter"],
+        "headline-lg": ["Inter"],
+        "headline-md": ["Inter"],
+        "data-mono": ["JetBrains Mono"],
+        "label-caps": ["Inter"]
+      },
+      fontSize: {
+        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+        "headline-md": ["18px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+        "data-mono": ["13px", {"lineHeight": "18px", "fontWeight": "500"}],
+        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+      },
+      spacing: {
+        "md": "16px",
+        "gutter": "16px",
+        "base": "4px",
+        "xs": "8px",
+        "xl": "32px",
+        "sm": "12px",
+        "lg": "24px",
+        "container-margin": "24px"
       },
       borderRadius: {
-        xl: '0.875rem',
-        '2xl': '1.125rem',
+        "DEFAULT": "0.25rem",
+        "lg": "0.5rem",
+        "xl": "0.75rem",
+        "2xl": "1.125rem",
+        "full": "9999px"
       },
       boxShadow: {
         // Soft, low-contrast elevations for a calm clinical surface.
@@ -61,7 +138,10 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    forms,
+    containerQueries,
+  ],
 };
 
 export default config;

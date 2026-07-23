@@ -4,8 +4,22 @@ import { ForgotPasswordPage } from '@/features/auth/ForgotPasswordPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { AuthCallbackPage } from '@/features/auth/AuthCallbackPage';
 import { CompleteProfilePage } from '@/features/auth/CompleteProfilePage';
+import { LoginScreen } from '@/features/auth/LoginScreen';
+import { PublicQueueBoard } from '@/features/dashboard/PublicQueueBoard';
 import { AppShell } from '@/components/layout/AppShell';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
+import { DoctorDashboard } from '@/features/dashboard/DoctorDashboard';
+import { ReceptionistDashboard } from '@/features/dashboard/ReceptionistDashboard';
+import { NurseDashboard } from '@/features/dashboard/NurseDashboard';
+import { PharmacistDashboard } from '@/features/dashboard/PharmacistDashboard';
+import { BillingDashboard } from '@/features/dashboard/BillingDashboard';
+import { LabDashboard } from '@/features/dashboard/LabDashboard';
+import { InventoryDashboard } from '@/features/dashboard/InventoryDashboard';
+import { RadiologistDashboard } from '@/features/dashboard/RadiologistDashboard';
+import { RecordsDashboard } from '@/features/dashboard/RecordsDashboard';
+import { SuperadminDashboard } from '@/features/dashboard/SuperadminDashboard';
+import { SystemSettings } from '@/features/dashboard/SystemSettings';
+import { PatientPortal } from '@/features/dashboard/PatientPortal';
 import { BranchesPage } from '@/features/branches/BranchesPage';
 import { PatientsPage } from '@/features/patients/PatientsPage';
 import { PatientDetailPage } from '@/features/patients/PatientDetailPage';
@@ -17,6 +31,21 @@ import { TriagePage } from '@/features/triage/TriagePage';
 import { EncounterPage } from '@/features/emr/EncounterPage';
 import { InventoryPage } from '@/features/inventory/InventoryPage';
 import { ReportsPage } from '@/features/reports/ReportsPage';
+import { RevenueSummaryReport } from '@/features/reports/RevenueSummaryReport';
+import { PaymentsCollectedReport } from '@/features/reports/PaymentsCollectedReport';
+import { OutstandingInvoicesReport } from '@/features/reports/OutstandingInvoicesReport';
+import { ShaClaimsReport } from '@/features/reports/ShaClaimsReport';
+import { DiagnosesSummaryReport } from '@/features/reports/DiagnosesSummaryReport';
+import { PatientEncountersReport } from '@/features/reports/PatientEncountersReport';
+import { PrescriptionsIssuedReport } from '@/features/reports/PrescriptionsIssuedReport';
+import { LabResultsReport } from '@/features/reports/LabResultsReport';
+import { QueueThroughputReport } from '@/features/reports/QueueThroughputReport';
+import { WaitTimesReport } from '@/features/reports/WaitTimesReport';
+import { PatientVolumeReport } from '@/features/reports/PatientVolumeReport';
+import { AppointmentStatisticsReport } from '@/features/reports/AppointmentStatisticsReport';
+import { StockLevelsReport } from '@/features/reports/StockLevelsReport';
+import { ExpiringItemsReport } from '@/features/reports/ExpiringItemsReport';
+import { StockConsumptionReport } from '@/features/reports/StockConsumptionReport';
 import { AuditLogPage } from '@/features/audit/AuditLogPage';
 import SettingsPage from '@/features/settings/SettingsPage';
 import { StaffProfilePage } from '@/features/profile/StaffProfilePage';
@@ -57,8 +86,10 @@ export function App(): JSX.Element {
     <Routes>
       {/* Public routes */}
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/login-screen" element={<LoginScreen />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
+      <Route path="/public-queue-board" element={<PublicQueueBoard />} />
 
       {/* Profile Completion */}
       <Route
@@ -122,6 +153,20 @@ export function App(): JSX.Element {
       >
         {/* Dashboard — visible to all authenticated staff */}
         <Route index element={<DashboardPage />} />
+        
+        {/* Dashboards preview */}
+        <Route path="doctor-dashboard" element={<DoctorDashboard />} />
+        <Route path="receptionist-dashboard" element={<ReceptionistDashboard />} />
+        <Route path="nurse-dashboard" element={<NurseDashboard />} />
+        <Route path="pharmacist-dashboard" element={<PharmacistDashboard />} />
+        <Route path="billing-dashboard" element={<BillingDashboard />} />
+        <Route path="inventory-dashboard" element={<InventoryDashboard />} />
+        <Route path="lab-dashboard" element={<LabDashboard />} />
+        <Route path="radiologist-dashboard" element={<RadiologistDashboard />} />
+        <Route path="records-dashboard" element={<RecordsDashboard />} />
+        <Route path="superadmin-dashboard" element={<SuperadminDashboard />} />
+        <Route path="system-settings" element={<SystemSettings />} />
+        <Route path="patient-portal" element={<PatientPortal />} />
 
         <Route
           path="profile"
@@ -269,6 +314,126 @@ export function App(): JSX.Element {
           element={
             <ProtectedRoute permission="reporting.read">
               <ReportsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="reports/financial/revenue-summary"
+          element={
+            <ProtectedRoute permission="reporting.read">
+              <RevenueSummaryReport />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="reports/financial/payments-collected" 
+          element={
+            <ProtectedRoute permission="reporting.read">
+              <PaymentsCollectedReport />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="reports/financial/outstanding-invoices" 
+          element={
+            <ProtectedRoute permission="reporting.read">
+              <OutstandingInvoicesReport />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="reports/financial/sha-claims" 
+          element={
+            <ProtectedRoute permission="reporting.read">
+              <ShaClaimsReport />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="reports/clinical/diagnoses-summary" 
+          element={
+            <ProtectedRoute permission="reporting.read">
+              <DiagnosesSummaryReport />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="reports/clinical/patient-encounters" 
+          element={
+            <ProtectedRoute permission="reporting.read">
+              <PatientEncountersReport />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="reports/clinical/prescriptions-issued" 
+          element={
+            <ProtectedRoute permission="reporting.read">
+              <PrescriptionsIssuedReport />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="reports/clinical/lab-results" 
+          element={
+            <ProtectedRoute permission="reporting.read">
+              <LabResultsReport />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="reports/operational/queue-throughput" 
+          element={
+            <ProtectedRoute permission="reporting.read">
+              <QueueThroughputReport />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="reports/operational/wait-times" 
+          element={
+            <ProtectedRoute permission="reporting.read">
+              <WaitTimesReport />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="reports/operational/patient-volume" 
+          element={
+            <ProtectedRoute permission="reporting.read">
+              <PatientVolumeReport />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="reports/operational/appointment-statistics" 
+          element={
+            <ProtectedRoute permission="reporting.read">
+              <AppointmentStatisticsReport />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="reports/inventory/stock-levels" 
+          element={
+            <ProtectedRoute permission="reporting.read">
+              <StockLevelsReport />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="reports/inventory/expiring-items" 
+          element={
+            <ProtectedRoute permission="reporting.read">
+              <ExpiringItemsReport />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="reports/inventory/stock-consumption" 
+          element={
+            <ProtectedRoute permission="reporting.read">
+              <StockConsumptionReport />
             </ProtectedRoute>
           }
         />

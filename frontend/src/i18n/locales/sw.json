@@ -233,6 +233,51 @@
       "visit_type_emergency": "Dharura",
       "submit": "Toa tiketi",
       "submitting": "Inatoa…",
+      "selected": "Aliyechaguliwa:",
+      "clear": "Futa",
+      "success_title": "Usajili umefanikiwa!",
+      "success_body": "Ziara imeundwa kwa {{name}}.",
+      "visit_number": "Namba ya ziara",
+      "go_triage": "Nenda kwenye ubao wa triage",
+      "hero": {
+        "register_title": "Sajili mgonjwa mpya",
+        "register_desc": "Sajili mgeni mpya na uunde faili la matibabu papo hapo.",
+        "checkin_title": "Usajili / toa tiketi",
+        "checkin_desc": "Tafuta mgonjwa aliyesajiliwa hapo juu na utoe tiketi ya foleni."
+      },
+      "kpi": {
+        "waiting": "Wanasubiri mapokezi",
+        "now_serving": "Anahudumiwa sasa",
+        "stations_open": "Vituo vilivyo wazi"
+      },
+      "queue": {
+        "title": "Foleni ya mapokezi",
+        "refresh": "Onyesha upya",
+        "empty": "Hakuna tiketi mapokezini kwa sasa.",
+        "col_ticket": "Tiketi",
+        "col_patient": "Mgonjwa",
+        "col_priority": "Kipaumbele",
+        "col_station": "Kituo",
+        "col_time": "Muda",
+        "col_status": "Hali",
+        "open_board": "Fungua ubao wa mapokezi"
+      },
+      "priority": {
+        "normal": "Kawaida",
+        "priority": "Kipaumbele",
+        "emergency": "Dharura"
+      },
+      "state": {
+        "issued": "Imetolewa",
+        "waiting": "Inasubiri",
+        "called": "Imeitwa",
+        "in_service": "Inahudumiwa",
+        "held": "Imesimamishwa",
+        "completed": "Imekamilika",
+        "no_show": "Hakufika",
+        "transferred": "Imehamishwa",
+        "cancelled": "Imeghairiwa"
+      },
       "errors": {
         "no_patient": "Chagua mgonjwa kabla ya kuwasilisha."
       }

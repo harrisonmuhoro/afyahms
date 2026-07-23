@@ -18,10 +18,10 @@ Route::prefix('forgot-password')->name('forgot-password.')->group(function () {
 
 Route::prefix('google')->name('google.')->group(function () {
     Route::get('/redirect', [\App\Modules\Auth\Controllers\GoogleAuthController::class, 'redirect'])
-        ->middleware('throttle:10,1')
+        ->middleware('throttle:60,1')
         ->name('redirect');
     Route::get('/callback', [\App\Modules\Auth\Controllers\GoogleAuthController::class, 'callback'])
-        ->middleware('throttle:10,1')
+        ->middleware('throttle:60,1')
         ->name('callback');
     Route::post('/complete-profile', [\App\Modules\Auth\Controllers\GoogleAuthController::class, 'completeProfile'])
         ->middleware(['auth:sanctum', 'throttle:5,1'])

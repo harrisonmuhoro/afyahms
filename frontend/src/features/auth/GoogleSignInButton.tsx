@@ -29,7 +29,7 @@ export const GoogleSignInButton: React.FC = () => {
             onClick={handleGoogleSignIn}
             disabled={loading}
             type="button"
-            className="flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-secondary w-full justify-center gap-3"
         >
             <svg className="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24">
                 <path
@@ -49,7 +49,7 @@ export const GoogleSignInButton: React.FC = () => {
                     fill="#34A853"
                 />
             </svg>
-            {loading ? 'Redirecting to Google...' : 'Continue with Google'}
+            {loading ? 'Redirecting to Google…' : 'Google'}
         </button>
     );
 };

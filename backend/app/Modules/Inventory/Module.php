@@ -12,6 +12,5 @@ final class Module
 
     public static function boot(\Illuminate\Contracts\Container\Container $app): void
     {
-        Route::group([], base_path('app/Modules/Inventory/routes.php'));
     }
 }

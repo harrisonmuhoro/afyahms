@@ -4,7 +4,8 @@ import type { ApiError, ApiErrorEnvelope } from './types';
 
 const FORBIDDEN_TOAST_DEDUPE_MS = 3000;
 let lastForbiddenToastAt = -Infinity;
-let bearerToken: string | null = null;
+const TOKEN_KEY = 'afya_hms_auth_token';
+let bearerToken: string | null = typeof localStorage !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null;
 
 function notifyForbidden(): void {
   const now = performance.now();
@@ -93,6 +94,13 @@ class HttpClientImpl {
 
   setToken(token: string | null): void {
     bearerToken = token;
+    if (typeof localStorage !== 'undefined') {
+      if (token) {
+        localStorage.setItem(TOKEN_KEY, token);
+      } else {
+        localStorage.removeItem(TOKEN_KEY);
+      }
+    }
   }
 
   async get<T>(url: string, options: RequestOptions = {}): Promise<T> {

@@ -26,7 +26,7 @@ final class UserResource extends JsonResource
             'address'         => $user->address,
             'next_of_kin_name' => $user->next_of_kin_name,
             'next_of_kin_phone' => $user->next_of_kin_phone,
-            'profile_photo_path' => $user->profile_photo_path,
+            'profile_photo_path' => $user->profile_photo_path ? asset('storage/' . $user->profile_photo_path) : null,
             'national_id'      => $canViewSensitiveStaffData ? $user->national_id : null,
             'date_of_birth'    => $canViewSensitiveStaffData ? $user->date_of_birth?->toDateString() : null,
             'staff_id'         => $user->staff_id,

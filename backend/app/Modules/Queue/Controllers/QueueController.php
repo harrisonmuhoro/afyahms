@@ -96,6 +96,15 @@ final class QueueController extends Controller
     {
         $visit = $this->service->openVisit($request->validated(), $request->user());
 
+        // Check for queue overflow (> 15 waiting patients)
+        $waitingCount = QueueTicket::where('state', 'waiting')->count();
+        if ($waitingCount > 15) {
+            $staff = \App\Models\User::role(['receptionist', 'superadmin'])->get();
+            if ($staff->isNotEmpty()) {
+                \Illuminate\Support\Facades\Notification::send($staff, new \App\Notifications\QueueOverflowAlert($waitingCount));
+            }
+        }
+
         return (new VisitResource($visit->load('tickets')))
             ->response()
             ->setStatusCode(201);
@@ -135,6 +144,15 @@ final class QueueController extends Controller
         $this->authorize('manage', $ticket);
         $nextStation = $request->input('next_station');
         $ticket = $this->service->complete($ticket, $request->user(), $nextStation);
+        
+        // Trigger ConsultationRequested if patient is routed to another station
+        if ($nextStation && $ticket->state === 'waiting') {
+            $ticket->loadMissing('station');
+            $doctors = \App\Models\User::role('doctor')->get();
+            if ($doctors->isNotEmpty()) {
+                \Illuminate\Support\Facades\Notification::send($doctors, new \App\Notifications\ConsultationRequested($ticket));
+            }
+        }
 
         return new QueueTicketResource($ticket);
     }
