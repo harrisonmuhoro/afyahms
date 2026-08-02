@@ -154,3 +154,18 @@ desktop.ini
 # NOTE: Keep these — DO NOT ignore:
 # composer.lock ✅
 # frontend/package-lock.json ✅
+
+# ============================================================
+# 📐 DESIGN SYSTEM & INTERNAL DOCS — LOCAL ONLY
+# ============================================================
+stitch_afya_hms_design_system/
+afya-hms-all-reports-spec.md
+afya-hms-reports-guide.md
+design.md
+
+# ============================================================
+# 🔗 GENERATED SYMLINKS & DEBUG FILES
+# ============================================================
+backend/public/storage
+backend/test_branch.php
+extend_reports.php

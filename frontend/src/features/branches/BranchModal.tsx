@@ -35,6 +35,7 @@ export function BranchModal({ isOpen, onClose, branchToEdit }: BranchModalProps)
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors },
   } = useForm<BranchFormData>({
     resolver: zodResolver(branchSchema),
@@ -93,7 +94,15 @@ export function BranchModal({ isOpen, onClose, branchToEdit }: BranchModalProps)
       refresh();
       onClose();
     } catch (err: any) {
-      setServerError(err.response?.data?.message || 'Failed to save branch.');
+      if (err.details) {
+        Object.keys(err.details).forEach((key) => {
+           // err.details[key] is string[], we take the first error
+           // @ts-ignore
+           setError(key as any, { type: 'server', message: err.details[key][0] });
+        });
+      } else {
+        setServerError(err.message || 'Failed to save branch.');
+      }
     } finally {
       setIsSubmitting(false);
     }

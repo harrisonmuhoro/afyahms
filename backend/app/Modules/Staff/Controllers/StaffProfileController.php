@@ -213,10 +213,10 @@ final class StaffProfileController extends Controller
         $this->assertStaffUser($user);
         $file = $request->file('file');
         $oldPath = $user->profile_photo_path;
-        $path = $file->store("profile-photos/{$user->id}", 'local');
+        $path = $file->store("profile-photos/{$user->id}", 'public');
 
         if ($oldPath !== null && $oldPath !== $path) {
-            Storage::disk('local')->delete($oldPath);
+            Storage::disk('public')->delete($oldPath);
         }
 
         $user->forceFill(['profile_photo_path' => $path])->save();

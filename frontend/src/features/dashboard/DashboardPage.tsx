@@ -5,6 +5,7 @@ import { useBranches } from '@/features/branches/BranchProvider';
 import { Icon } from '@/components/icons/Icon';
 import { NAV_ITEMS, isNavItemVisible, type NavItem } from '@/config/navigation';
 import type { IconName } from '@/components/icons/Icon';
+import { SuperadminDashboard } from './SuperadminDashboard';
 
 /* ─── Module category metadata ──────────────────────────────────────────────── */
 interface ModuleMeta {
@@ -215,6 +216,10 @@ export function DashboardPage(): JSX.Element {
   const { activeBranch } = useBranches();
   const roles = user?.roles ?? [];
   const isSuperadmin = roles.includes('superadmin');
+
+  if (isSuperadmin) {
+    return <SuperadminDashboard />;
+  }
   const firstName = user?.name.split(' ')[0] ?? null;
   const primaryRoleLabel = isSuperadmin
     ? 'Superadmin - system root'

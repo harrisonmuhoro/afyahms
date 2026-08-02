@@ -73,7 +73,7 @@ final class QueueService
             $branchId = $this->resolveBranchId($actor);
             $patientId = (int) $visitAttributes['patient_id'];
 
-            Patient::query()->whereKey($patientId)->lockForUpdate()->firstOrFail();
+            $patient = Patient::query()->whereKey($patientId)->lockForUpdate()->firstOrFail();
 
             // Validate profile completeness before issuing a ticket
             if (empty($patient->first_name) || empty($patient->last_name) || empty($patient->gender) || empty($patient->date_of_birth)) {

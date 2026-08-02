@@ -89,6 +89,15 @@ class PharmacyController extends Controller
             foreach ($prescription->items as $item) {
                 $medication = $item->medication;
                 $medication->decrement('stock_quantity', $item->quantity);
+                
+                // Trigger Low Stock Alert if stock is <= 20
+                $medication->refresh();
+                if ($medication->stock_quantity <= 20) {
+                    $pharmacists = \App\Models\User::role('pharmacist')->get();
+                    if ($pharmacists->isNotEmpty()) {
+                        \Illuminate\Support\Facades\Notification::send($pharmacists, new \App\Notifications\LowStockAlert($medication));
+                    }
+                }
             }
         });
 

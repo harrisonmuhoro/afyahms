@@ -65,10 +65,9 @@ final class PatientDto extends Data
     /**
      * @return array<string, mixed>
      */
-    public function toModelAttributes(int $branchId, ?int $registeredBy): array
+    public function toModelAttributes(?int $branchId, ?int $registeredBy): array
     {
-        return [
-            'branch_id'      => $branchId,
+        $payload = [
             'first_name'     => $this->firstName,
             'middle_name'    => $this->middleName,
             'last_name'      => $this->lastName,
@@ -88,5 +87,13 @@ final class PatientDto extends Data
             'is_active'      => $this->isActive,
             'registered_by'  => $registeredBy,
         ];
+
+        // Only include branch_id when it is known — portal self-updates
+        // may originate from patients without a branch assignment.
+        if ($branchId !== null) {
+            $payload['branch_id'] = $branchId;
+        }
+
+        return $payload;
     }
 }

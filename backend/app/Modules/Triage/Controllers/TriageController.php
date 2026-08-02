@@ -27,6 +27,22 @@ final class TriageController extends Controller
             $request->user(),
         );
 
+        // Check for critical vitals (Systolic BP > 180 or Heart Rate > 120)
+        $isCritical = false;
+        if (isset($assessment->systolic_bp) && $assessment->systolic_bp >= 180) {
+            $isCritical = true;
+        }
+        if (isset($assessment->heart_rate) && $assessment->heart_rate >= 120) {
+            $isCritical = true;
+        }
+        
+        if ($isCritical) {
+            $staff = \App\Models\User::role(['doctor', 'nurse'])->get();
+            if ($staff->isNotEmpty()) {
+                \Illuminate\Support\Facades\Notification::send($staff, new \App\Notifications\CriticalVitalsAlert($assessment));
+            }
+        }
+
         return (new TriageAssessmentResource($assessment))
             ->response()
             ->setStatusCode(201);

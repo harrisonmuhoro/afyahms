@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -122,24 +125,21 @@
 
   /* ─── Sidebar ────────────────────────────────────────────────────────────── */
   .sidebar {
-    background: linear-gradient(180deg, #0d9488 0%, #0f766e 40%, #115e59 75%, #134e4a 100%);
+    @apply bg-surface dark:bg-inverse-surface border-r border-outline-variant dark:border-on-surface-variant;
   }
   .sidebar-nav-link {
-    @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-teal-100/80
-           transition-all duration-150
-           hover:bg-white/10 hover:text-white;
+    @apply flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-on-surface-variant/20 hover:text-primary transition-colors text-body-md font-body-md;
   }
   .sidebar-nav-link-active {
-    @apply bg-white/15 text-white shadow-sm;
+    @apply text-primary dark:text-primary-fixed bg-primary-container/10 dark:bg-primary-container/20 border-r-4 border-primary dark:border-primary-fixed text-body-md font-body-md;
   }
   .sidebar-section-label {
-    @apply px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-teal-300/60;
+    @apply px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-tertiary;
   }
 
   /* ─── Top bar ────────────────────────────────────────────────────────────── */
   .topbar {
-    @apply flex items-center justify-between border-b border-stone-200/60 bg-white/80
-           px-4 py-2 backdrop-blur-md dark:border-stone-800/60 dark:bg-stone-900/80;
+    @apply sticky top-0 z-40 h-[64px] flex items-center justify-between border-b border-outline-variant bg-surface px-lg clinical-shadow dark:bg-inverse-surface dark:border-on-surface-variant;
   }
 
   /* ─── Avatar ─────────────────────────────────────────────────────────────── */
@@ -225,6 +225,9 @@
 }
 
 @layer utilities {
+  .clinical-shadow {
+    @apply shadow-card;
+  }
   .text-balance { text-wrap: balance; }
 
   /* Shake animation for login error */

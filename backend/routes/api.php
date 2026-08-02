@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\VerificationController;
 use App\Http\Controllers\PharmacyController;
+use App\Modules\Communication\Controllers\NotificationController;
 use App\Modules\Documents\Controllers\DocumentsController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,17 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('v1')->name('api.')->group(function () {
+
+    // ── Notifications ────────────────────────────────────────────────────────
+    Route::prefix('notifications')
+        ->middleware(['auth:sanctum'])
+        ->group(function () {
+            Route::get('/', [NotificationController::class, 'index']);
+            Route::post('/test', [NotificationController::class, 'generateTestNotifications']);
+            Route::post('/trigger-expiring-check', [NotificationController::class, 'triggerExpiringCheck']);
+            Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+            Route::post('/{id}/read', [NotificationController::class, 'markAsRead']);
+        });
 
     // ── Account & Security ─────────────────────────────────────────────────
     Route::prefix('account')
@@ -33,6 +45,8 @@ Route::prefix('v1')->name('api.')->group(function () {
     Route::prefix('pharmacy')
         ->middleware(['auth:sanctum'])
         ->group(function () {
+
+
             Route::get('/medications', [PharmacyController::class, 'getMedications'])
                 ->middleware('permission:pharmacy.view-stock');
             Route::post('/medications', [PharmacyController::class, 'storeMedication'])

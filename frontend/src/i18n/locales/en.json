@@ -233,6 +233,51 @@
       "visit_type_emergency": "Emergency",
       "submit": "Issue ticket",
       "submitting": "Issuing…",
+      "selected": "Selected:",
+      "clear": "Clear",
+      "success_title": "Check-in successful!",
+      "success_body": "Visit created for {{name}}.",
+      "visit_number": "Visit number",
+      "go_triage": "Go to triage board",
+      "hero": {
+        "register_title": "Register new patient",
+        "register_desc": "Onboard a new visitor and create a medical file instantly.",
+        "checkin_title": "Check-in / issue ticket",
+        "checkin_desc": "Search for a registered patient above and issue a queue ticket."
+      },
+      "kpi": {
+        "waiting": "Waiting at reception",
+        "now_serving": "Now serving",
+        "stations_open": "Stations open"
+      },
+      "queue": {
+        "title": "Front-desk queue",
+        "refresh": "Refresh",
+        "empty": "No tickets at reception right now.",
+        "col_ticket": "Ticket",
+        "col_patient": "Patient",
+        "col_priority": "Priority",
+        "col_station": "Station",
+        "col_time": "Time",
+        "col_status": "Status",
+        "open_board": "Open reception board"
+      },
+      "priority": {
+        "normal": "Normal",
+        "priority": "Priority",
+        "emergency": "Emergency"
+      },
+      "state": {
+        "issued": "Issued",
+        "waiting": "Waiting",
+        "called": "Called",
+        "in_service": "In service",
+        "held": "On hold",
+        "completed": "Completed",
+        "no_show": "No-show",
+        "transferred": "Transferred",
+        "cancelled": "Cancelled"
+      },
       "errors": {
         "no_patient": "Pick a patient before submitting."
       }

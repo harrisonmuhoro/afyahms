@@ -34,6 +34,11 @@ final class EloquentBranchRepository extends EloquentRepository implements Branc
         return $this->newQuery()->where('code', $code)->first();
     }
 
+    public function listAll(): Collection
+    {
+        return $this->newQuery()->orderBy('name')->get();
+    }
+
     public function listActive(): Collection
     {
         return $this->newQuery()->where('is_active', true)->orderBy('name')->get();

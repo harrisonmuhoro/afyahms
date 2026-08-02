@@ -81,7 +81,7 @@ final class AuthController extends Controller
         );
 
         return response()->json([
-            'user' => (new UserResource($user->fresh(self::USER_RESOURCE_RELATIONS)))->toArray($request),
+            'user' => (new UserResource($user->fresh()))->toArray($request),
         ]);
     }
 
@@ -92,7 +92,7 @@ final class AuthController extends Controller
         $user->forceFill($request->safe()->only(['locale', 'theme']))->save();
 
         return response()->json([
-            'user' => (new UserResource($user->fresh(self::USER_RESOURCE_RELATIONS)))->toArray($request),
+            'user' => (new UserResource($user->fresh()))->toArray($request),
         ]);
     }
 

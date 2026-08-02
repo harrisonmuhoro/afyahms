@@ -240,7 +240,11 @@ export function StaffProfilePage(): JSX.Element {
     <div className="mx-auto max-w-6xl space-y-6 pb-10">
       <header className="flex flex-col gap-4 border-b border-stone-200 pb-5 dark:border-stone-800 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-4">
-          <div className="avatar-lg h-14 w-14 text-lg">{initials(activeUser.name)}</div>
+          {activeUser.profile_photo_path ? (
+            <img src={activeUser.profile_photo_path} alt={activeUser.name} className="avatar-lg h-14 w-14 object-cover rounded-full" />
+          ) : (
+            <div className="avatar-lg h-14 w-14 text-lg">{initials(activeUser.name)}</div>
+          )}
           <div>
             <h1 className="page-title">My Profile</h1>
             <p className="mt-1 text-sm text-stone-500">{activeUser.email}</p>

@@ -14,13 +14,13 @@ function initials(name: string): string {
 }
 
 const PORTAL_NAV = [
-  { to: '/portal', key: 'Home' },
-  { to: '/portal/profile', key: 'My Profile' },
-  { to: '/portal/appointments', key: 'Appointments' },
-  { to: '/portal/records', key: 'Records' },
-  { to: '/portal/results', key: 'Results' },
-  { to: '/portal/bills', key: 'Bills & Pay' },
-  { to: '/portal/messages', key: 'Messages' },
+  { to: '/portal', key: 'Home', icon: 'dashboard' },
+  { to: '/portal/profile', key: 'My Profile', icon: 'user' },
+  { to: '/portal/appointments', key: 'Appointments', icon: 'calendar' },
+  { to: '/portal/records', key: 'Records', icon: 'fileText' },
+  { to: '/portal/results', key: 'Results', icon: 'laboratory' },
+  { to: '/portal/bills', key: 'Bills & Pay', icon: 'payments' },
+  { to: '/portal/messages', key: 'Messages', icon: 'message' },
 ];
 
 export function PortalShell(): JSX.Element {
@@ -29,150 +29,140 @@ export function PortalShell(): JSX.Element {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
 
   const handleLogout = async (): Promise<void> => {
     await logout();
     navigate('/login', { replace: true });
   };
 
+  const SidebarContent = () => (
+    <>
+      <div className="p-lg flex items-center gap-3">
+        <div className="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center">
+          <Icon name="medical" size={24} className="text-on-primary-container" />
+        </div>
+        <div>
+          <h1 className="text-headline-md font-headline-md font-bold text-primary">Afya Portal</h1>
+          <p className="text-body-sm text-on-surface-variant">Patient Access</p>
+        </div>
+      </div>
+      <nav className="flex-1 mt-md overflow-y-auto">
+        {PORTAL_NAV.map((item) => {
+          const isActive = item.to === '/portal' 
+            ? location.pathname === '/portal' 
+            : location.pathname.startsWith(item.to);
+
+          return (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.to === '/portal'}
+              onClick={() => setMobileMenuOpen(false)}
+              className={`flex items-center gap-3 px-4 py-3 font-body-md text-body-md transition-colors ${
+                isActive
+                  ? 'text-primary bg-primary-container/10 border-r-4 border-primary'
+                  : 'text-on-surface-variant hover:bg-surface-container-high'
+              }`}
+            >
+              <Icon name={item.icon as any} size={20} />
+              {item.key}
+            </NavLink>
+          );
+        })}
+      </nav>
+      <div className="px-md py-lg border-t border-outline-variant mt-auto">
+        <button 
+          onClick={() => {
+            navigate('/portal/appointments');
+            setMobileMenuOpen(false);
+          }}
+          className="w-full bg-primary text-on-primary py-2.5 rounded-lg font-body-md font-semibold mb-lg hover:opacity-90 transition-opacity"
+        >
+          New Appointment
+        </button>
+        <div className="space-y-1">
+          <a href="#" className="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-primary transition-colors">
+            <Icon name="info" size={20} />
+            <span className="text-body-sm">Support</span>
+          </a>
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-error transition-colors"
+          >
+            <Icon name="logout" size={20} />
+            <span className="text-body-sm">Sign Out</span>
+          </button>
+        </div>
+      </div>
+    </>
+  );
+
   return (
-    <div className="flex min-h-screen flex-col bg-stone-50 text-stone-900 dark:bg-stone-950 dark:text-stone-100">
-      {/* ── Top Navigation Bar ───────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between border-b border-stone-200 bg-white px-4 shadow-sm dark:border-stone-800 dark:bg-stone-900 md:px-8">
-        
-        {/* Brand */}
-        <div className="flex items-center gap-3">
+    <div className="min-h-screen bg-surface text-on-surface font-sans">
+      {/* ── Mobile Sidebar Overlay ───────────────────────────────────────── */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden">
+          <div 
+            className="fixed inset-0 z-40 bg-stone-900/50 backdrop-blur-sm"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <aside className="fixed inset-y-0 left-0 z-50 w-[260px] flex flex-col bg-surface shadow-xl">
+            <SidebarContent />
+          </aside>
+        </div>
+      )}
+
+      {/* ── Desktop Sidebar ──────────────────────────────────────────────── */}
+      <aside className="hidden lg:flex w-[260px] h-full fixed left-0 top-0 flex-col bg-surface border-r border-outline-variant z-50">
+        <SidebarContent />
+      </aside>
+
+      {/* ── Top Bar ──────────────────────────────────────────────────────── */}
+      <header className="h-[64px] sticky top-0 z-40 bg-surface border-b border-outline-variant shadow-sm flex justify-between items-center px-4 lg:px-lg lg:ml-[260px] lg:w-[calc(100%-260px)]">
+        <div className="flex items-center gap-3 w-full max-w-xl">
           <button
             type="button"
-            className="md:hidden -ml-2 p-2 text-stone-500 hover:text-stone-900 dark:hover:text-stone-100"
+            className="lg:hidden p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all"
             onClick={() => setMobileMenuOpen(true)}
           >
             <Icon name="menu" size={24} />
           </button>
           
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-600">
-            <Icon name="heartPulse" size={20} className="text-white" />
+          <div className="relative w-full hidden sm:block">
+            <Icon name="search" size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
+            <input 
+              className="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all" 
+              placeholder="Search for records, test results, or bills..." 
+              type="text"
+            />
           </div>
-          <span className="hidden text-lg font-bold text-teal-800 dark:text-teal-400 md:block">
-            Afya Portal
-          </span>
         </div>
-
-        {/* Desktop Nav Links */}
-        <nav className="hidden items-center gap-1 md:flex">
-          {PORTAL_NAV.map((item) => {
-            const isActive = item.to === '/portal' 
-              ? location.pathname === '/portal' 
-              : location.pathname.startsWith(item.to);
-
-            return (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.to === '/portal'}
-                className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-teal-50 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300'
-                    : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900 dark:text-stone-300 dark:hover:bg-stone-800 dark:hover:text-stone-100'
-                }`}
-              >
-                {item.key}
-              </NavLink>
-            );
-          })}
-        </nav>
-
-        {/* Right Actions */}
-        <div className="flex items-center gap-2">
-          {/* Theme toggle */}
-          <button
-            type="button"
+        
+        <div className="flex items-center gap-2 sm:gap-md shrink-0">
+          <button 
             onClick={toggleTheme}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-stone-500 transition-colors hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-stone-800"
+            className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all"
           >
-            <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={20} />
+            <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={24} />
           </button>
-
-          {/* User Profile */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setProfileOpen(!profileOpen)}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-100 text-teal-700 hover:bg-teal-200 dark:bg-teal-900/50 dark:text-teal-300"
-            >
-              <span className="text-sm font-bold">{user ? initials(user.name) : 'U'}</span>
-            </button>
-
-            {profileOpen && (
-              <>
-                <div 
-                  className="fixed inset-0 z-40" 
-                  onClick={() => setProfileOpen(false)} 
-                />
-                <div className="absolute right-0 mt-2 w-48 z-50 rounded-xl border border-stone-200 bg-white p-2 shadow-lg dark:border-stone-700 dark:bg-stone-800">
-                  <div className="px-3 py-2">
-                    <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{user?.name}</p>
-                    <p className="text-xs text-stone-500 dark:text-stone-400">{user?.email}</p>
-                  </div>
-                  <div className="my-1 h-px bg-stone-100 dark:bg-stone-700" />
-                  <button
-                    onClick={handleLogout}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-                  >
-                    <Icon name="logout" size={16} />
-                    Sign out
-                  </button>
-                </div>
-              </>
-            )}
+          <button className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all">
+            <Icon name="bell" size={24} />
+          </button>
+          
+          <div className="flex items-center gap-3 pl-2 sm:pl-md border-l border-outline-variant ml-1 sm:ml-md">
+            <div className="text-right hidden sm:block">
+              <p className="text-body-sm font-semibold truncate max-w-[150px]">{user?.name}</p>
+              <p className="text-[11px] text-on-surface-variant font-label-caps uppercase truncate max-w-[150px]">Patient</p>
+            </div>
+            <div className="w-9 h-9 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-sm">
+              {user ? initials(user.name) : 'U'}
+            </div>
           </div>
         </div>
       </header>
 
-      {/* ── Mobile Navigation Drawer ─────────────────────────────────────── */}
-      {mobileMenuOpen && (
-        <div className="md:hidden">
-          <div 
-            className="fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-sm"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-          <nav className="fixed inset-y-0 left-0 z-50 w-64 bg-white p-4 shadow-xl dark:bg-stone-900">
-            <div className="mb-6 flex items-center justify-between">
-              <span className="text-lg font-bold text-teal-800 dark:text-teal-400">Afya Portal</span>
-              <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-stone-500">
-                <Icon name="close" size={24} />
-              </button>
-            </div>
-            
-            <div className="flex flex-col gap-2">
-              {PORTAL_NAV.map((item) => {
-                const isActive = item.to === '/portal' 
-                  ? location.pathname === '/portal' 
-                  : location.pathname.startsWith(item.to);
-
-                return (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`rounded-xl px-4 py-3 text-base font-medium transition-colors ${
-                      isActive
-                        ? 'bg-teal-50 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300'
-                        : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900 dark:text-stone-300 dark:hover:bg-stone-800 dark:hover:text-stone-100'
-                    }`}
-                  >
-                    {item.key}
-                  </NavLink>
-                );
-              })}
-            </div>
-          </nav>
-        </div>
-      )}
-
       {/* ── Main Content Area ──────────────────────────────────────────── */}
-      <main className="mx-auto w-full max-w-4xl p-4 sm:p-6 lg:p-8">
+      <main className="lg:ml-[260px] p-4 lg:p-lg min-h-[calc(100vh-64px)] bg-background">
         <Outlet />
       </main>
     </div>

@@ -41,6 +41,11 @@ import {
   MessageSquare,
   AlertCircle,
   Download,
+  MapPin,
+  Wallet,
+  Info,
+  Send,
+  FileText,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -96,6 +101,11 @@ const REGISTRY = {
   alertCircle: AlertCircle,
   shield: ShieldCheck,
   medical: HeartPulse,
+  location: MapPin,
+  wallet: Wallet,
+  info: Info,
+  send: Send,
+  fileText: FileText,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof REGISTRY;

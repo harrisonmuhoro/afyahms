@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Icon } from '@/components/icons/Icon';
 import type { IconName } from '@/components/icons/Icon';
 
@@ -107,81 +108,41 @@ function ReportCard({ item, onClick }: ReportCardProps): JSX.Element {
   );
 }
 
-/* ─── Mock Report Modal ──────────────────────────────────────────────────────── */
-function ReportModal({ item, onClose }: { item: ReportItem, onClose: () => void }) {
-  const { t } = useTranslation(['reports']);
-  
-  // Generic mock data based on item key
-  const mockData = Array.from({ length: 5 }).map((_, i) => ({
-    id: `RPT-${1000 + i}`,
-    date: `2026-06-${20 + i}`,
-    status: i % 2 === 0 ? 'Completed' : 'Pending',
-    value: Math.floor(Math.random() * 50000) + 1000,
-  }));
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-300">
-        <div className="flex items-center justify-between p-6 border-b border-stone-100 dark:border-stone-800">
-          <div className="flex items-center gap-4">
-            <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${item.color}`}>
-              <Icon name={item.icon} size={20} />
-            </span>
-            <div>
-              <h2 className="text-lg font-bold text-stone-900 dark:text-stone-100">{t(`reports:items.${item.key}.name`)}</h2>
-              <p className="text-xs text-stone-500">Showing sample data for this report</p>
-            </div>
-          </div>
-          <button onClick={onClose} className="p-2 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 bg-stone-100 dark:bg-stone-800 rounded-full transition-colors">
-            <Icon name="close" size={18} />
-          </button>
-        </div>
-        
-        <div className="p-6 overflow-y-auto">
-          <div className="border border-stone-200 dark:border-stone-800 rounded-2xl overflow-hidden">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-stone-50 dark:bg-stone-950 text-stone-500 font-medium">
-                <tr>
-                  <th className="px-4 py-3">Record ID</th>
-                  <th className="px-4 py-3">Date</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 text-right">Value (Ksh)</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-stone-100 dark:divide-stone-800 text-stone-700 dark:text-stone-300">
-                {mockData.map((row) => (
-                  <tr key={row.id} className="hover:bg-stone-50/50 dark:hover:bg-stone-900/50 transition-colors">
-                    <td className="px-4 py-3 font-mono text-xs">{row.id}</td>
-                    <td className="px-4 py-3">{row.date}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-md ${row.status === 'Completed' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400'}`}>
-                        {row.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-right font-medium">{row.value.toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        
-        <div className="p-6 border-t border-stone-100 dark:border-stone-800 bg-stone-50 dark:bg-stone-950 flex justify-end">
-          <button onClick={onClose} className="px-5 py-2 bg-stone-900 dark:bg-white text-white dark:text-stone-900 rounded-xl font-bold text-sm shadow-sm hover:shadow-md transition-all">
-            Close Report
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /* ─── Main component ─────────────────────────────────────────────────────────── */
 export function ReportsPage(): JSX.Element {
   const { t } = useTranslation(['reports', 'common']);
+  const navigate = useNavigate();
   const [dateFrom, setDateFrom] = useState<string>('');
   const [dateTo, setDateTo] = useState<string>('');
-  const [selectedReport, setSelectedReport] = useState<ReportItem | null>(null);
+
+  const handleReportClick = (item: ReportItem): void => {
+    const params = new URLSearchParams();
+    if (dateFrom) params.set('from', dateFrom);
+    if (dateTo) params.set('to', dateTo);
+
+    const urlMap: Record<string, string> = {
+      'revenue': '/reports/financial/revenue-summary',
+      'payments': '/reports/financial/payments-collected',
+      'outstanding': '/reports/financial/outstanding-invoices',
+      'sha_claims': '/reports/financial/sha-claims',
+      'diagnoses': '/reports/clinical/diagnoses-summary',
+      'encounters': '/reports/clinical/patient-encounters',
+      'prescriptions': '/reports/clinical/prescriptions-issued',
+      'lab_results': '/reports/clinical/lab-results',
+      'queue_throughput': '/reports/operational/queue-throughput',
+      'wait_times': '/reports/operational/wait-times',
+      'patient_volume': '/reports/operational/patient-volume',
+      'appointments': '/reports/operational/appointment-statistics',
+      'stock_levels': '/reports/inventory/stock-levels',
+      'expiring': '/reports/inventory/expiring-items',
+      'consumption': '/reports/inventory/stock-consumption',
+    };
+
+    const path = urlMap[item.key];
+    if (path) {
+      navigate(`${path}?${params.toString()}`);
+    }
+  };
 
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-12">
@@ -236,16 +197,12 @@ export function ReportsPage(): JSX.Element {
             {/* Card grid */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {group.items.map((item) => (
-                <ReportCard key={item.key} item={item} onClick={() => setSelectedReport(item)} />
+                <ReportCard key={item.key} item={item} onClick={() => handleReportClick(item)} />
               ))}
             </div>
           </section>
         ))}
       </div>
-
-      {selectedReport && (
-        <ReportModal item={selectedReport} onClose={() => setSelectedReport(null)} />
-      )}
     </div>
   );
 }

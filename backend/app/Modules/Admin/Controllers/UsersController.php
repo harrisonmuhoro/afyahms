@@ -104,6 +104,12 @@ final class UsersController extends Controller
             ],
         );
 
+        // Notify superadmins
+        $superadmins = User::role('superadmin')->get();
+        if ($superadmins->isNotEmpty()) {
+            \Illuminate\Support\Facades\Notification::send($superadmins, new \App\Notifications\NewStaffAdded($user));
+        }
+
         return response()->json(['user' => (new UserResource($user->fresh()->load(['roles', 'branches'])))->resolve($request)], 201);
     }
 
