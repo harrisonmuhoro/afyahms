@@ -99,7 +99,7 @@ export function LoginPage(): JSX.Element {
   };
 
   return (
-    <div className="flex min-h-full overflow-hidden bg-stone-50 dark:bg-stone-950">
+    <div className="flex min-h-screen overflow-hidden bg-stone-50 dark:bg-stone-950">
       {/* ── Left panel (~45%): brand & marketing ────────────────────────── */}
       <section className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-brand-600 to-brand-950 p-10 lg:flex lg:w-[45%]">
         {/* Decorative elements */}

@@ -64,8 +64,8 @@
   }
   /* Large CTA variant used on the login panel */
   .btn-login {
-    @apply btn w-full justify-center rounded-xl bg-brand-600 py-3 text-base font-semibold text-white
-           shadow-lg shadow-brand-600/25 hover:bg-brand-700 hover:shadow-brand-700/30
+    @apply btn w-full justify-center rounded-xl bg-blue-600 py-3 text-base font-semibold text-white
+           shadow-lg shadow-blue-600/25 hover:bg-blue-700 hover:shadow-blue-700/30
            active:scale-[0.99] transition-all duration-150;
   }
 
