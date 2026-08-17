@@ -47,7 +47,7 @@ frontend/vite.config.ts.timestamp-*
 
 backend/public/build/
 backend/public/hot/
-backend/public/storage/
+backend/public/storage
 
 
 # ============================================================
@@ -78,7 +78,7 @@ backend/storage/app/public/*
 
 backend/storage/debugbar/
 
-# Composer local overrides (not for teammates)
+# Composer local overrides
 backend/composer.local.json
 backend/composer.original.json
 
@@ -133,12 +133,7 @@ docker-compose.override.yml
 # 🖥️ IDE & OS
 # ============================================================
 .idea/
-.vscode/*
-!.vscode/settings.json
-!.vscode/extensions.json
-frontend/.vscode/*
-!frontend/.vscode/settings.json
-!frontend/.vscode/extensions.json
+.vscode/
 .DS_Store
 Thumbs.db
 desktop.ini
@@ -155,6 +150,7 @@ desktop.ini
 # composer.lock ✅
 # frontend/package-lock.json ✅
 
+
 # ============================================================
 # 📐 DESIGN SYSTEM & INTERNAL DOCS — LOCAL ONLY
 # ============================================================
@@ -164,11 +160,9 @@ afya-hms-reports-guide.md
 design.md
 post_signature_soap_actions.md
 
-# ============================================================
-# 🔗 GENERATED SYMLINKS & DEBUG FILES
-# ============================================================
-backend/public/storage
-backend/test_branch.php
-extend_reports.php.vscode/
 
-git commit -m "chore: ignore post_signature_soap_actions.md in git repository"
+# ============================================================
+# 🔗 GENERATED & TEMP FILES
+# ============================================================
+backend/test_branch.php
+extend_reports.php
