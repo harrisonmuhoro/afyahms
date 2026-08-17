@@ -22,6 +22,11 @@ Route::middleware(['auth:sanctum'])->group(function (): void {
         ->middleware('permission:billing.read')
         ->name('billing.visits.bill.show');
 
+    Route::get('/billing/visits/{visit}/receipt',      [\App\Modules\Billing\Controllers\ReceiptController::class, 'show'])
+        ->whereNumber('visit')
+        ->middleware('permission:billing.read')
+        ->name('billing.visits.receipt.show');
+
     Route::get('/billing/visits/{visit}/bill/status',  [BillingController::class, 'status'])
         ->whereNumber('visit')
         ->middleware('permission:billing.read')

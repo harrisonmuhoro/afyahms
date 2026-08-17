@@ -96,13 +96,13 @@ final class QueueController extends Controller
     {
         $visit = $this->service->openVisit($request->validated(), $request->user());
 
-        // Check for queue overflow (> 15 waiting patients)
-        $waitingCount = QueueTicket::where('state', 'waiting')->count();
+        // Check for queue overflow (> 15 waiting patients in this branch)
+        $waitingCount = QueueTicket::where('state', 'waiting')
+            ->where('branch_id', $visit->branch_id)
+            ->count();
+            
         if ($waitingCount > 15) {
-            $staff = \App\Models\User::role(['receptionist', 'superadmin'])->get();
-            if ($staff->isNotEmpty()) {
-                \Illuminate\Support\Facades\Notification::send($staff, new \App\Notifications\QueueOverflowAlert($waitingCount));
-            }
+            \App\Jobs\NotifyQueueOverflow::dispatch($waitingCount, (int) $visit->branch_id);
         }
 
         return (new VisitResource($visit->load('tickets')))
@@ -147,11 +147,7 @@ final class QueueController extends Controller
         
         // Trigger ConsultationRequested if patient is routed to another station
         if ($nextStation && $ticket->state === 'waiting') {
-            $ticket->loadMissing('station');
-            $doctors = \App\Models\User::role('doctor')->get();
-            if ($doctors->isNotEmpty()) {
-                \Illuminate\Support\Facades\Notification::send($doctors, new \App\Notifications\ConsultationRequested($ticket));
-            }
+            \App\Jobs\NotifyConsultationRequested::dispatch($ticket);
         }
 
         return new QueueTicketResource($ticket);

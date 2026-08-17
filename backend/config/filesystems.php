@@ -48,9 +48,17 @@ return [
             'endpoint' => env('BACKBLAZE_ENDPOINT'),
             'throw'    => false,
         ],
+        'pdf' => [
+            'driver'     => 'local',
+            'root'       => storage_path('app/pdf-exports'),
+            'url'        => env('APP_URL').'/storage/pdf-exports',
+            'visibility' => 'public',
+            'throw'      => false,
+        ],
     ],
 
     'links' => [
-        public_path('storage') => storage_path('app/public'),
+        public_path('storage')             => storage_path('app/public'),
+        public_path('storage/pdf-exports') => storage_path('app/pdf-exports'),
     ],
 ];

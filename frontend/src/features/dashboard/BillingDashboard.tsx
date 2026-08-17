@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useBoard } from '@/features/queue/api';
 import { useBill, useRecordPayment, useMarkBillCleared } from '@/features/queue/billingApi';
+import { httpClient } from '@/lib/http';
 import type { QueueTicket } from '@/features/queue/types';
 
 const PAYMENT_METHODS = [
@@ -51,18 +52,47 @@ export function BillingDashboard(): JSX.Element {
   const tenderedNum = Number.parseFloat(tendered) || 0;
   const change = Math.max(0, tenderedNum - amountDue);
 
+  const openReceipt = async (): Promise<void> => {
+    if (activeTicket?.visit_id == null) return;
+    try {
+      const token = httpClient.getToken();
+      const baseUrl = String((httpClient as unknown as { instance: { defaults: { baseURL?: string } } })
+        .instance?.defaults?.baseURL ?? '');
+      const response = await fetch(
+        `${baseUrl}/billing/visits/${activeTicket.visit_id}/receipt`,
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+      );
+      if (!response.ok) return;
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 10_000);
+    } catch {
+      // silent — billing staff will see no PDF pop-up on network failure
+    }
+  };
+
   const onCollect = async (): Promise<void> => {
     if (activeTicket === null || bill === null || tenderedNum <= 0) return;
     setFeedback(null);
     try {
       const paid = Math.min(tenderedNum, amountDue);
-      await recordPayment.mutateAsync({ amount: paid, method });
+      const updatedBill = await recordPayment.mutateAsync({ amount: paid, method });
       setFeedback(
         `Received ${kes(paid)} (${method}) for ${activeTicket.patient_name ?? 'patient'}${
           change > 0 ? ` — change ${kes(change)}` : ''
         }.`,
       );
       setTendered('');
+      // Auto-open receipt PDF if the bill is now cleared
+      // updatedBill is { data: Bill } per billingApi.ts return type
+      if (updatedBill?.data?.status === 'cleared' || updatedBill?.data?.status === 'waived') {
+        void openReceipt();
+      }
     } catch {
       setFeedback('Payment failed — refresh and try again.');
     }
@@ -434,10 +464,14 @@ export function BillingDashboard(): JSX.Element {
           <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
             <h4 className="text-label-caps font-label-caps text-on-surface-variant mb-md">Revenue Tools</h4>
             <div className="grid grid-cols-1 gap-2">
-              <button className="w-full bg-primary-container text-on-primary-container p-4 rounded-lg flex flex-col items-start gap-1 hover:brightness-110 transition-all group">
+              <button
+                onClick={openReceipt}
+                disabled={activeTicket?.visit_id == null}
+                className="w-full bg-primary-container text-on-primary-container p-4 rounded-lg flex flex-col items-start gap-1 hover:brightness-110 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <span className="material-symbols-outlined text-[24px]">description</span>
-                <span className="font-bold text-body-md">Generate Final Bill</span>
-                <span className="text-[11px] opacity-80">Close patient encounter and print invoice</span>
+                <span className="font-bold text-body-md">Download Receipt PDF</span>
+                <span className="text-[11px] opacity-80">Generate & open a print-ready receipt</span>
               </button>
               <button className="w-full bg-surface border border-outline-variant text-on-surface p-4 rounded-lg flex flex-col items-start gap-1 hover:bg-surface-container transition-all">
                 <span className="material-symbols-outlined text-[24px] text-tertiary">assessment</span>

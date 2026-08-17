@@ -67,9 +67,13 @@ final class RadiologyController extends Controller
     }
 
     /** GET /api/v1/radiology/visits/{visit}/orders */
-    public function index(Visit $visit): JsonResponse
+    public function index(int $visit): JsonResponse
     {
-        $orders = $this->radiology->ordersForVisit($visit);
+        $visitModel = \App\Modules\Queue\Models\Visit::withoutGlobalScope(
+            \App\Modules\Tenancy\Scopes\BranchScope::class
+        )->findOrFail($visit);
+
+        $orders = $this->radiology->ordersForVisit($visitModel);
 
         return response()->json([
             'data' => $orders->map(fn ($o) => $this->orderData($o))->values()->all(),
@@ -77,8 +81,12 @@ final class RadiologyController extends Controller
     }
 
     /** POST /api/v1/radiology/visits/{visit}/orders */
-    public function store(Request $request, Visit $visit): JsonResponse
+    public function store(Request $request, int $visit): JsonResponse
     {
+        $visitModel = \App\Modules\Queue\Models\Visit::withoutGlobalScope(
+            \App\Modules\Tenancy\Scopes\BranchScope::class
+        )->findOrFail($visit);
+
         $validated = $request->validate([
             'imaging_study_id'    => ['required', 'integer', 'exists:imaging_studies,id'],
             'priority'            => ['nullable', 'in:routine,urgent,stat'],
@@ -89,11 +97,12 @@ final class RadiologyController extends Controller
         ]);
 
         $study = ImagingStudy::findOrFail((int) $validated['imaging_study_id']);
-        $order = $this->radiology->placeOrder($visit, $study, $request->user(), $validated);
+        $order = $this->radiology->placeOrder($visitModel, $study, $request->user(), $validated);
         $order->load(['study', 'report', 'orderedBy']);
 
         return response()->json(['data' => $this->orderData($order)], 201);
     }
+
 
     /** POST /api/v1/radiology/orders/{order}/schedule */
     public function schedule(Request $request, ImagingOrder $order): JsonResponse
@@ -191,7 +200,6 @@ final class RadiologyController extends Controller
     private function orderData(ImagingOrder $order): array
     {
         return [
-            'id'                  => $order->id,
             'public_id'           => $order->public_id,
             'visit_id'            => $order->visit_id,
             'patient_id'          => $order->patient_id,
@@ -233,8 +241,7 @@ final class RadiologyController extends Controller
     private function reportData(ImagingReport $report): array
     {
         return [
-            'id'               => $report->id,
-            'imaging_order_id' => $report->imaging_order_id,
+            'imaging_order_public_id' => $report->order?->public_id, // Safely reference the order UUID
             'technique'        => $report->technique,
             'findings'         => $report->findings,
             'impression'       => $report->impression,

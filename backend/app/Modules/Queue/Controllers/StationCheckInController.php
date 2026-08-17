@@ -30,6 +30,24 @@ final class StationCheckInController extends Controller
             abort(403, 'Station belongs to a different branch.');
         }
 
+        // Enforce role-based access to stations
+        if (!$user->hasRole(['superadmin', 'hospital-admin'])) {
+            $allowedRoles = match ($station->code) {
+                'REC' => ['receptionist'],
+                'TRI' => ['nurse', 'doctor'],
+                'DOC' => ['doctor'],
+                'LAB' => ['lab-technician'],
+                'RAD' => ['radiologist'],
+                'PHA' => ['pharmacist'],
+                'BIL' => ['cashier'],
+                default => [], // Deny by default for unknown stations
+            };
+
+            if (!$user->hasAnyRole($allowedRoles)) {
+                abort(403, "You do not have the required role to check into the {$station->code} station.");
+            }
+        }
+
         $user->update(['current_station_id' => $station->id]);
 
         return response()->json([
@@ -38,16 +56,19 @@ final class StationCheckInController extends Controller
         ]);
     }
 
-    /** POST /api/v1/queue/stations/{id}/check-out */
     public function checkOut(Request $request, int $stationId): JsonResponse
     {
         $user = $request->user();
 
-        // No-op if already checked out.
-        $user->update(['current_station_id' => null]);
+        if ($user->current_station_id === $stationId) {
+            $user->update(['current_station_id' => null]);
+            $message = 'Checked out from station.';
+        } else {
+            $message = 'You are not checked into this station.';
+        }
 
         return response()->json([
-            'message'         => 'Checked out from station.',
+            'message'         => $message,
             'current_station' => null,
         ]);
     }

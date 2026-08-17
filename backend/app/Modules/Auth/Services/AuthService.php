@@ -65,7 +65,7 @@ final class AuthService
         // Short-window throttle check.
         $recent = $this->history->recentAttemptsFor($email, 1);
         $maxAttempts = (int) config('auth.login.max_attempts_per_minute', 5);
-        if ($recent >= $maxAttempts && ! $this->bypassesAccountLockout($user)) {
+        if ($recent >= $maxAttempts) {
             $this->history->record($user, $request, LoginHistory::STATUS_LOCKED);
 
             throw new ForbiddenException(
@@ -76,7 +76,8 @@ final class AuthService
 
         if ($user === null) {
             $this->history->record($user, $request, LoginHistory::STATUS_FAILED_PASSWORD);
-            throw new ForbiddenException('This account does not exist in the system.');
+            // Unified error message to prevent user enumeration
+            throw new ForbiddenException('Invalid email or password. Please try again.');
         }
 
         if (! Hash::check($password, $user->password)) {
@@ -84,7 +85,7 @@ final class AuthService
                 user: $user,
                 maxAttempts: $maxAttempts,
                 lockoutMinutes: (int) config('auth.login.lockout_minutes', 15),
-                allowLockout: ! $this->bypassesAccountLockout($user),
+                allowLockout: true,
             );
             $user->refresh();
             
@@ -97,7 +98,8 @@ final class AuthService
                 );
             }
 
-            throw new ForbiddenException('Invalid password. Please try again.');
+            // Unified error message to prevent user enumeration
+            throw new ForbiddenException('Invalid email or password. Please try again.');
         }
 
         $this->history->clearFailures($user);
@@ -200,12 +202,14 @@ final class AuthService
 
     private function bypassesAccountLockout(?User $user): bool
     {
-        return $user?->hasRole('superadmin') ?? false;
+        // Security Fix: No account should bypass lockout, especially high-privileged ones.
+        return false;
     }
 
     private function bypassesLoginMfa(User $user): bool
     {
-        return $user->hasAnyRole(['superadmin', 'hospital-admin', 'doctor']);
+        // Security Fix: Highly privileged accounts MUST use MFA. They should NEVER bypass it.
+        return false;
     }
 
     private function formatDuration(int $seconds): string

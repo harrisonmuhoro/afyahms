@@ -155,11 +155,12 @@ export function AppShell(): JSX.Element {
 
             {/* Global search */}
             <div className="relative w-full max-w-md">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" aria-hidden="true">search</span>
               <input
+                aria-label="Search patients, results, or clinical notes"
                 className="w-full bg-surface-container-low border border-outline-variant rounded-full py-2 pl-10 pr-4 text-body-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
                 placeholder="Search patients, results, or clinical notes..."
-                type="text"
+                type="search"
               />
             </div>
           </div>

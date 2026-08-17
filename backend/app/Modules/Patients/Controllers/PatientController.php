@@ -56,7 +56,6 @@ final class PatientController extends Controller
     public function show(string $uuid): JsonResource
     {
         $patient = $this->service->findByPublicId($uuid);
-        $this->authorize('manage', $patient);
 
         return new PatientResource($patient);
     }
@@ -64,7 +63,6 @@ final class PatientController extends Controller
     public function update(UpdatePatientRequest $request, string $uuid): JsonResource
     {
         $patient = $this->service->findByPublicId($uuid);
-        $this->authorize('manage', $patient);
         $updated = $this->service->update($patient, $request->validated(), $request->user(), $request);
 
         return new PatientResource($updated);
@@ -73,7 +71,6 @@ final class PatientController extends Controller
     public function destroy(string $uuid): JsonResponse
     {
         $patient = $this->service->findByPublicId($uuid);
-        $this->authorize('manage', $patient);
         $this->service->softDelete($patient);
 
         return response()->json([
@@ -85,8 +82,6 @@ final class PatientController extends Controller
     {
         $source = $this->service->findByPublicId($request->string('source_uuid')->toString());
         $target = $this->service->findByPublicId($request->string('target_uuid')->toString());
-        $this->authorize('manage', $source);
-        $this->authorize('manage', $target);
 
         $this->service->merge(
             $source,

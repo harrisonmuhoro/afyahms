@@ -2,6 +2,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { httpClient } from '@/lib/http';
+import { generateAndDownloadPdf } from '@/lib/pdf';
 import { Icon } from '@/components/icons/Icon';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useBranches } from '@/features/branches/BranchProvider';
@@ -79,7 +80,7 @@ export function RevenueSummaryReport(): JSX.Element {
   };
 
   const handlePrint = (): void => {
-    window.print();
+    generateAndDownloadPdf('revenue-summary', { from, to, branch_id: branchId });
   };
 
   return (

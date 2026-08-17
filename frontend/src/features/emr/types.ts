@@ -20,6 +20,8 @@ export interface SoapNote {
   is_signed: boolean;
   is_amended: boolean;
   signed_at: string | null;
+  acknowledged_by: number | null;
+  acknowledged_at: string | null;
   created_at: string | null;
   updated_at: string | null;
 }

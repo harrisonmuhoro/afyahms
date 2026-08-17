@@ -2,6 +2,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { httpClient } from '@/lib/http';
+import { generateAndDownloadPdf } from '@/lib/pdf';
 import { useBranches } from '@/features/branches/BranchProvider';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Icon } from '@/components/icons/Icon';
@@ -82,7 +83,7 @@ export function PaymentsCollectedReport(): JSX.Element {
   };
 
   const handlePrint = (): void => {
-    window.print();
+    generateAndDownloadPdf('payments-collected', { from, to, branch_id: branchId });
   };
 
   return (

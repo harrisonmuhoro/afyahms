@@ -89,9 +89,13 @@ final class Rbac
 
         // EMR
         'emr.create', 'emr.read', 'emr.update', 'emr.delete', 'emr.list', 'emr.sign',
-        'emr.amend', 'emr.view-history',
+        'emr.amend', 'emr.view-history', 'emr.acknowledge',
+        'soap_notes.export_pdf',
         'vitals.create', 'vitals.read', 'vitals.update', 'vitals.list',
         'diagnoses.create', 'diagnoses.read', 'diagnoses.update', 'diagnoses.delete', 'diagnoses.list',
+
+        // Referrals
+        'referrals.create', 'referrals.read', 'referrals.list',
 
         // Clinical Alerts
         'alerts.read', 'alerts.list', 'alerts.acknowledge', 'alerts.configure',
@@ -171,6 +175,21 @@ final class Rbac
     ];
 
     /**
+     * Post-signature permission aliases: map spec names → actual Spatie permissions.
+     *
+     * `soap_notes.add_addendum`  → emr.amend
+     * `pharmacy.receive_prescription` → prescriptions.create
+     * `billing.generate_invoice` → invoices.create
+     * `lab_orders.create`        → lab.order
+     */
+    public const POST_SIGNATURE_ALIASES = [
+        'soap_notes.add_addendum'        => 'emr.amend',
+        'pharmacy.receive_prescription'  => 'prescriptions.create',
+        'billing.generate_invoice'       => 'invoices.create',
+        'lab_orders.create'              => 'lab.order',
+    ];
+
+    /**
      * Permission grants per role. Derived 1:1 from `docs/08-rbac-matrix.md` §6.
      * Format: role_slug => [permissions...].
      *
@@ -198,6 +217,7 @@ final class Rbac
             'visits.create', 'visits.read', 'visits.update', 'visits.list', 'visits.close',
             'triage.read', 'triage.list',
             'emr.read', 'emr.list', 'emr.view-history',
+            'soap_notes.export_pdf',
             'vitals.read', 'vitals.list',
             'diagnoses.read', 'diagnoses.list',
             'alerts.read', 'alerts.list', 'alerts.configure',
@@ -273,6 +293,8 @@ final class Rbac
             'visits.read', 'visits.list',
             'triage.create', 'triage.read', 'triage.update', 'triage.list', 'triage.assign-category',
             'emr.create', 'emr.read', 'emr.update', 'emr.list', 'emr.sign', 'emr.amend', 'emr.view-history',
+            'soap_notes.export_pdf',
+            'referrals.create', 'referrals.read', 'referrals.list',
             'vitals.create', 'vitals.read', 'vitals.update', 'vitals.list',
             'diagnoses.create', 'diagnoses.read', 'diagnoses.update', 'diagnoses.delete', 'diagnoses.list',
             'alerts.read', 'alerts.list', 'alerts.acknowledge',
@@ -296,7 +318,8 @@ final class Rbac
             'queue.read', 'queue.list', 'queue.issue', 'queue.call-next', 'queue.advance', 'queue.manage', 'queue.override-priority',
             'visits.create', 'visits.read', 'visits.update', 'visits.list',
             'triage.create', 'triage.read', 'triage.update', 'triage.list', 'triage.assign-category',
-            'emr.create', 'emr.read', 'emr.update', 'emr.list', 'emr.view-history',
+            'emr.create', 'emr.read', 'emr.update', 'emr.list', 'emr.view-history', 'emr.acknowledge',
+            'soap_notes.export_pdf',
             'vitals.create', 'vitals.read', 'vitals.update', 'vitals.list',
             'diagnoses.read', 'diagnoses.list',
             'alerts.read', 'alerts.list', 'alerts.acknowledge',
@@ -316,7 +339,7 @@ final class Rbac
             'patients.create', 'patients.read', 'patients.update', 'patients.list',
             'appointments.create', 'appointments.read', 'appointments.update', 'appointments.delete', 'appointments.list',
             'appointments.cancel', 'appointments.reschedule',
-            'queue.read', 'queue.list', 'queue.issue', 'queue.call-next', 'queue.advance', 'queue.manage', 'queue.void',
+            'queue.read', 'queue.list', 'queue.issue',
             'visits.create', 'visits.read', 'visits.update', 'visits.list', 'visits.close',
             'triage.read', 'triage.list',
             'invoices.read', 'invoices.list',
@@ -332,6 +355,7 @@ final class Rbac
             'appointments.read', 'appointments.list',
             'queue.read', 'queue.list',
             'emr.read', 'emr.list', 'emr.view-history',
+            'soap_notes.export_pdf',
             'diagnoses.read', 'diagnoses.list',
             'reporting.read', 'reporting.list', 'reporting.clinical', 'reporting.operational', 'reporting.export',
             'communication.read', 'communication.list',
@@ -409,6 +433,7 @@ final class Rbac
             'portal.access', 'portal.view-results', 'portal.view-invoices', 'portal.pay',
             'portal.demographics.update', 'data-corrections.create',
             'documents.view-own',
+            'soap_notes.export_pdf',
         ],
     ];
 

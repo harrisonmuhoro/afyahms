@@ -70,6 +70,7 @@ export function usePatient(uuid: string | undefined): {
   patient: Patient | null;
   isLoading: boolean;
   error: HttpError | null;
+  refetch: () => void;
 } {
   const query = useQuery({
     queryKey: ['patients', 'detail', uuid],
@@ -77,7 +78,9 @@ export function usePatient(uuid: string | undefined): {
       if (uuid === undefined) {
         return null;
       }
-      return await httpClient.get<Patient>(`/patients/${uuid}`);
+      // PatientResource wraps in { data: Patient }
+      const res = await httpClient.get<{ data: Patient }>(`/patients/${uuid}`);
+      return res.data;
     },
     enabled: uuid !== undefined,
     staleTime: 60_000,
@@ -87,6 +90,7 @@ export function usePatient(uuid: string | undefined): {
     patient: query.data ?? null,
     isLoading: query.isLoading,
     error: query.error as HttpError | null,
+    refetch: () => { void query.refetch(); },
   };
 }
 
@@ -168,6 +172,7 @@ interface UpdatePatientInput {
 
 export function useUpdatePatient(): {
   mutate: (input: UpdatePatientInput) => void;
+  mutateAsync: (input: UpdatePatientInput) => Promise<{ data: Patient }>;
   isPending: boolean;
   error: HttpError | null;
 } {
@@ -184,6 +189,7 @@ export function useUpdatePatient(): {
 
   return {
     mutate: mutation.mutate,
+    mutateAsync: mutation.mutateAsync,
     isPending: mutation.isPending,
     error: (mutation.error as HttpError | null) ?? null,
   };

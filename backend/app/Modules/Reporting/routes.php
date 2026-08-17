@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Modules\Reporting\Controllers\ReportingController;
+use App\Modules\Reporting\Controllers\ReportPdfController;
 
 Route::middleware(['api', 'auth:sanctum'])
     ->prefix('api/v1/reports')
@@ -11,4 +12,16 @@ Route::middleware(['api', 'auth:sanctum'])
         ->middleware('permission:reporting.read');
     Route::get('{type}', [ReportingController::class, 'getReportData'])
         ->middleware('permission:reporting.read');
+
+    Route::post('pdf/{type}', [ReportPdfController::class, 'generate'])
+        ->middleware('permission:reports.view')
+        ->name('pdf.generate');
+
+    Route::get('pdf/job/{jobId}/status', [ReportPdfController::class, 'status'])
+        ->middleware('permission:reports.view')
+        ->name('reports.pdf.status');
+
+    Route::get('pdf/job/{jobId}/download', [ReportPdfController::class, 'download'])
+        ->middleware('permission:reports.view')
+        ->name('reports.pdf.download');
 });

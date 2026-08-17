@@ -13,28 +13,31 @@ class PatientPolicy
 {
     use HandlesAuthorization;
 
-    public function manage(User $user, Patient $patient): bool
-    {
-        if ($user->hasRole('superadmin')) {
-            return true;
-        }
-
-        $activeBranch = app(BranchContext::class)->get();
-
-        return $activeBranch !== null && (int) $patient->branch_id === (int) $activeBranch;
-    }
-
     public function view(User $user, Patient $patient): bool
     {
         if ($user->hasRole('superadmin')) {
             return true;
         }
 
-        $activeBranch = app(BranchContext::class)->get();
+        return app(BranchContext::class)->get() !== null && $user->can('patients.read');
+    }
 
-        return $activeBranch !== null
-            && (int) $patient->branch_id === (int) $activeBranch
-            && $user->can('patients.read');
+    public function update(User $user, Patient $patient): bool
+    {
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        return app(BranchContext::class)->get() !== null && $user->can('patients.update');
+    }
+
+    public function merge(User $user, Patient $patient): bool
+    {
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        return app(BranchContext::class)->get() !== null && $user->can('patients.merge');
     }
 
     public function create(User $user): bool
@@ -48,6 +51,7 @@ class PatientPolicy
             return true;
         }
 
+        // Only the registering branch or superadmins can soft-delete a patient.
         $activeBranch = app(BranchContext::class)->get();
 
         return $activeBranch !== null

@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { PermissionButton } from '@/components/auth/PermissionButton';
+import { useAuth } from '@/features/auth/AuthProvider';
 import {
   useAddDiagnosis,
+  useAcknowledgeSoap,
   useAmendSoap,
   useCompleteEncounter,
   useDiagnosisCatalogSearch,
@@ -89,6 +91,7 @@ export function EncounterPage(): JSX.Element {
 
 function EncounterWorkspace({ encounter }: { encounter: Encounter }): JSX.Element {
   const { t } = useTranslation(['emr', 'common', 'errors']);
+  const { hasPermission, user } = useAuth();
   const [activeTab, setActiveTab] = useState('SOAP NOTES');
   const note = encounter.soap_note;
   const signed = note?.is_signed ?? false;
@@ -99,28 +102,34 @@ function EncounterWorkspace({ encounter }: { encounter: Encounter }): JSX.Elemen
     assessment: note?.assessment ?? '',
     plan: note?.plan ?? '',
   });
-  const [amendMode, setAmendMode] = useState(false);
+  const [showAddendum, setShowAddendum] = useState(false);
   const [banner, setBanner] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!amendMode) {
-      setSoap({
-        subjective: note?.subjective ?? '',
-        objective: note?.objective ?? '',
-        assessment: note?.assessment ?? '',
-        plan: note?.plan ?? '',
-      });
-    }
-  }, [note?.id, note?.subjective, note?.objective, note?.assessment, note?.plan, amendMode]);
+    setSoap({
+      subjective: note?.subjective ?? '',
+      objective: note?.objective ?? '',
+      assessment: note?.assessment ?? '',
+      plan: note?.plan ?? '',
+    });
+  }, [note?.id, note?.subjective, note?.objective, note?.assessment, note?.plan]);
 
   const saveSoap = useSaveSoap(encounter.id);
   const signSoap = useSignSoap(encounter.id);
-  const amendSoap = useAmendSoap(encounter.id);
   const complete = useCompleteEncounter(encounter.id);
 
-  const readOnly = (signed && !amendMode) || encounter.status === 'completed';
-  const noteIsEmpty = ![note?.subjective, note?.objective, note?.assessment, note?.plan].some((v) => (v ?? '').trim() !== '');
+  // Once signed, the note is permanently locked. No edit button ever appears.
+  const readOnly = signed || encounter.status === 'completed';
+
+  // Sign button activates as soon as local state has content — no need to save draft first.
+  const localNoteEmpty = ![soap.subjective, soap.objective, soap.assessment, soap.plan].some(
+    (v) => (v ?? '').trim() !== ''
+  );
+  const serverNoteEmpty = ![note?.subjective, note?.objective, note?.assessment, note?.plan].some(
+    (v) => (v ?? '').trim() !== ''
+  );
+  const noteIsEmpty = localNoteEmpty && serverNoteEmpty;
 
   const handleError = (err: unknown): void => {
     setError(err instanceof Error ? err.message : t('errors:generic'));
@@ -131,14 +140,8 @@ function EncounterWorkspace({ encounter }: { encounter: Encounter }): JSX.Elemen
     setError(null);
     setBanner(null);
     try {
-      if (amendMode) {
-        await amendSoap.mutateAsync(soap);
-        setAmendMode(false);
-        setBanner(t('emr:amended'));
-      } else {
-        await saveSoap.mutateAsync(soap);
-        setBanner(t('emr:saved'));
-      }
+      await saveSoap.mutateAsync(soap);
+      setBanner(t('emr:saved'));
     } catch (err: unknown) {
       handleError(err);
     }
@@ -147,8 +150,18 @@ function EncounterWorkspace({ encounter }: { encounter: Encounter }): JSX.Elemen
   const onSign = async (): Promise<void> => {
     setError(null);
     try {
+      // Auto-save any unsaved draft content before signing
+      const hasUnsavedChanges =
+        (soap.subjective ?? '') !== (note?.subjective ?? '') ||
+        (soap.objective ?? '') !== (note?.objective ?? '') ||
+        (soap.assessment ?? '') !== (note?.assessment ?? '') ||
+        (soap.plan ?? '') !== (note?.plan ?? '');
+
+      if (hasUnsavedChanges) {
+        await saveSoap.mutateAsync(soap);
+      }
       await signSoap.mutateAsync();
-      setBanner(t('emr:signed'));
+      setShowPostSignModal(true);
     } catch (err: unknown) {
       handleError(err);
     }
@@ -163,6 +176,11 @@ function EncounterWorkspace({ encounter }: { encounter: Encounter }): JSX.Elemen
       handleError(err);
     }
   };
+
+  const isDoctor = user?.roles.includes('doctor') ?? false;
+  const isNurse = user?.roles.includes('nurse') ?? false;
+  const isAdmin = user?.roles.some((r) => ['hospital-admin', 'superadmin', 'receptionist', 'cashier'].includes(r)) ?? false;
+  const [showPostSignModal, setShowPostSignModal] = useState(false);
 
   return (
     <div className="space-y-lg">
@@ -193,21 +211,59 @@ function EncounterWorkspace({ encounter }: { encounter: Encounter }): JSX.Elemen
               )}
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-body-sm text-on-surface-variant">Visit #{encounter.visit_id ?? 'N/A'}</span>
-              </div>
+              <span className="text-body-sm text-on-surface-variant">Visit #{encounter.visit_id ?? 'N/A'}</span>
             </div>
           </div>
         </div>
         <div className="flex flex-col items-end gap-2">
           <StatusBadge status={encounter.status} />
-          {signed && <span className="bg-secondary/10 text-secondary px-3 py-1 rounded-md text-[11px] font-bold border border-secondary/20">{t('emr:signed_badge')}</span>}
+          {signed && (
+            <span className="bg-secondary/10 text-secondary px-3 py-1 rounded-md text-[11px] font-bold border border-secondary/20">
+              {t('emr:signed_badge')}
+            </span>
+          )}
         </div>
       </div>
 
+      {/* Post-Sign Modal — appears immediately after signing */}
+      {showPostSignModal && (
+        <PostSignModal
+          encounterId={encounter.id}
+          visitId={encounter.visit_id ?? 0}
+          patientId={encounter.patient_id}
+          signedAt={note?.signed_at ?? null}
+          isDoctor={isDoctor}
+          isNurse={isNurse}
+          isAdmin={isAdmin}
+          hasPermission={hasPermission}
+          onNavigateToTab={(tab) => { setActiveTab(tab); setShowPostSignModal(false); }}
+          onAddAddendum={() => { setShowAddendum(true); setActiveTab('SOAP NOTES'); setShowPostSignModal(false); }}
+          onClose={() => {
+            setShowPostSignModal(false);
+            setBanner('Note signed and locked. Select next steps from the action bar below.');
+          }}
+        />
+      )}
+
+      {/* Post-Signature Action Bar — appears below header once note is signed */}
+      {signed && encounter.status !== 'completed' && (
+        <PostSignatureActionBar
+          encounterId={encounter.id}
+          visitId={encounter.visit_id ?? 0}
+          patientId={encounter.patient_id}
+          signedAt={note?.signed_at ?? null}
+          isDoctor={isDoctor}
+          isNurse={isNurse}
+          isAdmin={isAdmin}
+          hasPermission={hasPermission}
+          onNavigateToTab={setActiveTab}
+          onAddAddendum={() => { setShowAddendum(true); setActiveTab('SOAP NOTES'); }}
+        />
+      )}
+
       {/* Three-Column Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start">
-        {/* Left Rail: Patient Summary (Placeholder/Static for design match) */}
+        {/* Left Rail */}
         <div className="lg:col-span-3 space-y-md">
           <div className="bg-white border border-outline-variant rounded-xl p-md shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
             <h3 className="text-label-caps text-on-surface-variant mb-3 flex items-center gap-2">
@@ -275,42 +331,63 @@ function EncounterWorkspace({ encounter }: { encounter: Encounter }): JSX.Elemen
           </div>
           <div className="flex-1 p-md space-y-md">
             {activeTab === 'SOAP NOTES' && (
-              <form onSubmit={onSave} className="space-y-md">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-body-sm font-semibold text-on-surface">
-                    {amendMode ? t('emr:amendment') : t('emr:soap_note')}
-                  </h2>
-                </div>
-                <div className="space-y-4">
-                  <SoapField label={t('emr:soap.subjective')} value={soap.subjective ?? ''} readOnly={readOnly} onChange={(v) => setSoap((s) => ({ ...s, subjective: v }))} />
-                  <SoapField label={t('emr:soap.objective')} value={soap.objective ?? ''} readOnly={readOnly} onChange={(v) => setSoap((s) => ({ ...s, objective: v }))} />
-                  <SoapField label={t('emr:soap.assessment')} value={soap.assessment ?? ''} readOnly={readOnly} onChange={(v) => setSoap((s) => ({ ...s, assessment: v }))} />
-                  <SoapField label={t('emr:soap.plan')} value={soap.plan ?? ''} readOnly={readOnly} onChange={(v) => setSoap((s) => ({ ...s, plan: v }))} />
-                </div>
-                
-                <div className="flex flex-wrap justify-end gap-2 pt-4 border-t border-outline-variant">
-                  {signed && !amendMode && encounter.status !== 'completed' && (
-                    <PermissionButton permission="emr.amend" type="button" onClick={() => setAmendMode(true)} className="px-4 py-2 border border-outline-variant rounded-md text-body-sm font-semibold hover:bg-surface-container">
-                      {t('emr:amend')}
-                    </PermissionButton>
+              <div className="space-y-md">
+                {/* Locked note view — always read-only once signed */}
+                <form onSubmit={onSave} className="space-y-md">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-body-sm font-semibold text-on-surface">{t('emr:soap_note')}</h2>
+                    {signed && (
+                      <span className="text-[11px] text-tertiary flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[14px]">lock</span>
+                        Signed — read only
+                      </span>
+                    )}
+                  </div>
+                  <div className="space-y-4">
+                    <SoapField label={t('emr:soap.subjective')} value={soap.subjective ?? ''} readOnly={readOnly} onChange={(v) => setSoap((s) => ({ ...s, subjective: v }))} />
+                    <SoapField label={t('emr:soap.objective')} value={soap.objective ?? ''} readOnly={readOnly} onChange={(v) => setSoap((s) => ({ ...s, objective: v }))} />
+                    <SoapField label={t('emr:soap.assessment')} value={soap.assessment ?? ''} readOnly={readOnly} onChange={(v) => setSoap((s) => ({ ...s, assessment: v }))} />
+                    <SoapField label={t('emr:soap.plan')} value={soap.plan ?? ''} readOnly={readOnly} onChange={(v) => setSoap((s) => ({ ...s, plan: v }))} />
+                  </div>
+
+                  {/* Unsigned state: Save + Sign */}
+                  {!signed && encounter.status !== 'completed' && (
+                    <div className="flex flex-wrap justify-end gap-2 pt-4 border-t border-outline-variant">
+                      <PermissionButton
+                        permission="emr.update"
+                        type="submit"
+                        disabled={saveSoap.isPending}
+                        className="bg-surface-container-high text-on-surface px-4 py-2 rounded-md font-semibold text-body-sm hover:bg-surface-container-highest disabled:opacity-50"
+                      >
+                        {saveSoap.isPending ? 'Saving...' : t('emr:save_draft')}
+                      </PermissionButton>
+                      <PermissionButton
+                        permission="emr.sign"
+                        type="button"
+                        onClick={onSign}
+                        disabled={signSoap.isPending || noteIsEmpty}
+                        title={noteIsEmpty ? t('emr:sign_requires_content') : undefined}
+                        className="bg-primary text-white px-4 py-2 rounded-md font-semibold text-body-sm hover:bg-primary/90 disabled:opacity-50"
+                      >
+                        {signSoap.isPending ? t('emr:signing') : t('emr:sign')}
+                      </PermissionButton>
+                    </div>
                   )}
-                  {amendMode && (
-                    <button type="button" onClick={() => setAmendMode(false)} className="px-4 py-2 text-tertiary hover:text-on-surface text-body-sm font-semibold">
-                      {t('common:cancel')}
-                    </button>
-                  )}
-                  {!readOnly && (
-                    <PermissionButton permission="emr.update" type="submit" disabled={saveSoap.isPending || amendSoap.isPending} className="bg-surface-container-high text-on-surface px-4 py-2 rounded-md font-semibold text-body-sm hover:bg-surface-container-highest disabled:opacity-50">
-                      {amendMode ? t('emr:save_amendment') : t('emr:save_draft')}
-                    </PermissionButton>
-                  )}
-                  {!signed && !amendMode && encounter.status !== 'completed' && (
-                    <PermissionButton permission="emr.sign" type="button" onClick={onSign} disabled={signSoap.isPending || noteIsEmpty} title={noteIsEmpty ? t('emr:sign_requires_content') : undefined} className="bg-primary text-white px-4 py-2 rounded-md font-semibold text-body-sm hover:bg-primary-container disabled:opacity-50">
-                      {signSoap.isPending ? t('emr:signing') : t('emr:sign')}
-                    </PermissionButton>
-                  )}
-                </div>
-              </form>
+                </form>
+
+                {/* Addendum section — only visible when triggered from action bar */}
+                {signed && showAddendum && (
+                  <AddendumForm
+                    encounterId={encounter.id}
+                    onCancel={() => setShowAddendum(false)}
+                    onSuccess={() => {
+                      setShowAddendum(false);
+                      setBanner('Addendum saved and appended to the record.');
+                    }}
+                    onError={handleError}
+                  />
+                )}
+              </div>
             )}
 
             {activeTab === 'DIAGNOSIS' && (
@@ -331,7 +408,7 @@ function EncounterWorkspace({ encounter }: { encounter: Encounter }): JSX.Elemen
           </div>
         </div>
 
-        {/* Right Rail: Orders Cart & Completion */}
+        {/* Right Rail: Completion */}
         <div className="lg:col-span-3 space-y-md">
           {encounter.status !== 'completed' && (
             <div className="bg-white border border-outline-variant rounded-xl p-md shadow-[0px_1px_3px_rgba(0,0,0,0.05)] space-y-md">
@@ -385,6 +462,336 @@ function EncounterWorkspace({ encounter }: { encounter: Encounter }): JSX.Elemen
     </div>
   );
 }
+
+/* ─── Post-Signature Action Bar ─────────────────────────────────────────── */
+
+interface PostSignatureActionBarProps {
+  encounterId: number;
+  visitId: number;
+  patientId: number;
+  signedAt: string | null;
+  isDoctor: boolean;
+  isNurse: boolean;
+  isAdmin: boolean;
+  hasPermission: (p: string) => boolean;
+  onNavigateToTab: (tab: string) => void;
+  onAddAddendum: () => void;
+}
+
+function PostSignatureActionBar({
+  encounterId,
+  visitId,
+  patientId,
+  signedAt,
+  isDoctor,
+  isNurse,
+  isAdmin,
+  hasPermission,
+  onNavigateToTab,
+  onAddAddendum,
+}: PostSignatureActionBarProps): JSX.Element {
+  const navigate = useNavigate();
+  const acknowledgeApi = useAcknowledgeSoap(encounterId);
+  const [ackDone, setAckDone] = useState(false);
+  const [ackError, setAckError] = useState<string | null>(null);
+
+  const onAcknowledge = async (): Promise<void> => {
+    setAckError(null);
+    try {
+      await acknowledgeApi.mutateAsync();
+      setAckDone(true);
+    } catch (err: unknown) {
+      setAckError(err instanceof Error ? err.message : 'Failed to acknowledge');
+    }
+  };
+
+  const ActionBtn = ({
+    icon,
+    label,
+    onClick,
+    primary = false,
+    disabled = false,
+  }: {
+    icon: string;
+    label: string;
+    onClick: () => void;
+    primary?: boolean;
+    disabled?: boolean;
+  }) => (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        'flex items-center gap-2 px-4 py-2 rounded-lg text-body-sm font-semibold border transition-all disabled:opacity-50 disabled:cursor-not-allowed',
+        primary
+          ? 'bg-primary text-white border-primary hover:bg-primary/90'
+          : 'bg-white text-on-surface border-outline-variant hover:border-primary/40 hover:bg-primary/5'
+      )}
+    >
+      <span className="material-symbols-outlined text-[18px]">{icon}</span>
+      {label}
+    </button>
+  );
+
+  return (
+    <div className="bg-white border border-outline-variant rounded-xl p-md shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-label-caps text-on-surface-variant">Next Actions</p>
+        {signedAt !== null && (
+          <span className="text-[11px] text-tertiary flex items-center gap-1">
+            <span className="material-symbols-outlined text-[14px]">lock</span>
+            Signed {new Date(signedAt).toLocaleString('en-KE', { dateStyle: 'short', timeStyle: 'short' })}
+          </span>
+        )}
+      </div>
+      {ackError !== null && (
+        <p className="text-[11px] text-error mb-2">{ackError}</p>
+      )}
+      <div className="flex flex-wrap gap-2">
+
+        {/* ── Doctor actions ── */}
+        {isDoctor && hasPermission('prescriptions.create') && (
+          <ActionBtn
+            icon="medication"
+            label="Send to Pharmacy"
+            primary
+            onClick={() => onNavigateToTab('PRESCRIPTIONS')}
+          />
+        )}
+        {isDoctor && hasPermission('appointments.create') && (
+          <ActionBtn
+            icon="event"
+            label="Schedule Follow-Up"
+            primary
+            onClick={() => navigate(`/appointments/new?patient_id=${patientId}&type=follow_up`)}
+          />
+        )}
+        {isDoctor && hasPermission('lab.order') && (
+          <ActionBtn
+            icon="biotech"
+            label="Order Labs"
+            onClick={() => onNavigateToTab('ORDERS')}
+          />
+        )}
+        {isDoctor && hasPermission('radiology.order') && (
+          <ActionBtn
+            icon="radiology"
+            label="Order Imaging"
+            onClick={() => onNavigateToTab('ORDERS')}
+          />
+        )}
+        {isDoctor && hasPermission('referrals.create') && (
+          <ActionBtn
+            icon="transfer_within_a_station"
+            label="Refer Patient"
+            onClick={() => navigate(`/referrals/new?patient_id=${patientId}&visit_id=${visitId}`)}
+          />
+        )}
+        {isDoctor && hasPermission('emr.amend') && (
+          <ActionBtn
+            icon="edit_note"
+            label="Add Addendum"
+            onClick={onAddAddendum}
+          />
+        )}
+
+        {/* ── Nurse actions ── */}
+        {isNurse && hasPermission('vitals.create') && (
+          <ActionBtn
+            icon="monitor_heart"
+            label="Record Vitals"
+            onClick={() => onNavigateToTab('SOAP NOTES')}
+          />
+        )}
+        {isNurse && hasPermission('mar.administer') && (
+          <ActionBtn
+            icon="vaccines"
+            label="Administer Medication"
+            onClick={() => onNavigateToTab('ORDERS')}
+          />
+        )}
+        {isNurse && hasPermission('emr.acknowledge') && (
+          <ActionBtn
+            icon={ackDone ? 'check_circle' : 'check_circle_outline'}
+            label={ackDone ? 'Acknowledged ✓' : acknowledgeApi.isPending ? 'Acknowledging...' : 'Acknowledge'}
+            disabled={acknowledgeApi.isPending || ackDone}
+            onClick={() => void onAcknowledge()}
+          />
+        )}
+
+        {/* ── Admin actions ── */}
+        {isAdmin && hasPermission('invoices.create') && (
+          <ActionBtn
+            icon="receipt_long"
+            label="Generate Invoice"
+            onClick={() => navigate(`/billing/invoices/new?visit_id=${visitId}`)}
+          />
+        )}
+        {isAdmin && hasPermission('appointments.create') && (
+          <ActionBtn
+            icon="event"
+            label="Book Follow-Up"
+            onClick={() => navigate(`/appointments/new?patient_id=${patientId}&type=follow_up`)}
+          />
+        )}
+        {isAdmin && hasPermission('documents.download') && (
+          <ActionBtn
+            icon="summarize"
+            label="Download Summary"
+            onClick={() => window.print()}
+          />
+        )}
+
+        {/* ── Export PDF — all roles with soap_notes.export_pdf ── */}
+        {hasPermission('soap_notes.export_pdf') && (
+          <ActionBtn
+            icon="print"
+            label="Print / Export"
+            onClick={() => window.print()}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Post-Sign Modal ───────────────────────────────────────────────────── */
+
+function PostSignModal({
+  encounterId,
+  visitId,
+  patientId,
+  signedAt,
+  isDoctor,
+  isNurse,
+  isAdmin,
+  hasPermission,
+  onNavigateToTab,
+  onAddAddendum,
+  onClose,
+}: PostSignatureActionBarProps & { onClose: () => void }): JSX.Element {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-outline-variant flex items-start justify-between">
+          <div>
+            <h2 className="text-headline-sm font-bold text-on-surface flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary text-[28px]">lock</span>
+              Note Signed and Locked
+            </h2>
+            <p className="text-body-sm text-on-surface-variant mt-1">
+              The SOAP note has been finalized. What would you like to do next?
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-on-surface-variant hover:bg-surface-container p-2 rounded-full transition-colors"
+          >
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div className="p-6">
+          <PostSignatureActionBar
+            encounterId={encounterId}
+            visitId={visitId}
+            patientId={patientId}
+            signedAt={signedAt}
+            isDoctor={isDoctor}
+            isNurse={isNurse}
+            isAdmin={isAdmin}
+            hasPermission={hasPermission}
+            onNavigateToTab={onNavigateToTab}
+            onAddAddendum={onAddAddendum}
+          />
+        </div>
+        <div className="p-4 bg-surface-container-low border-t border-outline-variant flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-6 py-2 bg-primary text-white rounded-lg font-bold text-body-sm hover:bg-primary/90 transition-colors"
+          >
+            Dismiss
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Addendum Form ─────────────────────────────────────────────────────── */
+
+function AddendumForm({
+  encounterId,
+  onCancel,
+  onSuccess,
+  onError,
+}: {
+  encounterId: number;
+  onCancel: () => void;
+  onSuccess: () => void;
+  onError: (err: unknown) => void;
+}): JSX.Element {
+  const amendSoap = useAmendSoap(encounterId);
+  const [text, setText] = useState('');
+
+  const onSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+    e.preventDefault();
+    if (!text.trim()) return;
+    try {
+      // The amend endpoint appends — the original fields are sent as empty strings
+      // so only the addendum text is new content.
+      await amendSoap.mutateAsync({
+        subjective: '',
+        objective: '',
+        assessment: '',
+        plan: text.trim(),
+      });
+      onSuccess();
+    } catch (err: unknown) {
+      onError(err);
+    }
+  };
+
+  return (
+    <div className="border border-secondary/30 rounded-lg p-md bg-secondary/5 space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-body-sm font-semibold text-on-surface">Add Addendum</h3>
+        <span className="text-[11px] text-tertiary">
+          Appended to the original — original text cannot be altered
+        </span>
+      </div>
+      <form onSubmit={onSubmit} className="space-y-3">
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.currentTarget.value)}
+          rows={4}
+          required
+          placeholder="Enter addendum text..."
+          className="w-full p-3 border border-outline-variant rounded-lg text-body-md outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/10 bg-white transition-all"
+        />
+        <div className="flex gap-2 justify-end">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-4 py-2 text-tertiary hover:text-on-surface text-body-sm font-semibold"
+          >
+            Cancel
+          </button>
+          <PermissionButton
+            permission="emr.amend"
+            type="submit"
+            disabled={amendSoap.isPending || !text.trim()}
+            className="bg-secondary text-white px-4 py-2 rounded-md font-semibold text-body-sm hover:bg-secondary/90 disabled:opacity-50"
+          >
+            {amendSoap.isPending ? 'Saving...' : 'Save Addendum'}
+          </PermissionButton>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+/* ─── Diagnoses Section ─────────────────────────────────────────────────── */
 
 function DiagnosesSection({ encounter }: { encounter: Encounter }): JSX.Element {
   const { t } = useTranslation(['emr', 'common', 'errors']);
@@ -483,6 +890,8 @@ function DiagnosesSection({ encounter }: { encounter: Encounter }): JSX.Element 
   );
 }
 
+/* ─── SOAP Field ────────────────────────────────────────────────────────── */
+
 function SoapField({
   label,
   value,
@@ -512,6 +921,8 @@ function SoapField({
     </div>
   );
 }
+
+/* ─── Status Badge ──────────────────────────────────────────────────────── */
 
 function StatusBadge({ status }: { status: Encounter['status'] }): JSX.Element {
   const { t } = useTranslation(['emr']);

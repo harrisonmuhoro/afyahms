@@ -49,6 +49,11 @@ Route::middleware(['auth:sanctum', 'break.glass'])->group(function (): void {
         ->middleware('permission:emr.amend')
         ->name('encounters.soap.amend');
 
+    Route::post('/encounters/{id}/soap/acknowledge', [EmrController::class, 'acknowledgeSoap'])
+        ->whereNumber('id')
+        ->middleware('permission:emr.acknowledge')
+        ->name('encounters.soap.acknowledge');
+
     // Diagnoses
     Route::post('/encounters/{id}/diagnoses',  [EmrController::class, 'addDiagnosis'])
         ->whereNumber('id')

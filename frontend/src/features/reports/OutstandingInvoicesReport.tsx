@@ -2,6 +2,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { httpClient } from '@/lib/http';
+import { generateAndDownloadPdf } from '@/lib/pdf';
 import { useBranches } from '@/features/branches/BranchProvider';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { Icon } from '@/components/icons/Icon';
@@ -86,7 +87,7 @@ export function OutstandingInvoicesReport(): JSX.Element {
   };
 
   const handlePrint = (): void => {
-    window.print();
+    generateAndDownloadPdf('outstanding-invoices', { branch_id: branchId });
   };
 
   return (

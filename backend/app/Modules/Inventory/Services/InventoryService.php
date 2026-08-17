@@ -325,7 +325,13 @@ final class InventoryService
         return DB::transaction(function () use ($po, $actor, $receivedLines): PurchaseOrder {
             foreach ($receivedLines as $line) {
                 $poItem = PurchaseOrderItem::findOrFail((int) $line['po_item_id']);
-                $qty    = (int) ($line['quantity_received'] ?? 0);
+                
+                // Security Fix: Prevent IDOR / cross-contamination of PO items
+                if ($poItem->purchase_order_id !== $po->id) {
+                    throw new ConflictException("Item does not belong to this purchase order.", 403);
+                }
+                
+                $qty = (int) ($line['quantity_received'] ?? 0);
 
                 if ($qty <= 0) {
                     continue;

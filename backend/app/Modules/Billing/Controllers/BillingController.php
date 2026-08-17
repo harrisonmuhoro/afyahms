@@ -74,6 +74,23 @@ final class BillingController extends Controller
         ]);
 
         $bill = $this->billing->billForVisit($visit);
+
+        // Authorization: prevent cross-branch payment recording (IDOR fix)
+        if ($bill->branch_id !== $visit->branch_id) {
+            abort(403, 'Forbidden: branch mismatch.');
+        }
+
+        // Guard: do not allow payment on an already-cleared or waived bill
+        if ($bill->isCleared()) {
+            return response()->json([
+                'error' => [
+                    'type'    => 'BillAlreadyCleared',
+                    'status'  => 409,
+                    'message' => 'This bill has already been cleared and cannot accept further payments.',
+                ],
+            ], 409);
+        }
+
         $bill = $this->billing->recordPayment(
             $bill,
             (float) $validated['amount'],
@@ -81,13 +98,10 @@ final class BillingController extends Controller
             $request->user(),
         );
         
-        // Trigger High Value Payment Alert if amount > 50,000
+        // High Value Payment Alert — dispatch as background job to avoid blocking the HTTP response
         $amount = (float) $validated['amount'];
         if ($amount > 50000) {
-            $admins = \App\Models\User::role(['superadmin', 'billing_admin'])->get();
-            if ($admins->isNotEmpty()) {
-                \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\HighValuePaymentAlert($bill, $amount));
-            }
+            \App\Jobs\SendHighValuePaymentAlert::dispatch($bill, $amount);
         }
         
         $bill->load('items');
@@ -127,7 +141,6 @@ final class BillingController extends Controller
     private function billData(Bill $bill): array
     {
         return [
-            'id'             => $bill->id,
             'public_id'      => $bill->public_id,
             'visit_id'       => $bill->visit_id,
             'patient_id'     => $bill->patient_id,

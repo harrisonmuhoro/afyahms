@@ -16,19 +16,21 @@ final class SoapNoteResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'           => $this->id,
-            'encounter_id' => $this->encounter_id,
-            'patient_id'   => $this->patient_id,
-            'subjective'   => $this->subjective,
-            'objective'    => $this->objective,
-            'assessment'   => $this->assessment,
-            'plan'         => $this->plan,
-            'authored_by'  => $this->authored_by,
-            'is_signed'    => $this->signed_at !== null,
-            'is_amended'   => (bool) $this->is_amended,
-            'signed_at'    => $this->signed_at?->toIso8601String(),
-            'created_at'   => $this->created_at?->toIso8601String(),
-            'updated_at'   => $this->updated_at?->toIso8601String(),
+            'id'               => $this->id,
+            'encounter_id'     => $this->encounter_id,
+            'patient_id'       => $this->patient_id,
+            'subjective'       => $this->subjective,
+            'objective'        => $this->objective,
+            'assessment'       => $this->assessment,
+            'plan'             => $this->plan,
+            'authored_by'      => $this->authored_by,
+            'is_signed'        => $this->signed_at !== null,
+            'is_amended'       => (bool) $this->is_amended,
+            'signed_at'        => $this->signed_at?->toIso8601String(),
+            'acknowledged_by'  => $this->acknowledged_by,
+            'acknowledged_at'  => $this->acknowledged_at?->toIso8601String(),
+            'created_at'       => $this->created_at?->toIso8601String(),
+            'updated_at'       => $this->updated_at?->toIso8601String(),
         ];
     }
 }

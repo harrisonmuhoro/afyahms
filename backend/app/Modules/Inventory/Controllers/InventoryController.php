@@ -196,11 +196,8 @@ final class InventoryController extends Controller
 
         $po = $this->inventory->receivePurchaseOrder($po, $request->user(), $validated['items']);
 
-        // Notify pharmacists and inventory managers
-        $staff = \App\Models\User::role(['pharmacist', 'inventory_manager'])->get();
-        if ($staff->isNotEmpty()) {
-            \Illuminate\Support\Facades\Notification::send($staff, new \App\Notifications\StockReceivedAlert($po));
-        }
+        // Dispatch background job to notify staff (prevents HTTP thread blocking)
+        \App\Jobs\NotifyStockReceived::dispatch($po);
 
         return response()->json(['data' => $po]);
     }

@@ -1,44 +1,94 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Modules\Reporting\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
-class ReportingController extends Controller
+final class ReportingController extends Controller
 {
-    public function getDashboardStats(Request $request)
+    public function getDashboardStats(Request $request): JsonResponse
     {
-                if ($type === 'sha-claims') return $this->getShaClaims($request);
-        if ($type === 'diagnoses-summary') return $this->getDiagnosesSummary($request);
-        if ($type === 'patient-encounters') return $this->getPatientEncounters($request);
+        $branchId = $this->getEffectiveBranchId($request);
+
+        $revenueToday = \App\Modules\Billing\Models\Bill::query()
+            ->whereDate('created_at', today())
+            ->when($branchId, fn ($q) => $q->where('branch_id', $branchId))
+            ->sum('paid_amount');
+
+        $outstandingInvoices = \App\Modules\Billing\Models\Bill::query()
+            ->whereIn('status', ['pending', 'partial'])
+            ->when($branchId, fn ($q) => $q->where('branch_id', $branchId))
+            ->count();
+
+        $shaClaimsPending = \App\Modules\Billing\Models\Bill::query()
+            ->where('payment_method', 'insurance')
+            ->where('status', 'pending')
+            ->when($branchId, fn ($q) => $q->where('branch_id', $branchId))
+            ->count();
+
+        $patientsSeen = \App\Modules\Queue\Models\Visit::query()
+            ->whereDate('visit_date', today())
+            ->when($branchId, fn ($q) => $q->where('branch_id', $branchId))
+            ->count();
 
         return response()->json([
             'financial' => [
-                'revenue_today' => 125000,
-                'outstanding_invoices' => 45,
-                'sha_claims_pending' => 12,
+                'revenue_today'        => $revenueToday,
+                'outstanding_invoices' => $outstandingInvoices,
+                'sha_claims_pending'   => $shaClaimsPending,
             ],
             'clinical' => [
-                'patients_seen_today' => 142,
-                'prescriptions_issued' => 89,
-                'lab_tests_conducted' => 56,
+                'patients_seen_today' => $patientsSeen,
             ],
-            'operational' => [
-                'average_wait_time_mins' => 24,
-                'active_staff' => 38,
-                'beds_occupied' => 75,
-            ]
         ]);
     }
 
-    public function getReportData(Request $request, $type)
+    /**
+     * Get the effective branch_id for filtering.
+     * Non-superadmin users are always scoped to their own active branch.
+     * Superadmins can supply any branch_id or 'all'.
+     */
+    private function getEffectiveBranchId(Request $request): ?int
     {
+        $user = $request->user();
+        if ($user === null) {
+            return null;
+        }
+
+        // Non-superadmins are always scoped to their active branch.
+        if (! $user->hasRole('superadmin')) {
+            return $user->current_branch_id;
+        }
+
+        // Superadmins can pick a branch via query param; omit to see all.
+        $branchId = $request->query('branch_id');
+        if ($branchId && $branchId !== 'all') {
+            return (int) $branchId;
+        }
+
+        return null;
+    }
+
+    /**
+     * Apply branch scoping to a query builder.
+     */
+    private function applyBranchScope(Builder $query, ?int $branchId): Builder
+    {
+        return $query->when($branchId !== null, fn ($q) => $q->where('branch_id', $branchId));
+    }
+
+    public function getReportData(\App\Http\Requests\ReportFilterRequest $request, string $type): JsonResponse
+    {
+        // ...
         if ($type === 'revenue-summary') return $this->getRevenueSummary($request);
         if ($type === 'payments-collected') return $this->getPaymentsCollected($request);
         if ($type === 'outstanding-invoices') return $this->getOutstandingInvoices($request);
-
         if ($type === 'sha-claims') return $this->getShaClaims($request);
         if ($type === 'diagnoses-summary') return $this->getDiagnosesSummary($request);
         if ($type === 'patient-encounters') return $this->getPatientEncounters($request);
@@ -52,10 +102,6 @@ class ReportingController extends Controller
         if ($type === 'expiring-items') return $this->getExpiringItems($request);
         if ($type === 'stock-consumption') return $this->getStockConsumption($request);
 
-                if ($type === 'sha-claims') return $this->getShaClaims($request);
-        if ($type === 'diagnoses-summary') return $this->getDiagnosesSummary($request);
-        if ($type === 'patient-encounters') return $this->getPatientEncounters($request);
-
         return response()->json([
             'report_type' => $type,
             'message' => 'Unknown report type.',
@@ -63,38 +109,40 @@ class ReportingController extends Controller
         ], 404);
     }
 
-    private function getRevenueSummary(Request $request)
+    private function getRevenueSummary(\App\Http\Requests\ReportFilterRequest $request)
     {
-        $from = $request->query('from');
-        $to = $request->query('to');
+        $validated = $request->validated();
+        $from = $validated['from'] ?? null;
+        $to = $validated['to'] ?? null;
         
-        $query = \App\Modules\Billing\Models\Bill::with('patient');
+        $query = \App\Modules\Billing\Models\Bill::query();
 
         if ($from) $query->whereDate('created_at', '>=', $from);
         if ($to) $query->whereDate('created_at', '<=', $to);
 
-        $user = $request->user();
-        if ($request->has('branch_id') && $user !== null && method_exists($user, 'hasRole') && $user->hasRole('superadmin')) {
-            $branchId = $request->query('branch_id');
-            if ($branchId && $branchId !== 'all') $query->where('branch_id', $branchId);
-        }
+        $branchId = $this->getEffectiveBranchId($request);
+        $this->applyBranchScope($query, $branchId);
 
-        $bills = $query->get();
+        // SQL Aggregations for KPIs
+        $totalRevenue = (float) (clone $query)->sum('paid_amount');
+        $completedCount = (int) (clone $query)->whereIn('status', ['cleared', 'waived'])->count();
+        $pendingCount = (int) (clone $query)->whereIn('status', ['pending', 'partial'])->count();
 
-        $totalRevenue = $bills->sum('paid_amount');
-        $completedCount = $bills->whereIn('status', ['cleared', 'waived'])->count();
-        $pendingCount = $bills->whereIn('status', ['pending', 'partial'])->count();
+        // SQL Aggregations for Chart
+        $chartData = (clone $query)
+            ->selectRaw('DATE(created_at) as date, SUM(paid_amount) as revenue')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->toArray();
 
-        $chartData = $bills->groupBy(function($bill) {
-            return $bill->created_at ? $bill->created_at->format('Y-m-d') : 'Unknown';
-        })->map(function($group, $date) {
-            return [
-                'date' => $date,
-                'revenue' => $group->sum('paid_amount'),
-            ];
-        })->values()->sortBy('date')->values()->toArray();
+        // Limited Table Data (preventing mass memory consumption)
+        $bills = (clone $query)->with('patient')
+            ->orderByDesc('created_at')
+            ->limit(100)
+            ->get();
 
-        $tableData = $bills->sortByDesc('created_at')->map(function($bill) {
+        $tableData = $bills->map(function($bill) {
             return [
                 'public_id' => $bill->public_id,
                 'date' => $bill->created_at ? $bill->created_at->format('Y-m-d H:i:s') : 'Unknown',
@@ -103,11 +151,7 @@ class ReportingController extends Controller
                 'total_amount' => $bill->total_amount,
                 'paid_amount' => $bill->paid_amount,
             ];
-        })->values()->toArray();
-
-                if ($type === 'sha-claims') return $this->getShaClaims($request);
-        if ($type === 'diagnoses-summary') return $this->getDiagnosesSummary($request);
-        if ($type === 'patient-encounters') return $this->getPatientEncounters($request);
+        })->toArray();
 
         return response()->json([
             'kpis' => [
@@ -120,54 +164,55 @@ class ReportingController extends Controller
         ]);
     }
 
-    private function getPaymentsCollected(Request $request)
+    private function getPaymentsCollected(\App\Http\Requests\ReportFilterRequest $request)
     {
-        $from = $request->query('from');
-        $to = $request->query('to');
+        $validated = $request->validated();
+        $from = $validated['from'] ?? null;
+        $to = $validated['to'] ?? null;
         
-        $query = \App\Modules\Billing\Models\Bill::with('patient')->where('paid_amount', '>', 0);
+        $query = \App\Modules\Billing\Models\Bill::query()->where('paid_amount', '>', 0);
 
         if ($from) $query->whereDate('updated_at', '>=', $from);
         if ($to) $query->whereDate('updated_at', '<=', $to);
 
-        $user = $request->user();
-        if ($request->has('branch_id') && $user !== null && method_exists($user, 'hasRole') && $user->hasRole('superadmin')) {
-            $branchId = $request->query('branch_id');
-            if ($branchId && $branchId !== 'all') $query->where('branch_id', $branchId);
-        }
+        $branchId = $this->getEffectiveBranchId($request);
+        $this->applyBranchScope($query, $branchId);
 
-        $bills = $query->get();
+        // SQL Aggregations for KPIs
+        $totalCollected = (float) (clone $query)->sum('paid_amount');
+        $cashPayments = (float) (clone $query)->where('payment_method', 'cash')->sum('paid_amount');
+        $mpesaPayments = (float) (clone $query)->where('payment_method', 'mpesa')->sum('paid_amount');
+        $insurancePayments = (float) (clone $query)->where('payment_method', 'insurance')->sum('paid_amount');
 
-        $totalCollected = $bills->sum('paid_amount');
-        $cashPayments = $bills->where('payment_method', 'cash')->sum('paid_amount');
-        $mpesaPayments = $bills->where('payment_method', 'mpesa')->sum('paid_amount');
-        $insurancePayments = $bills->where('payment_method', 'insurance')->sum('paid_amount');
+        // SQL Aggregations for Chart
+        $chartData = (clone $query)
+            ->selectRaw("
+                DATE(updated_at) as date,
+                SUM(CASE WHEN payment_method = 'cash' THEN paid_amount ELSE 0 END) as Cash,
+                SUM(CASE WHEN payment_method = 'mpesa' THEN paid_amount ELSE 0 END) as 'M-Pesa',
+                SUM(CASE WHEN payment_method = 'insurance' THEN paid_amount ELSE 0 END) as Insurance
+            ")
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->toArray();
 
-        $chartData = $bills->groupBy(function($bill) {
-            return $bill->updated_at ? $bill->updated_at->format('Y-m-d') : 'Unknown';
-        })->map(function($group, $date) {
-            return [
-                'date' => $date,
-                'Cash' => $group->where('payment_method', 'cash')->sum('paid_amount'),
-                'M-Pesa' => $group->where('payment_method', 'mpesa')->sum('paid_amount'),
-                'Insurance' => $group->where('payment_method', 'insurance')->sum('paid_amount'),
-            ];
-        })->values()->sortBy('date')->values()->toArray();
+        // Limited Table Data
+        $bills = (clone $query)->with('patient')
+            ->orderByDesc('updated_at')
+            ->limit(100)
+            ->get();
 
-        $tableData = $bills->sortByDesc('updated_at')->map(function($bill) {
+        $tableData = $bills->map(function($bill) {
             return [
                 'public_id' => $bill->public_id,
                 'date' => $bill->updated_at ? $bill->updated_at->format('Y-m-d H:i:s') : 'Unknown',
                 'patient_name' => $bill->patient ? $bill->patient->fullName() : 'Unknown',
                 'channel' => ucfirst($bill->payment_method ?? 'Cash'),
-                'reference' => 'REF-' . substr(md5($bill->id), 0, 8),
+                'reference' => 'REF-' . substr(md5((string)$bill->id), 0, 8),
                 'amount' => $bill->paid_amount,
             ];
-        })->values()->toArray();
-
-                if ($type === 'sha-claims') return $this->getShaClaims($request);
-        if ($type === 'diagnoses-summary') return $this->getDiagnosesSummary($request);
-        if ($type === 'patient-encounters') return $this->getPatientEncounters($request);
+        })->toArray();
 
         return response()->json([
             'kpis' => [
@@ -181,58 +226,54 @@ class ReportingController extends Controller
         ]);
     }
 
-    private function getOutstandingInvoices(Request $request)
+    private function getOutstandingInvoices(\App\Http\Requests\ReportFilterRequest $request)
     {
-        $from = $request->query('from');
-        $to = $request->query('to');
+        $validated = $request->validated();
+        $from = $validated['from'] ?? null;
+        $to = $validated['to'] ?? null;
         
-        $query = \App\Modules\Billing\Models\Bill::with('patient')->whereIn('status', ['pending', 'partial']);
+        $query = \App\Modules\Billing\Models\Bill::query()->whereIn('status', ['pending', 'partial']);
 
         if ($from) $query->whereDate('created_at', '>=', $from);
         if ($to) $query->whereDate('created_at', '<=', $to);
 
-        $user = $request->user();
-        if ($request->has('branch_id') && $user !== null && method_exists($user, 'hasRole') && $user->hasRole('superadmin')) {
-            $branchId = $request->query('branch_id');
-            if ($branchId && $branchId !== 'all') $query->where('branch_id', $branchId);
-        }
+        $branchId = $this->getEffectiveBranchId($request);
+        $this->applyBranchScope($query, $branchId);
 
-        $bills = $query->get();
-
-        $totalOutstanding = $bills->sum(function($bill) { return $bill->total_amount - $bill->paid_amount; });
-        $fullyUnpaid = $bills->where('paid_amount', 0)->count();
-        $partiallyPaid = $bills->where('paid_amount', '>', 0)->count();
+        // SQL Aggregations for KPIs
+        $totalOutstanding = (float) (clone $query)->selectRaw('SUM(total_amount - paid_amount) as total')->value('total');
+        $fullyUnpaid = (int) (clone $query)->where('paid_amount', 0)->count();
+        $partiallyPaid = (int) (clone $query)->where('paid_amount', '>', 0)->count();
         
-        $oldestUnpaid = $bills->min('created_at');
-        $oldestUnpaidDate = $oldestUnpaid ? $oldestUnpaid->format('Y-m-d') : 'N/A';
+        $oldestUnpaid = (clone $query)->min('created_at');
+        $oldestUnpaidDate = $oldestUnpaid ? (new \Carbon\Carbon($oldestUnpaid))->format('Y-m-d') : 'N/A';
 
-        // Chart Data grouped by aging bucket
-        $now = Carbon::now();
-        $buckets = [
-            '0-30 days' => 0,
-            '31-60 days' => 0,
-            '61-90 days' => 0,
-            '90+ days' => 0,
-        ];
-
-        foreach ($bills as $bill) {
-            $days = $now->diffInDays($bill->created_at);
-            $balance = $bill->total_amount - $bill->paid_amount;
-            if ($days <= 30) $buckets['0-30 days'] += $balance;
-            elseif ($days <= 60) $buckets['31-60 days'] += $balance;
-            elseif ($days <= 90) $buckets['61-90 days'] += $balance;
-            else $buckets['90+ days'] += $balance;
-        }
+        // Chart Data grouped by aging bucket using SQL
+        $bucketsQuery = (clone $query)->selectRaw("
+            SUM(CASE WHEN DATEDIFF(NOW(), created_at) <= 30 THEN total_amount - paid_amount ELSE 0 END) as '0-30 days',
+            SUM(CASE WHEN DATEDIFF(NOW(), created_at) BETWEEN 31 AND 60 THEN total_amount - paid_amount ELSE 0 END) as '31-60 days',
+            SUM(CASE WHEN DATEDIFF(NOW(), created_at) BETWEEN 61 AND 90 THEN total_amount - paid_amount ELSE 0 END) as '61-90 days',
+            SUM(CASE WHEN DATEDIFF(NOW(), created_at) > 90 THEN total_amount - paid_amount ELSE 0 END) as '90+ days'
+        ")->first();
 
         $chartData = [];
-        foreach ($buckets as $bucket => $amount) {
-            $chartData[] = [
-                'bucket' => $bucket,
-                'amount' => $amount
-            ];
+        if ($bucketsQuery) {
+            foreach (['0-30 days', '31-60 days', '61-90 days', '90+ days'] as $bucket) {
+                $chartData[] = [
+                    'bucket' => $bucket,
+                    'amount' => (float) $bucketsQuery->getAttribute($bucket)
+                ];
+            }
         }
 
-        $tableData = $bills->sortByDesc('created_at')->map(function($bill) use ($now) {
+        // Limited Table Data
+        $now = \Carbon\Carbon::now();
+        $bills = (clone $query)->with('patient')
+            ->orderByDesc('created_at')
+            ->limit(100)
+            ->get();
+
+        $tableData = $bills->map(function($bill) use ($now) {
             return [
                 'public_id' => $bill->public_id,
                 'date' => $bill->created_at ? $bill->created_at->format('Y-m-d') : 'Unknown',
@@ -244,11 +285,7 @@ class ReportingController extends Controller
                 'days_outstanding' => $now->diffInDays($bill->created_at),
                 'status' => $bill->paid_amount > 0 ? 'Partially Paid' : 'Unpaid',
             ];
-        })->values()->toArray();
-
-                if ($type === 'sha-claims') return $this->getShaClaims($request);
-        if ($type === 'diagnoses-summary') return $this->getDiagnosesSummary($request);
-        if ($type === 'patient-encounters') return $this->getPatientEncounters($request);
+        })->toArray();
 
         return response()->json([
             'kpis' => [
@@ -262,54 +299,55 @@ class ReportingController extends Controller
         ]);
     }
 
-    private function getShaClaims(Request $request)
+    private function getShaClaims(\App\Http\Requests\ReportFilterRequest $request)
     {
-        $from = $request->query('from');
-        $to = $request->query('to');
+        $validated = $request->validated();
+        $from = $validated['from'] ?? null;
+        $to = $validated['to'] ?? null;
         
-        $query = \App\Modules\Billing\Models\Bill::with('patient')->where('payment_method', 'insurance');
+        $query = \App\Modules\Billing\Models\Bill::query()->where('payment_method', 'insurance');
 
         if ($from) $query->whereDate('created_at', '>=', $from);
         if ($to) $query->whereDate('created_at', '<=', $to);
 
-        $user = $request->user();
-        if ($request->has('branch_id') && $user !== null && method_exists($user, 'hasRole') && $user->hasRole('superadmin')) {
-            $branchId = $request->query('branch_id');
-            if ($branchId && $branchId !== 'all') $query->where('branch_id', $branchId);
-        }
+        $branchId = $this->getEffectiveBranchId($request);
+        $this->applyBranchScope($query, $branchId);
 
-        $bills = $query->get();
-
-        $submittedCount = $bills->count();
-        $claimedAmount = $bills->sum('total_amount');
-        $approvedCount = $bills->whereIn('status', ['cleared', 'waived'])->count();
-        $pendingCount = $bills->where('status', 'pending')->count();
+        // SQL Aggregations for KPIs
+        $submittedCount = (int) (clone $query)->count();
+        $claimedAmount = (float) (clone $query)->sum('total_amount');
+        $approvedCount = (int) (clone $query)->whereIn('status', ['cleared', 'waived'])->count();
+        $pendingCount = (int) (clone $query)->where('status', 'pending')->count();
         $rejectedCount = 0; // Currently no rejected status in bills
         
-        $chartData = $bills->groupBy(function($bill) {
-            return $bill->created_at ? $bill->created_at->format('Y-m-d') : 'Unknown';
-        })->map(function($group, $date) {
-            return [
-                'date' => $date,
-                'Approved' => $group->whereIn('status', ['cleared', 'waived'])->count(),
-                'Pending' => $group->where('status', 'pending')->count(),
-                'Rejected' => 0,
-            ];
-        })->values()->sortBy('date')->values()->toArray();
+        // SQL Aggregations for Chart
+        $chartData = (clone $query)
+            ->selectRaw("
+                DATE(created_at) as date,
+                SUM(CASE WHEN status IN ('cleared', 'waived') THEN 1 ELSE 0 END) as Approved,
+                SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as Pending,
+                0 as Rejected
+            ")
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->toArray();
 
-        $tableData = $bills->sortByDesc('created_at')->map(function($bill) {
+        // Limited Table Data
+        $bills = (clone $query)->with('patient')
+            ->orderByDesc('created_at')
+            ->limit(100)
+            ->get();
+
+        $tableData = $bills->map(function($bill) {
             return [
-                'claim_id' => 'CLM-' . substr(md5($bill->id), 0, 8),
+                'claim_id' => 'CLM-' . substr(md5((string)$bill->id), 0, 8),
                 'date' => $bill->created_at ? $bill->created_at->format('Y-m-d H:i:s') : 'Unknown',
                 'patient_name' => $bill->patient ? $bill->patient->fullName() : 'Unknown',
                 'status' => $bill->status === 'pending' ? 'Pending' : ($bill->status === 'cleared' || $bill->status === 'waived' ? 'Approved' : 'Rejected'),
                 'amount' => $bill->total_amount,
             ];
-        })->values()->toArray();
-
-                if ($type === 'sha-claims') return $this->getShaClaims($request);
-        if ($type === 'diagnoses-summary') return $this->getDiagnosesSummary($request);
-        if ($type === 'patient-encounters') return $this->getPatientEncounters($request);
+        })->toArray();
 
         return response()->json([
             'kpis' => [
@@ -364,10 +402,6 @@ class ReportingController extends Controller
                 'percentage' => $totalDiagnoses > 0 ? round(($group->count() / $totalDiagnoses) * 100, 1) : 0,
             ];
         })->sortByDesc('cases')->values()->toArray();
-
-                if ($type === 'sha-claims') return $this->getShaClaims($request);
-        if ($type === 'diagnoses-summary') return $this->getDiagnosesSummary($request);
-        if ($type === 'patient-encounters') return $this->getPatientEncounters($request);
 
         return response()->json([
             'kpis' => [
@@ -424,10 +458,6 @@ class ReportingController extends Controller
                 'provider' => $enc->provider ? $enc->provider->name : 'N/A',
             ];
         })->values()->toArray();
-
-                if ($type === 'sha-claims') return $this->getShaClaims($request);
-        if ($type === 'diagnoses-summary') return $this->getDiagnosesSummary($request);
-        if ($type === 'patient-encounters') return $this->getPatientEncounters($request);
 
         return response()->json([
             'kpis' => [
@@ -488,10 +518,6 @@ class ReportingController extends Controller
                 'status' => ucfirst($rx->status ?? 'pending'),
             ];
         })->values()->toArray();
-
-                if ($type === 'sha-claims') return $this->getShaClaims($request);
-        if ($type === 'diagnoses-summary') return $this->getDiagnosesSummary($request);
-        if ($type === 'patient-encounters') return $this->getPatientEncounters($request);
 
         return response()->json([
             'kpis' => [
@@ -558,10 +584,6 @@ class ReportingController extends Controller
             ];
         })->values()->toArray();
 
-                if ($type === 'sha-claims') return $this->getShaClaims($request);
-        if ($type === 'diagnoses-summary') return $this->getDiagnosesSummary($request);
-        if ($type === 'patient-encounters') return $this->getPatientEncounters($request);
-
         return response()->json([
             'kpis' => [
                 'total_ordered' => $totalOrdered,
@@ -574,66 +596,63 @@ class ReportingController extends Controller
         ]);
     }
 
-    private function getQueueThroughput(Request $request)
+    private function getQueueThroughput(\App\Http\Requests\ReportFilterRequest $request)
     {
-        $from = $request->query('from');
-        $to = $request->query('to');
+        $validated = $request->validated();
+        $from = $validated['from'] ?? null;
+        $to = $validated['to'] ?? null;
 
-        $query = \App\Modules\Queue\Models\QueueTicket::with('station')
+        $query = \App\Modules\Queue\Models\QueueTicket::query()
             ->where('state', 'completed');
 
         if ($from) $query->whereDate('ticket_date', '>=', $from);
         if ($to) $query->whereDate('ticket_date', '<=', $to);
 
-        $user = $request->user();
-        if ($request->has('branch_id') && $user !== null && method_exists($user, 'hasRole') && $user->hasRole('superadmin')) {
-            $branchId = $request->query('branch_id');
-            if ($branchId && $branchId !== 'all') $query->where('branch_id', $branchId);
-        }
+        $branchId = $this->getEffectiveBranchId($request);
+        $this->applyBranchScope($query, $branchId);
 
-        $tickets = $query->get();
-        $totalServed = $tickets->count();
-        $uniqueDays = $tickets->unique(function ($t) { return $t->ticket_date->format('Y-m-d'); })->count();
-        $avgPerDay = $uniqueDays > 0 ? round($totalServed / $uniqueDays) : 0;
+        // KPIs
+        $totalServed = (int) (clone $query)->count();
+        $uniqueDays = (int) (clone $query)->distinct('ticket_date')->count('ticket_date');
+        $avgPerDay = $uniqueDays > 0 ? (int) round($totalServed / $uniqueDays) : 0;
 
-        $stationCounts = $tickets->groupBy(function ($t) {
-            return $t->station ? $t->station->name : 'Unknown';
-        })->map(function ($g) { return $g->count(); });
-        $busiestStation = $stationCounts->sortDesc()->keys()->first() ?? 'N/A';
+        $stationCounts = (clone $query)
+            ->join('stations', 'queue_tickets.station_id', '=', 'stations.id')
+            ->selectRaw('stations.name as station, COUNT(*) as count')
+            ->groupBy('stations.name')
+            ->orderByDesc('count')
+            ->get();
+            
+        $busiestStation = $stationCounts->first()->station ?? 'N/A';
 
-        $dayCounts = $tickets->groupBy(function ($t) { return $t->ticket_date->format('Y-m-d'); })
-            ->map(function ($g) { return $g->count(); });
-        $busiestDay = $dayCounts->sortDesc()->keys()->first() ?? 'N/A';
+        $dayCounts = (clone $query)
+            ->selectRaw('DATE(ticket_date) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->orderByDesc('count')
+            ->first();
+        $busiestDay = $dayCounts->date ?? 'N/A';
 
-        // Chart: grouped by station per day
-        $chartData = $tickets->groupBy(function ($t) {
-            return $t->station ? $t->station->name : 'Unknown';
-        })->map(function ($group, $station) {
+        // Chart: grouped by station
+        $chartData = $stationCounts->toArray();
+
+        // Table Data
+        $tickets = (clone $query)->with('station')
+            ->orderByDesc('ticket_date')
+            ->limit(100)
+            ->get();
+
+        $tableData = $tickets->map(function($t) {
+            $waitMinutes = ($t->called_at && $t->served_at) ? $t->called_at->diffInMinutes($t->served_at) : 0;
+            $serviceMinutes = ($t->served_at && $t->completed_at) ? $t->served_at->diffInMinutes($t->completed_at) : 0;
+            
             return [
-                'station' => $station,
-                'count' => $group->count(),
+                'date' => $t->ticket_date->format('Y-m-d'),
+                'station' => $t->station ? $t->station->name : 'Unknown',
+                'patients_served' => 1,
+                'avg_wait_minutes' => $waitMinutes,
+                'avg_service_minutes' => $serviceMinutes,
             ];
-        })->values()->toArray();
-
-        // Table: per-day per-station breakdown
-        $tableData = $tickets->groupBy(function ($t) {
-            return $t->ticket_date->format('Y-m-d') . '|' . ($t->station ? $t->station->name : 'Unknown');
-        })->map(function ($group, $key) {
-            [$date, $station] = explode('|', $key);
-            $waitTimes = $group->filter(fn($t) => $t->called_at && $t->served_at)->map(fn($t) => $t->called_at->diffInMinutes($t->served_at));
-            $serviceTimes = $group->filter(fn($t) => $t->served_at && $t->completed_at)->map(fn($t) => $t->served_at->diffInMinutes($t->completed_at));
-            return [
-                'date' => $date,
-                'station' => $station,
-                'patients_served' => $group->count(),
-                'avg_wait_minutes' => $waitTimes->count() > 0 ? round($waitTimes->avg()) : 0,
-                'avg_service_minutes' => $serviceTimes->count() > 0 ? round($serviceTimes->avg()) : 0,
-            ];
-        })->sortBy('date')->values()->toArray();
-
-                if ($type === 'sha-claims') return $this->getShaClaims($request);
-        if ($type === 'diagnoses-summary') return $this->getDiagnosesSummary($request);
-        if ($type === 'patient-encounters') return $this->getPatientEncounters($request);
+        })->toArray();
 
         return response()->json([
             'kpis' => [
@@ -647,76 +666,68 @@ class ReportingController extends Controller
         ]);
     }
 
-    private function getWaitTimes(Request $request)
+    private function getWaitTimes(\App\Http\Requests\ReportFilterRequest $request)
     {
-        $from = $request->query('from');
-        $to = $request->query('to');
+        $validated = $request->validated();
+        $from = $validated['from'] ?? null;
+        $to = $validated['to'] ?? null;
 
-        $query = \App\Modules\Queue\Models\QueueTicket::with('station');
+        $query = \App\Modules\Queue\Models\QueueTicket::query()
+            ->whereNotNull('called_at')
+            ->whereNotNull('created_at');
 
         if ($from) $query->whereDate('ticket_date', '>=', $from);
         if ($to) $query->whereDate('ticket_date', '<=', $to);
 
-        $user = $request->user();
-        if ($request->has('branch_id') && $user !== null && method_exists($user, 'hasRole') && $user->hasRole('superadmin')) {
-            $branchId = $request->query('branch_id');
-            if ($branchId && $branchId !== 'all') $query->where('branch_id', $branchId);
-        }
+        $branchId = $this->getEffectiveBranchId($request);
+        $this->applyBranchScope($query, $branchId);
 
-        $tickets = $query->get();
-
-        // Calculate wait time per ticket (called_at - created_at, roughly)
-        $withWait = $tickets->filter(fn($t) => $t->called_at && $t->created_at);
-        $waitMinutes = $withWait->map(fn($t) => $t->created_at->diffInMinutes($t->called_at));
-        $avgWait = $waitMinutes->count() > 0 ? round($waitMinutes->avg()) : 0;
+        // SQL Aggregation for Wait Times (TIMESTAMPDIFF works in MySQL)
+        $avgWait = (int) (clone $query)->selectRaw('AVG(TIMESTAMPDIFF(MINUTE, created_at, called_at)) as avg')->value('avg');
+        $slaBreaches = (int) (clone $query)->selectRaw('COUNT(CASE WHEN TIMESTAMPDIFF(MINUTE, created_at, called_at) > 60 THEN 1 END) as breaches')->value('breaches');
 
         // Longest stage (by station)
-        $stageWaits = $withWait->groupBy(function ($t) {
-            return $t->station ? $t->station->name : 'Unknown';
-        })->map(function ($group) {
-            return round($group->avg(fn($t) => $t->created_at->diffInMinutes($t->called_at)));
-        });
-        $longestStage = $stageWaits->sortDesc()->keys()->first() ?? 'N/A';
+        $stageWaits = (clone $query)
+            ->join('stations', 'queue_tickets.station_id', '=', 'stations.id')
+            ->selectRaw('stations.name as station, AVG(TIMESTAMPDIFF(MINUTE, created_at, called_at)) as wait')
+            ->groupBy('stations.name')
+            ->orderByDesc('wait')
+            ->get();
+        $longestStage = $stageWaits->first()->station ?? 'N/A';
 
         // Peak hour
-        $hourCounts = $withWait->filter(fn($t) => $t->created_at)->groupBy(fn($t) => $t->created_at->format('H'))
-            ->map(fn($g) => round($g->avg(fn($t) => $t->created_at->diffInMinutes($t->called_at))));
-        $peakHour = $hourCounts->sortDesc()->keys()->first();
-        $peakHourLabel = $peakHour !== null ? $peakHour . ':00' : 'N/A';
+        $hourCounts = (clone $query)
+            ->selectRaw('HOUR(created_at) as hour, AVG(TIMESTAMPDIFF(MINUTE, created_at, called_at)) as wait')
+            ->groupBy('hour')
+            ->orderByDesc('wait')
+            ->get();
+        $peakHourLabel = $hourCounts->first() ? $hourCounts->first()->hour . ':00' : 'N/A';
 
-        // SLA breaches (> 60 min)
-        $slaBreaches = $waitMinutes->filter(fn($m) => $m > 60)->count();
+        // Chart Data
+        $chartData = (clone $query)
+            ->join('stations', 'queue_tickets.station_id', '=', 'stations.id')
+            ->selectRaw('DATE(ticket_date) as date, stations.name as station, AVG(TIMESTAMPDIFF(MINUTE, queue_tickets.created_at, queue_tickets.called_at)) as wait')
+            ->groupBy('date', 'station')
+            ->get()
+            ->toArray();
 
-        // Chart: daily avg wait per station
-        $chartData = $withWait->groupBy(fn($t) => $t->ticket_date->format('Y-m-d'))
-            ->map(function ($dayGroup, $date) {
-                $row = ['date' => $date];
-                $byStation = $dayGroup->groupBy(fn($t) => $t->station ? $t->station->name : 'Unknown');
-                foreach ($byStation as $station => $group) {
-                    $row[$station] = round($group->avg(fn($t) => $t->created_at->diffInMinutes($t->called_at)));
-                }
-                return $row;
-            })->sortBy('date')->values()->toArray();
+        // Limited Table Data
+        $tickets = (clone $query)->with('station')
+            ->orderByDesc('ticket_date')
+            ->limit(100)
+            ->get();
 
-        // Table: per-day per-stage
-        $tableData = $withWait->groupBy(function ($t) {
-            return $t->ticket_date->format('Y-m-d') . '|' . ($t->station ? $t->station->name : 'Unknown');
-        })->map(function ($group, $key) {
-            [$date, $stage] = explode('|', $key);
-            $waits = $group->map(fn($t) => $t->created_at->diffInMinutes($t->called_at));
+        $tableData = $tickets->map(function($t) {
+            $wait = $t->created_at->diffInMinutes($t->called_at);
             return [
-                'date' => $date,
-                'stage' => $stage,
-                'avg_wait' => round($waits->avg()),
-                'min_wait' => $waits->min(),
-                'max_wait' => $waits->max(),
-                'patients' => $group->count(),
+                'date' => $t->ticket_date->format('Y-m-d'),
+                'stage' => $t->station ? $t->station->name : 'Unknown',
+                'avg_wait' => $wait,
+                'min_wait' => $wait,
+                'max_wait' => $wait,
+                'patients' => 1,
             ];
-        })->sortBy('date')->values()->toArray();
-
-                if ($type === 'sha-claims') return $this->getShaClaims($request);
-        if ($type === 'diagnoses-summary') return $this->getDiagnosesSummary($request);
-        if ($type === 'patient-encounters') return $this->getPatientEncounters($request);
+        })->toArray();
 
         return response()->json([
             'kpis' => [
@@ -781,7 +792,7 @@ class ReportingController extends Controller
                     if ($fv && $from && $fv >= $from) $newCount++;
                     else $retCount++;
                 }
-                return ['date' => $date, 'New' => $newCount, 'Returning' => $retCount];
+                return ['date' => $date, 'new_patients' => $newCount, 'returning' => $retCount];
             })->sortBy('date')->values()->toArray();
 
         // Table: daily breakdown
@@ -798,20 +809,16 @@ class ReportingController extends Controller
                 return [
                     'date' => $date,
                     'new_patients' => $newCount,
-                    'returning_patients' => $retCount,
+                    'returning' => $retCount,
                     'total' => $newCount + $retCount,
                 ];
             })->sortByDesc('date')->values()->toArray();
 
-                if ($type === 'sha-claims') return $this->getShaClaims($request);
-        if ($type === 'diagnoses-summary') return $this->getDiagnosesSummary($request);
-        if ($type === 'patient-encounters') return $this->getPatientEncounters($request);
-
         return response()->json([
             'kpis' => [
-                'total_patients' => $totalPatients,
+                'total' => $totalPatients,
                 'new_patients' => $newPatients,
-                'returning_patients' => $returningPatients,
+                'returning' => $returningPatients,
                 'ratio' => $ratio,
             ],
             'chart_data' => $chartData,
@@ -840,16 +847,16 @@ class ReportingController extends Controller
         $totalBooked = $visits->count();
         $attended = $visits->whereIn('status', ['completed', 'in_progress'])->count();
         $missed = $visits->where('status', 'cancelled')->count();
-        $attendanceRate = $totalBooked > 0 ? round(($attended / $totalBooked) * 100, 1) : 0;
+        $attendanceRate = $totalBooked > 0 ? round(($attended / $totalBooked) * 100, 1) . '%' : '0%';
 
         // Chart: daily booked/attended/missed
         $chartData = $visits->groupBy(fn($v) => $v->visit_date->format('Y-m-d'))
             ->map(function ($group, $date) {
                 return [
                     'date' => $date,
-                    'Booked' => $group->count(),
-                    'Attended' => $group->whereIn('status', ['completed', 'in_progress'])->count(),
-                    'Missed' => $group->where('status', 'cancelled')->count(),
+                    'booked' => $group->count(),
+                    'attended' => $group->whereIn('status', ['completed', 'in_progress'])->count(),
+                    'missed' => $group->where('status', 'cancelled')->count(),
                 ];
             })->sortBy('date')->values()->toArray();
 
@@ -863,14 +870,9 @@ class ReportingController extends Controller
                     'booked' => $booked,
                     'attended' => $att,
                     'missed' => $miss,
-                    'cancelled' => $miss,
-                    'attendance_rate' => $booked > 0 ? round(($att / $booked) * 100, 1) : 0,
+                    'rate' => $booked > 0 ? round(($att / $booked) * 100, 1) . '%' : '0%',
                 ];
             })->sortByDesc('date')->values()->toArray();
-
-                if ($type === 'sha-claims') return $this->getShaClaims($request);
-        if ($type === 'diagnoses-summary') return $this->getDiagnosesSummary($request);
-        if ($type === 'patient-encounters') return $this->getPatientEncounters($request);
 
         return response()->json([
             'kpis' => [
@@ -886,7 +888,7 @@ class ReportingController extends Controller
 
     private function getStockLevels(Request $request)
     {
-        // Snapshot report — no date range
+        // Snapshot report â€” no date range
         $query = \App\Modules\Inventory\Models\InventoryItem::query();
 
         $user = $request->user();
@@ -911,26 +913,21 @@ class ReportingController extends Controller
         })->sortBy('stock_pct')->take(10)->values()->toArray();
 
         $tableData = $items->sortBy('quantity_on_hand')->map(function ($i) {
-            $status = 'Adequate';
+            $status = 'In Stock';
             if ($i->quantity_on_hand <= 0) $status = 'Out of Stock';
-            elseif ($i->quantity_on_hand <= $i->reorder_level * 0.5) $status = 'Critical';
-            elseif ($i->quantity_on_hand <= $i->reorder_level) $status = 'Low';
+            elseif ($i->quantity_on_hand <= $i->reorder_level) $status = 'Low Stock';
 
             return [
-                'name' => $i->name,
+                'item_name' => $i->name,
                 'category' => $i->category ?? 'Uncategorized',
                 'unit' => $i->unit ?? 'Unit',
-                'quantity' => $i->quantity_on_hand,
+                'quantity_on_hand' => $i->quantity_on_hand,
                 'reorder_level' => $i->reorder_level,
                 'status' => $status,
                 'unit_cost' => $i->unit_cost ?? 0,
                 'total_value' => $i->quantity_on_hand * ($i->unit_cost ?? 0),
             ];
         })->values()->toArray();
-
-                if ($type === 'sha-claims') return $this->getShaClaims($request);
-        if ($type === 'diagnoses-summary') return $this->getDiagnosesSummary($request);
-        if ($type === 'patient-encounters') return $this->getPatientEncounters($request);
 
         return response()->json([
             'kpis' => [
@@ -1006,10 +1003,6 @@ class ReportingController extends Controller
             ];
         })->values()->toArray();
 
-                if ($type === 'sha-claims') return $this->getShaClaims($request);
-        if ($type === 'diagnoses-summary') return $this->getDiagnosesSummary($request);
-        if ($type === 'patient-encounters') return $this->getPatientEncounters($request);
-
         return response()->json([
             'kpis' => [
                 'within_30' => $within30,
@@ -1075,178 +1068,12 @@ class ReportingController extends Controller
             ];
         })->sortByDesc('units_consumed')->values()->toArray();
 
-                if ($type === 'sha-claims') return $this->getShaClaims($request);
-        if ($type === 'diagnoses-summary') return $this->getDiagnosesSummary($request);
-        if ($type === 'patient-encounters') return $this->getPatientEncounters($request);
-
         return response()->json([
             'kpis' => [
                 'total_items_consumed' => $totalItemsConsumed,
                 'total_units_dispensed' => $totalUnitsDispensed,
                 'highest_item' => $topItemName,
                 'total_value' => $totalValue,
-            ],
-            'chart_data' => $chartData,
-            'table_data' => $tableData,
-        ]);
-    }
-
-    private function getShaClaims(Request $request)
-    {
-        $from = $request->query('from');
-        $to = $request->query('to');
-        
-        $query = \App\Modules\Billing\Models\Bill::with('patient')->where('payment_method', 'insurance');
-
-        if ($from) $query->whereDate('created_at', '>=', $from);
-        if ($to) $query->whereDate('created_at', '<=', $to);
-
-        $user = $request->user();
-        if ($request->has('branch_id') && $user !== null && method_exists($user, 'hasRole') && $user->hasRole('superadmin')) {
-            $branchId = $request->query('branch_id');
-            if ($branchId) $query->where('branch_id', $branchId);
-        }
-
-        $bills = $query->get();
-
-        $submittedCount = $bills->count();
-        $approvedCount = $bills->whereIn('status', ['cleared', 'waived'])->count();
-        $rejectedCount = 0;
-        
-        $chartData = $bills->groupBy(function($bill) {
-            return $bill->created_at->format('Y-m-d');
-        })->map(function($group, $date) {
-            return [
-                'date' => $date,
-                'claims_amount' => $group->sum('total_amount'),
-            ];
-        })->values()->sortBy('date')->values()->toArray();
-
-        $tableData = $bills->sortByDesc('created_at')->map(function($bill) {
-            return [
-                'claim_id' => 'CLM-' . substr(md5($bill->id), 0, 8),
-                'date' => $bill->created_at->format('Y-m-d H:i:s'),
-                'patient_name' => $bill->patient ? $bill->patient->fullName() : 'Unknown',
-                'status' => $bill->status === 'pending' ? 'Pending' : ($bill->status === 'cleared' ? 'Approved' : 'Rejected'),
-                'amount' => $bill->total_amount,
-            ];
-        })->values()->toArray();
-
-        return response()->json([
-            'kpis' => [
-                'submitted' => $submittedCount,
-                'approved' => $approvedCount,
-                'rejected' => $rejectedCount,
-                'avg_processing_days' => 14,
-            ],
-            'chart_data' => $chartData,
-            'table_data' => $tableData,
-        ]);
-    }
-
-    private function getDiagnosesSummary(Request $request)
-    {
-        $from = $request->query('from');
-        $to = $request->query('to');
-        
-        $query = \App\Modules\Emr\Models\Diagnosis::query();
-
-        if ($from) $query->whereDate('created_at', '>=', $from);
-        if ($to) $query->whereDate('created_at', '<=', $to);
-
-        $user = $request->user();
-        if ($request->has('branch_id') && $user !== null && method_exists($user, 'hasRole') && $user->hasRole('superadmin')) {
-            $branchId = $request->query('branch_id');
-            if ($branchId) $query->where('branch_id', $branchId);
-        }
-
-        $diagnoses = $query->get();
-        $totalDiagnoses = $diagnoses->count();
-        $uniquePatients = $diagnoses->unique('patient_id')->count();
-        
-        $grouped = $diagnoses->groupBy('icd10_code');
-        $topDiagnosis = $grouped->sortByDesc(function($group) { return $group->count(); })->first();
-        $topName = $topDiagnosis ? $topDiagnosis->first()->description : 'N/A';
-
-        $chartData = $grouped->map(function($group, $code) {
-            return [
-                'code' => $code,
-                'description' => $group->first()->description ?? $code,
-                'count' => $group->count(),
-            ];
-        })->sortByDesc('count')->take(10)->values()->toArray();
-
-        $tableData = $grouped->map(function($group, $code) use ($totalDiagnoses) {
-            return [
-                'icd10_code' => $code,
-                'description' => $group->first()->description ?? $code,
-                'cases' => $group->count(),
-                'percentage' => $totalDiagnoses > 0 ? round(($group->count() / $totalDiagnoses) * 100, 1) : 0,
-            ];
-        })->sortByDesc('cases')->values()->toArray();
-
-        return response()->json([
-            'kpis' => [
-                'total_diagnoses' => $totalDiagnoses,
-                'top_diagnosis' => $topName,
-                'unique_patients' => $uniquePatients,
-            ],
-            'chart_data' => $chartData,
-            'table_data' => $tableData,
-        ]);
-    }
-
-    private function getPatientEncounters(Request $request)
-    {
-        $from = $request->query('from');
-        $to = $request->query('to');
-        
-        $query = \App\Modules\Emr\Models\Encounter::with(['patient', 'provider']);
-
-        if ($from) $query->whereDate('visit_date', '>=', $from);
-        if ($to) $query->whereDate('visit_date', '<=', $to);
-
-        $user = $request->user();
-        if ($request->has('branch_id') && $user !== null && method_exists($user, 'hasRole') && $user->hasRole('superadmin')) {
-            $branchId = $request->query('branch_id');
-            if ($branchId) $query->where('branch_id', $branchId);
-        }
-
-        $encounters = $query->get();
-        $totalEncounters = $encounters->count();
-        $completed = $encounters->where('status', 'completed')->count();
-        $cancelled = $encounters->where('status', 'cancelled')->count();
-        $inpatient = $encounters->where('encounter_type', 'inpatient')->count();
-        $outpatient = $encounters->where('encounter_type', 'outpatient')->count();
-
-        $chartData = $encounters->groupBy(function($enc) {
-            return $enc->visit_date ? $enc->visit_date->format('Y-m-d') : $enc->created_at->format('Y-m-d');
-        })->map(function($group, $date) {
-            return [
-                'date' => $date,
-                'Outpatient' => $group->where('encounter_type', 'outpatient')->count(),
-                'Inpatient' => $group->where('encounter_type', 'inpatient')->count(),
-            ];
-        })->values()->sortBy('date')->values()->toArray();
-
-        $tableData = $encounters->sortByDesc('visit_date')->map(function($enc) {
-            return [
-                'encounter_id' => substr($enc->public_id, 0, 8),
-                'date' => $enc->visit_date ? $enc->visit_date->format('Y-m-d H:i') : $enc->created_at->format('Y-m-d H:i'),
-                'patient_name' => $enc->patient ? $enc->patient->fullName() : 'Unknown',
-                'type' => ucfirst($enc->encounter_type),
-                'status' => ucfirst($enc->status),
-                'provider' => $enc->provider ? $enc->provider->name : 'N/A',
-            ];
-        })->values()->toArray();
-
-        return response()->json([
-            'kpis' => [
-                'total' => $totalEncounters,
-                'completed' => $completed,
-                'cancelled' => $cancelled,
-                'inpatient' => $inpatient,
-                'outpatient' => $outpatient,
             ],
             'chart_data' => $chartData,
             'table_data' => $tableData,

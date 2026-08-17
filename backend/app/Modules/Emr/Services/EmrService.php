@@ -147,6 +147,38 @@ final class EmrService
     }
 
     /**
+     * Acknowledge a signed SOAP note. Records which user confirmed they have
+     * read the signed care instructions (typically a nurse). Idempotent: calling
+     * again updates the acknowledger and timestamp.
+     *
+     * Audit requirement (post_signature_soap_actions.md): every post-signature
+     * action is logged with actor, role, action, timestamp, note_id.
+     */
+    public function acknowledgeSoap(int $encounterId, User $actor): SoapNote
+    {
+        return DB::transaction(function () use ($encounterId, $actor): SoapNote {
+            $this->requireEncounter($encounterId);
+            $note = $this->encounters->latestSoapNote($encounterId);
+            if (! $note instanceof SoapNote) {
+                throw new NotFoundException('No SOAP note found for this encounter.');
+            }
+            if (! $note->isSigned()) {
+                throw new ConflictException(
+                    'Only a signed note can be acknowledged.',
+                    409,
+                    ['code' => 'NOTE_NOT_SIGNED'],
+                );
+            }
+
+            /** @var SoapNote */
+            return $this->encounters->updateSoapNote($note, [
+                'acknowledged_by' => $actor->id,
+                'acknowledged_at' => now(),
+            ]);
+        });
+    }
+
+    /**
      * Append a signed addendum to an already-signed note. The prior note stays
      * immutable; a new `is_amended` note is created and signed.
      *

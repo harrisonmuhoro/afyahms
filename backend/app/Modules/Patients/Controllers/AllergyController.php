@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Patients\Requests\StoreAllergyRequest;
 use App\Modules\Patients\Resources\AllergyResource;
 use App\Modules\Patients\Services\AllergyService;
+use App\Modules\Patients\Services\PatientService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,11 +18,17 @@ final class AllergyController extends Controller
 
     public function index(string $uuid): JsonResource
     {
+        $patient = app(PatientService::class)->findByPublicId($uuid);
+        $this->authorize('view', $patient);
+
         return AllergyResource::collection($this->service->listForPatient($uuid));
     }
 
     public function store(StoreAllergyRequest $request, string $uuid): JsonResponse
     {
+        $patient = app(PatientService::class)->findByPublicId($uuid);
+        $this->authorize('manage', $patient);
+
         $row = $this->service->create($uuid, $request->validated(), $request->user());
 
         return (new AllergyResource($row))->response()->setStatusCode(201);
@@ -29,6 +36,9 @@ final class AllergyController extends Controller
 
     public function destroy(string $uuid, int $allergyId): JsonResponse
     {
+        $patient = app(PatientService::class)->findByPublicId($uuid);
+        $this->authorize('manage', $patient);
+
         $this->service->delete($uuid, $allergyId);
 
         return response()->json(['message' => 'Removed.']);

@@ -102,6 +102,22 @@ export function useSignSoap(encounterId: number): {
   return { mutateAsync: mutation.mutateAsync, isPending: mutation.isPending };
 }
 
+export function useAcknowledgeSoap(encounterId: number): {
+  mutateAsync: () => Promise<{ data: SoapNote }>;
+  isPending: boolean;
+} {
+  const qc = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async () => {
+      return await httpClient.post<{ data: SoapNote }>(`/encounters/${encounterId}/soap/acknowledge`);
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: encounterKey(encounterId) });
+    },
+  });
+  return { mutateAsync: mutation.mutateAsync, isPending: mutation.isPending };
+}
+
 export function useAmendSoap(encounterId: number): {
   mutateAsync: (input: SoapInput) => Promise<{ data: SoapNote }>;
   isPending: boolean;

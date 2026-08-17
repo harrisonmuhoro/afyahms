@@ -65,9 +65,13 @@ final class LaboratoryController extends Controller
     }
 
     /** GET /api/v1/lab/visits/{visit}/orders */
-    public function index(Visit $visit): JsonResponse
+    public function index(int $visit): JsonResponse
     {
-        $orders = $this->lab->ordersForVisit($visit);
+        $visitModel = \App\Modules\Queue\Models\Visit::withoutGlobalScope(
+            \App\Modules\Tenancy\Scopes\BranchScope::class
+        )->findOrFail($visit);
+
+        $orders = $this->lab->ordersForVisit($visitModel);
 
         return response()->json([
             'data' => $orders->map(fn ($o) => $this->orderData($o))->values()->all(),
@@ -75,8 +79,12 @@ final class LaboratoryController extends Controller
     }
 
     /** POST /api/v1/lab/visits/{visit}/orders */
-    public function store(Request $request, Visit $visit): JsonResponse
+    public function store(Request $request, int $visit): JsonResponse
     {
+        $visitModel = \App\Modules\Queue\Models\Visit::withoutGlobalScope(
+            \App\Modules\Tenancy\Scopes\BranchScope::class
+        )->findOrFail($visit);
+
         $validated = $request->validate([
             'lab_test_id'    => ['required', 'integer', 'exists:lab_tests,id'],
             'priority'       => ['nullable', 'in:routine,urgent,stat'],
@@ -85,11 +93,12 @@ final class LaboratoryController extends Controller
         ]);
 
         $test  = LabTest::findOrFail((int) $validated['lab_test_id']);
-        $order = $this->lab->placeOrder($visit, $test, $request->user(), $validated);
+        $order = $this->lab->placeOrder($visitModel, $test, $request->user(), $validated);
         $order->load(['test', 'result', 'orderedBy']);
 
         return response()->json(['data' => $this->orderData($order)], 201);
     }
+
 
     /** POST /api/v1/lab/orders/{order}/collect */
     public function collect(LabOrder $order): JsonResponse
@@ -148,10 +157,10 @@ final class LaboratoryController extends Controller
     {
         $result = $this->lab->verifyResult($result, $request->user());
         
-        // Notify the ordering physician
-        $result->loadMissing('order.orderedBy');
-        if ($result->order && $result->order->orderedBy) {
-            $result->order->orderedBy->notify(new \App\Notifications\LabResultReady($result->order));
+        // Notify the ordering physician asynchronously
+        $result->loadMissing('order');
+        if ($result->order) {
+            \App\Jobs\NotifyLabResultReady::dispatch($result->order);
         }
 
         $result->load(['reportedBy', 'verifiedBy']);
@@ -165,7 +174,6 @@ final class LaboratoryController extends Controller
     private function orderData(LabOrder $order): array
     {
         return [
-            'id'             => $order->id,
             'public_id'      => $order->public_id,
             'visit_id'       => $order->visit_id,
             'patient_id'     => $order->patient_id,
@@ -202,8 +210,7 @@ final class LaboratoryController extends Controller
     private function resultData(LabResult $result): array
     {
         return [
-            'id'              => $result->id,
-            'lab_order_id'    => $result->lab_order_id,
+            'lab_order_public_id' => $result->order?->public_id, // Safely reference the order UUID
             'findings'        => $result->findings,
             'interpretation'  => $result->interpretation,
             'reference_range' => $result->reference_range,

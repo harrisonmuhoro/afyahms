@@ -25,6 +25,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int|null $authored_by
  * @property \Illuminate\Support\Carbon|null $signed_at
  * @property bool   $is_amended
+ * @property int|null $acknowledged_by
+ * @property \Illuminate\Support\Carbon|null $acknowledged_at
  */
 class SoapNote extends Model
 {
@@ -36,11 +38,13 @@ class SoapNote extends Model
         'branch_id', 'encounter_id', 'patient_id',
         'subjective', 'objective', 'assessment', 'plan',
         'authored_by', 'signed_at', 'is_amended',
+        'acknowledged_by', 'acknowledged_at',
     ];
 
     protected $casts = [
-        'signed_at'  => 'datetime',
-        'is_amended' => 'boolean',
+        'signed_at'        => 'datetime',
+        'is_amended'       => 'boolean',
+        'acknowledged_at'  => 'datetime',
     ];
 
     protected static function booted(): void
@@ -61,5 +65,10 @@ class SoapNote extends Model
     public function author(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'authored_by');
+    }
+
+    public function acknowledgedBy(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'acknowledged_by');
     }
 }

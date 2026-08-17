@@ -80,6 +80,8 @@ final class BillingService
             $bill->paid_amount     = $newPaid;
             $bill->payment_method  = $method;
 
+            $wasNotCleared = !$bill->isCleared();
+
             if ($newPaid >= $bill->total_amount) {
                 $bill->status     = 'cleared';
                 $bill->cleared_by = $actor?->id;
@@ -89,6 +91,11 @@ final class BillingService
             }
 
             $bill->save();
+
+            // Send receipt if newly cleared and patient has an email
+            if ($wasNotCleared && $bill->status === 'cleared' && !empty($bill->patient->email)) {
+                $bill->patient->notify(new \App\Notifications\PaymentReceiptNotification($bill));
+            }
 
             return $bill->refresh();
         });

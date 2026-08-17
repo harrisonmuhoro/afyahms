@@ -103,6 +103,21 @@ final class EmrController extends Controller
         return (new SoapNoteResource($note))->response()->setStatusCode(201);
     }
 
+    /**
+     * POST /api/v1/encounters/{id}/soap/acknowledge
+     *
+     * Marks the signed note as acknowledged (read) by the requesting user —
+     * typically a nurse confirming they have seen the care instructions.
+     * Gated by `emr.acknowledge` permission (granted to: nurse, doctor, records-officer).
+     */
+    public function acknowledgeSoap(Request $request, int $id): JsonResource
+    {
+        abort_unless($request->user()?->can('emr.acknowledge'), 403);
+        $note = $this->service->acknowledgeSoap($id, $request->user());
+
+        return new SoapNoteResource($note);
+    }
+
     /** POST /api/v1/encounters/{id}/diagnoses */
     public function addDiagnosis(AddDiagnosisRequest $request, int $id): JsonResponse
     {
