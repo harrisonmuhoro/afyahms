@@ -29,9 +29,14 @@ final class GoogleAuthController extends Controller
     public function callback(Request $request): JsonResponse|\Illuminate\Http\RedirectResponse
     {
         try {
-            $googleUser = Socialite::driver('google')->stateless()->user();
+            /** @var \Laravel\Socialite\Two\AbstractProvider $provider */
+            $provider = Socialite::driver('google')->stateless();
+            if (app()->environment('local')) {
+                $provider->setHttpClient(new \GuzzleHttp\Client(['verify' => false]));
+            }
+            $googleUser = $provider->user();
         } catch (Exception $e) {
-            return response()->json(['message' => 'Failed to authenticate with Google.'], 401);
+            return response()->json(['message' => 'Failed to authenticate with Google.', 'error' => $e->getMessage()], 401);
         }
 
         $user = User::where('google_id', $googleUser->getId())->first();
