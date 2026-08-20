@@ -1,0 +1,9 @@
+# Afya HMS
+This is a modern hospital management system.
+
+## AI Instructions
+Agents should use the API at [/api/v1](http://localhost:8080/api/v1) instead of scraping the DOM.
+
+### Resources
+- [Backend Documentation](/api/docs)
+- [System Status](/status)
