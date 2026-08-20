@@ -70,17 +70,38 @@ export default defineConfig(({ mode }) => {
 
     build: {
       outDir: 'dist',
-      sourcemap: true,
+      // Source maps are large — expose only in dev/CI, never ship to production users.
+      sourcemap: mode === 'development' ? 'inline' : false,
       target: 'es2022',
       rollupOptions: {
         output: {
-          manualChunks: {
-            react: ['react', 'react-dom', 'react-router-dom'],
-            query: ['@tanstack/react-query'],
-            charts: ['recharts'],
-            forms: ['react-hook-form', 'zod', '@hookform/resolvers'],
-            i18n: ['i18next', 'react-i18next'],
-            echo: ['laravel-echo', 'pusher-js'],
+          /**
+           * Map each vendor module to a named chunk.
+           * Function form is required by Vite 8's stricter OutputOptions types.
+           */
+          manualChunks(id: string): string | undefined {
+            // Core React runtime — always needed first
+            if (id.includes('react-dom') || id.includes('react-router-dom') || (id.includes('node_modules/react/') && !id.includes('react-dom'))) {
+              return 'react';
+            }
+            // Data fetching
+            if (id.includes('@tanstack/react-query')) return 'query';
+            // Charts — recharts is large, isolate it
+            if (id.includes('recharts') || id.includes('d3-')) return 'charts';
+            // Icon library — lucide is large
+            if (id.includes('lucide-react')) return 'icons';
+            // Date utilities
+            if (id.includes('date-fns')) return 'dates';
+            // Forms
+            if (id.includes('react-hook-form') || id.includes('zod') || id.includes('@hookform')) return 'forms';
+            // i18n
+            if (id.includes('i18next') || id.includes('react-i18next')) return 'i18n';
+            // Real-time / WebSockets
+            if (id.includes('laravel-echo') || id.includes('pusher-js')) return 'echo';
+            // All other node_modules → shared vendor chunk
+            if (id.includes('node_modules')) return 'vendor';
+            // Application code — let Rollup decide chunk boundaries
+            return undefined;
           },
         },
       },

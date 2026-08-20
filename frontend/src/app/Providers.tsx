@@ -19,7 +19,10 @@ const queryClient = new QueryClient({
 
         return failureCount < 3;
       },
-      staleTime: 30_000,
+      // 5 min fresh window — avoids redundant re-fetches when navigating between pages.
+      staleTime: 5 * 60 * 1000,
+      // Keep unused query data in memory for 10 min so back-navigation is instant.
+      gcTime: 10 * 60 * 1000,
       refetchOnWindowFocus: import.meta.env.PROD,
     },
     mutations: {

@@ -159,7 +159,7 @@ function StatCard({ icon, label, value, iconClass, iconBg }: StatCardProps): JSX
         <Icon name={icon} size={17} className={iconClass} />
       </div>
       <p className="mt-2 text-2xl font-bold text-stone-900 dark:text-stone-50">{value}</p>
-      <p className="text-xs font-medium text-stone-500">{label}</p>
+      <p className="text-xs font-medium text-stone-600 dark:text-stone-400">{label}</p>
     </div>
   );
 }
@@ -189,7 +189,7 @@ function ModuleTile({ item, meta, index }: TileProps): JSX.Element {
         <span className="block truncate text-sm font-semibold text-stone-800 dark:text-stone-100">
           {t(item.key)}
         </span>
-        <span className="block truncate text-xs text-stone-500 dark:text-stone-400">
+        <span className="block truncate text-xs text-stone-600 dark:text-stone-400">
           {meta.description}
         </span>
       </span>
@@ -314,7 +314,7 @@ export function DashboardPage(): JSX.Element {
             <h1 className="text-2xl font-bold text-stone-900 dark:text-stone-50">
               {dashboardTitle}
             </h1>
-            <p className="mt-1 text-sm font-medium text-stone-500 dark:text-stone-400">
+            <p className="mt-1 text-sm font-medium text-stone-600 dark:text-stone-300">
               {dashboardSubtitle}
             </p>
             <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -339,10 +339,10 @@ export function DashboardPage(): JSX.Element {
 
         {/* Current time */}
         <div className="text-right">
-          <p className="text-sm font-medium text-stone-500 dark:text-stone-400">
+          <p className="text-sm font-medium text-stone-600 dark:text-stone-300">
             {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>
-          <p className="text-xs text-stone-400">
+          <p className="text-xs text-stone-500 dark:text-stone-400">
             {new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>
