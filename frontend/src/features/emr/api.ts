@@ -201,3 +201,92 @@ export function useDiagnosisCatalogSearch(term: string): {
 
   return { results: query.data ?? [], isLoading: query.isFetching };
 }
+
+export function useEmarRecords(visitId: number): {
+  data: import('./types').EmarRecord[];
+  isLoading: boolean;
+} {
+  const query = useQuery({
+    queryKey: ['emr', 'emar', visitId],
+    queryFn: async () => {
+      const res = await httpClient.get<{ data: import('./types').EmarRecord[] }>(`/encounters/visit/${visitId}/emar`);
+      return res.data;
+    },
+    enabled: !!visitId,
+  });
+
+  return {
+    data: query.data ?? [],
+    isLoading: query.isFetching,
+  };
+}
+
+export function usePendingEmarRecords(): {
+  data: import('./types').EmarRecord[];
+  isLoading: boolean;
+} {
+  const query = useQuery({
+    queryKey: ['emr', 'emar', 'pending'],
+    queryFn: async () => {
+      const res = await httpClient.get<{ data: import('./types').EmarRecord[] }>('/emar/pending');
+      return res.data;
+    },
+    refetchInterval: 15_000,
+  });
+
+  return {
+    data: query.data ?? [],
+    isLoading: query.isFetching,
+  };
+}
+
+interface AddEmarInput {
+  medication_id: number;
+  prescription_id?: number;
+  dose: string;
+  route: string;
+  frequency?: string;
+  scheduled_time: string;
+  notes?: string;
+}
+
+export function useAddEmarRecord(visitId: number) {
+  const qc = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async (input: AddEmarInput) => {
+      return await httpClient.post<{ data: import('./types').EmarRecord }>(`/encounters/visit/${visitId}/emar`, input);
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['emr', 'emar', visitId] });
+    },
+  });
+
+  return {
+    mutate: mutation.mutate,
+    mutateAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+  };
+}
+
+interface UpdateEmarInput {
+  status: 'given' | 'refused' | 'omitted';
+  notes?: string;
+}
+
+export function useUpdateEmarRecord(visitId: number) {
+  const qc = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async ({ recordId, data }: { recordId: number; data: UpdateEmarInput }) => {
+      return await httpClient.patch<{ data: import('./types').EmarRecord }>(`/encounters/visit/${visitId}/emar/${recordId}`, data);
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['emr', 'emar', visitId] });
+    },
+  });
+
+  return {
+    mutate: mutation.mutate,
+    mutateAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+  };
+}

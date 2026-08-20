@@ -224,3 +224,22 @@ export function useCallNext(): {
     isPending: mutation.isPending,
   };
 }
+
+export function useKpis(): {
+  data: { active_tickets: number; patients_seen: number; awaiting_triage: number } | null;
+  isLoading: boolean;
+} {
+  const query = useQuery({
+    queryKey: ['queue', 'kpis'],
+    queryFn: async () => {
+      const res = await httpClient.get<{ data: { active_tickets: number; patients_seen: number; awaiting_triage: number } }>('/queue/kpis');
+      return res.data;
+    },
+    refetchInterval: 10_000,
+  });
+
+  return {
+    data: query.data ?? null,
+    isLoading: query.isFetching,
+  };
+}

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useBoard } from '@/features/queue/api';
+import { usePendingEmarRecords } from '@/features/emr/api';
 import { cn } from '@/lib/cn';
 import type { MtsCategory, QueueTicket } from '@/features/queue/types';
 
@@ -31,6 +32,7 @@ export function NurseDashboard(): JSX.Element {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { snapshot, isLoading } = useBoard('TRI');
+  const { data: pendingMeds, isLoading: loadingMeds } = usePendingEmarRecords();
 
   const waiting = snapshot?.waiting ?? [];
   const inService = snapshot?.in_service ?? null;
@@ -166,17 +168,51 @@ export function NurseDashboard(): JSX.Element {
         )}
       </section>
 
-      {/* Medication Administration — no eMAR backend yet */}
+      {/* Medication Administration */}
       <section className="max-w-3xl">
         <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest mb-3">
           Medication Administration
         </h3>
-        <div className="bg-surface-container-low border border-dashed border-outline-variant rounded-xl py-8 text-center">
-          <span className="material-symbols-outlined text-[28px] text-outline-variant">medication</span>
-          <p className="mt-2 text-body-md text-on-surface-variant">
-            Medication administration tasks will appear here once the eMAR module is enabled.
-          </p>
-        </div>
+        {loadingMeds ? (
+          <p className="py-8 text-center text-body-md text-on-surface-variant">Loading pending medications…</p>
+        ) : pendingMeds.length === 0 ? (
+          <div className="bg-surface-container-low border border-dashed border-outline-variant rounded-xl py-8 text-center">
+            <span className="material-symbols-outlined text-[28px] text-outline-variant">medication</span>
+            <p className="mt-2 text-body-md text-on-surface-variant">
+              No pending medication administrations for today.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {pendingMeds.map((med) => (
+              <div key={med.id} className="bg-white border border-outline-variant rounded-xl p-md flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-semibold text-on-surface truncate">{med.medication?.generic_name}</p>
+                    <span className="px-2 py-0.5 rounded bg-tertiary-container text-on-tertiary-container text-[10px] font-bold uppercase tracking-wider">
+                      {med.dose}
+                    </span>
+                    <span className="px-2 py-0.5 rounded bg-surface-variant text-on-surface-variant text-[10px] font-bold uppercase tracking-wider">
+                      {med.route}
+                    </span>
+                  </div>
+                  <p className="text-body-sm text-on-surface-variant mt-0.5">
+                    For patient: <strong className="text-on-surface">{(med as any).patient?.full_name ?? '—'}</strong> 
+                    {' • '} Scheduled at: <strong className="text-on-surface">{new Date(med.scheduled_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => navigate(`/emr/encounter/${med.visit_id}`)}
+                  className="shrink-0 bg-primary/10 text-primary px-4 py-2 rounded-lg font-semibold text-body-sm hover:bg-primary/20 transition-all flex items-center gap-1.5"
+                >
+                  <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                  Administer
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );

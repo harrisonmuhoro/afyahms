@@ -79,3 +79,31 @@ export interface AddDiagnosisInput {
   certainty?: Certainty;
   onset_date?: string;
 }
+
+export type EmarStatus = 'pending' | 'given' | 'refused' | 'omitted';
+
+export interface EmarRecord {
+  id: number;
+  visit_id: number;
+  patient_id: number;
+  medication_id: number;
+  prescription_id: number | null;
+  dose: string;
+  route: string;
+  frequency: string | null;
+  scheduled_time: string;
+  administered_time: string | null;
+  administered_by: number | null;
+  status: EmarStatus;
+  notes: string | null;
+  medication?: {
+    id: number;
+    code: string;
+    generic_name: string;
+    brand_name: string | null;
+  };
+  administered_by_user?: {
+    id: number;
+    name: string;
+  };
+}

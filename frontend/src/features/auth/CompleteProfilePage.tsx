@@ -211,7 +211,7 @@ export function CompleteProfilePage(): JSX.Element {
                 </div>
                 <div>
                   <label className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">Date of Birth *</label>
-                  <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} required className="input" />
+                  <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} required max={new Date().toISOString().slice(0, 10)} className="input" />
                 </div>
                 <div>
                   <label className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">Gender</label>

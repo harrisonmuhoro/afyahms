@@ -588,7 +588,7 @@ export function AdminStaffPage(): JSX.Element {
                 </label>
                 <label className="block">
                   <span className="label">Date of birth</span>
-                  <input type="date" className="input" value={employmentForm.date_of_birth} onChange={(e) => setEmploymentForm({ ...employmentForm, date_of_birth: e.target.value })} />
+                  <input type="date" className="input" max={new Date().toISOString().slice(0, 10)} value={employmentForm.date_of_birth} onChange={(e) => setEmploymentForm({ ...employmentForm, date_of_birth: e.target.value })} />
                 </label>
                 <label className="block">
                   <span className="label">Department</span>

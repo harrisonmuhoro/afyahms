@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth:sanctum'])->group(function (): void {
 
     // Station + board
+    Route::get('/queue/kpis',                         [QueueController::class, 'kpis'])->middleware('permission:queue.read')->name('queue.kpis');
     Route::get('/queue/stations',                     [QueueController::class, 'stations'])->middleware('permission:queue.read')->name('queue.stations.index');
     Route::get('/queue/boards/{code}',                [QueueController::class, 'board'])->where('code', 'REC|TRI|DOC|LAB|PHA|BIL|RAD')->middleware('permission:queue.read')->name('queue.boards.show');
     Route::get('/queue/boards/{code}/public',         [QueueController::class, 'publicBoard'])->where('code', 'REC|TRI|DOC|LAB|PHA|BIL|RAD')->middleware('permission:queue.read')->name('queue.boards.public');

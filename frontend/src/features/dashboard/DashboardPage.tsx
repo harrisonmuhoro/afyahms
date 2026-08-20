@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useBranches } from '@/features/branches/BranchProvider';
+import { useKpis } from '@/features/queue/api';
 import { Icon } from '@/components/icons/Icon';
 import { NAV_ITEMS, isNavItemVisible, type NavItem } from '@/config/navigation';
 import type { IconName } from '@/components/icons/Icon';
@@ -214,6 +215,7 @@ export function DashboardPage(): JSX.Element {
   const { t } = useTranslation(['nav', 'app']);
   const { user, hasPermission } = useAuth();
   const { activeBranch } = useBranches();
+  const { data: kpiData } = useKpis();
   const roles = user?.roles ?? [];
   const isSuperadmin = roles.includes('superadmin');
 
@@ -260,21 +262,21 @@ export function DashboardPage(): JSX.Element {
         {
           icon: 'queue' as const,
           label: 'Active queue tickets',
-          value: '—',
+          value: kpiData?.active_tickets?.toString() ?? '—',
           iconBg: 'bg-teal-50 dark:bg-teal-950/50',
           iconClass: 'text-teal-600 dark:text-teal-400',
         },
         {
           icon: 'patients' as const,
           label: 'Patients seen today',
-          value: '—',
+          value: kpiData?.patients_seen?.toString() ?? '—',
           iconBg: 'bg-sky-50 dark:bg-sky-950/50',
           iconClass: 'text-sky-600 dark:text-sky-400',
         },
         {
           icon: 'triage' as const,
           label: 'Awaiting triage',
-          value: '—',
+          value: kpiData?.awaiting_triage?.toString() ?? '—',
           iconBg: 'bg-orange-50 dark:bg-orange-950/50',
           iconClass: 'text-orange-600 dark:text-orange-400',
         },

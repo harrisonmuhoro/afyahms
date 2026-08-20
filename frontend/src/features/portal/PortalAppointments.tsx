@@ -1,103 +1,100 @@
 import { useState } from 'react';
 import { Icon } from '@/components/icons/Icon';
 import { PortalModal, ConfirmDialog, ToastBanner } from './PortalModal';
-
-interface Appointment {
-  id: string;
-  date: string;
-  day: string;
-  month: string;
-  time: string;
-  provider: string;
-  department: string;
-  status: 'upcoming' | 'completed' | 'cancelled';
-  notes?: string;
-}
-
-const INITIAL_APPOINTMENTS: Appointment[] = [];
-
-const PROVIDERS = ['Dr. Mwangi (Cardiology)', 'Dr. Otieno (General Practice)', 'Dr. Achieng (Diabetology)', 'Dr. Kamau (Nutrition)', 'Dr. Wanjiku (Dermatology)'];
-const TIMES = ['08:00 AM', '09:00 AM', '10:00 AM', '11:00 AM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM'];
-
-const STATUS_CONFIG = {
-  upcoming: { label: 'Upcoming', classes: 'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300' },
-  completed: { label: 'Completed', classes: 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400' },
-  cancelled: { label: 'Cancelled', classes: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' },
-};
+import { usePortalPatient } from './api';
+import {
+  useAppointments,
+  useBookAppointment,
+  useCancelAppointment,
+  useSchedules,
+} from '../appointments/api';
+import { SlotPicker } from '../appointments/components/SlotPicker';
+import { AppointmentStatusBadge } from '../appointments/components/AppointmentStatusBadge';
+import type { Appointment, DoctorSchedule } from '../appointments/types';
 
 export function PortalAppointments(): JSX.Element {
-  const [appointments, setAppointments] = useState<Appointment[]>(INITIAL_APPOINTMENTS);
+  const { patient } = usePortalPatient();
+  const patientId = patient?.id;
+  
+  // Local state
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
   const [cancelTarget, setCancelTarget] = useState<string | null>(null);
-  const [rescheduleTarget, setRescheduleTarget] = useState<Appointment | null>(null);
   const [bookingOpen, setBookingOpen] = useState(false);
-  const [rescheduleDate, setRescheduleDate] = useState('');
-  const [rescheduleTime, setRescheduleTime] = useState('10:00 AM');
-  const [bookProvider, setBookProvider] = useState(PROVIDERS[0]);
-  const [bookDate, setBookDate] = useState('');
-  const [bookTime, setBookTime] = useState('10:00 AM');
-  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'info' } | null>(null);
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'info' | 'error' } | null>(null);
 
-  const showToast = (msg: string, type: 'success' | 'info' = 'success'): void => {
+  // Booking state
+  const [selectedScheduleId, setSelectedScheduleId] = useState<string>('');
+  const [bookDate, setBookDate] = useState('');
+  const [bookSlot, setBookSlot] = useState<{ start: string; end: string } | null>(null);
+
+  // API Hooks
+  const { data: appointmentsData, isLoading: isLoadingApts } = useAppointments();
+  const { data: schedulesData } = useSchedules();
+  
+  const bookMutation = useBookAppointment();
+  const cancelMutation = useCancelAppointment();
+
+  // Data processing
+  const appointments: Appointment[] = (appointmentsData as any)?.data ?? [];
+  const schedules: DoctorSchedule[] = (schedulesData as any)?.data ?? [];
+
+  const upcoming = appointments.filter((a) => ['scheduled', 'confirmed'].includes(a.status));
+  const past = appointments.filter((a) => !['scheduled', 'confirmed'].includes(a.status));
+  const displayed = activeTab === 'upcoming' ? upcoming : past;
+
+  const selectedSchedule = schedules.find(s => s.id === selectedScheduleId);
+
+  const showToast = (msg: string, type: 'success' | 'info' | 'error' = 'success'): void => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 4000);
   };
 
-  const handleCancel = (id: string): void => {
-    setAppointments((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: 'cancelled' as const } : a)),
-    );
-    showToast('Appointment cancelled.', 'info');
+  const handleCancel = async (id: string): Promise<void> => {
+    try {
+      await cancelMutation.mutateAsync({ id, reason: 'Cancelled by patient' });
+      showToast('Appointment cancelled successfully.', 'info');
+    } catch (err: any) {
+      showToast(err.message || 'Failed to cancel appointment', 'error');
+    }
   };
 
-  const handleReschedule = (): void => {
-    if (!rescheduleTarget || !rescheduleDate) return;
-    const d = new Date(rescheduleDate);
-    const formatted = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-    setAppointments((prev) =>
-      prev.map((a) =>
-        a.id === rescheduleTarget.id
-          ? { ...a, date: formatted, day: String(d.getDate()).padStart(2, '0'), month: d.toLocaleDateString('en-GB', { month: 'short' }), time: rescheduleTime }
-          : a,
-      ),
-    );
-    setRescheduleTarget(null);
-    showToast(`Appointment rescheduled to ${formatted} at ${rescheduleTime}.`);
+  const handleBook = async (): Promise<void> => {
+    if (!selectedSchedule || !bookDate || !bookSlot || !patientId) return;
+    
+    try {
+      await bookMutation.mutateAsync({
+        patient_id: String(patientId),
+        doctor_id: selectedSchedule.doctor_id,
+        branch_id: selectedSchedule.branch_id,
+        schedule_id: selectedSchedule.id,
+        type: 'general_consultation', // default for portal
+        appointment_date: bookDate,
+        start_time: bookSlot.start,
+        end_time: bookSlot.end,
+        booked_via: 'patient_portal',
+      });
+      
+      setBookingOpen(false);
+      setActiveTab('upcoming');
+      showToast(`Appointment booked successfully!`);
+      
+      // Reset form
+      setSelectedScheduleId('');
+      setBookDate('');
+      setBookSlot(null);
+    } catch (err: any) {
+      showToast(err.message || 'Failed to book appointment', 'error');
+    }
   };
-
-  const handleBook = (): void => {
-    if (!bookDate) return;
-    const d = new Date(bookDate);
-    const formatted = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-    const [provName, dept] = bookProvider.split(' (');
-    const newApt: Appointment = {
-      id: `APT-${Date.now()}`,
-      date: formatted,
-      day: String(d.getDate()).padStart(2, '0'),
-      month: d.toLocaleDateString('en-GB', { month: 'short' }),
-      time: bookTime,
-      provider: provName,
-      department: dept?.replace(')', '') ?? '',
-      status: 'upcoming',
-    };
-    setAppointments((prev) => [newApt, ...prev]);
-    setBookingOpen(false);
-    setActiveTab('upcoming');
-    showToast(`Appointment booked with ${provName} on ${formatted}.`);
-  };
-
-  const upcoming = appointments.filter((a) => a.status === 'upcoming');
-  const past = appointments.filter((a) => a.status !== 'upcoming');
-  const displayed = activeTab === 'upcoming' ? upcoming : past;
 
   return (
     <div className="animate-fade-in space-y-6">
-      {toast && <ToastBanner message={toast.msg} type={toast.type} />}
+      {toast && <ToastBanner message={toast.msg} type={toast.type as 'success' | 'info'} />}
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-stone-900 dark:text-stone-100 sm:text-3xl">Appointments</h1>
-          <p className="mt-1 text-stone-500 dark:text-stone-400">View, reschedule, or book appointments with your care team.</p>
+          <p className="mt-1 text-stone-500 dark:text-stone-400">View or book appointments with your care team.</p>
         </div>
         <button
           type="button"
@@ -122,7 +119,11 @@ export function PortalAppointments(): JSX.Element {
 
       {/* Appointment Cards */}
       <div className="space-y-4">
-        {displayed.length === 0 ? (
+        {isLoadingApts ? (
+          <div className="flex min-h-[200px] flex-col items-center justify-center rounded-2xl border border-dashed border-stone-300 bg-stone-50 text-stone-400 dark:border-stone-700 dark:bg-stone-900/30">
+            <p className="text-sm animate-pulse">Loading appointments...</p>
+          </div>
+        ) : displayed.length === 0 ? (
           <div className="flex min-h-[200px] flex-col items-center justify-center rounded-2xl border border-dashed border-stone-300 bg-stone-50 text-stone-400 dark:border-stone-700 dark:bg-stone-900/30">
             <Icon name="calendar" size={40} className="mb-3 opacity-40" />
             <p className="text-sm">No {activeTab} appointments.</p>
@@ -134,29 +135,33 @@ export function PortalAppointments(): JSX.Element {
           </div>
         ) : (
           displayed.map((apt) => {
-            const cfg = STATUS_CONFIG[apt.status];
+            const dateObj = new Date(apt.appointment_date);
+            const monthStr = dateObj.toLocaleDateString('en-GB', { month: 'short' });
+            const dayStr = String(dateObj.getDate()).padStart(2, '0');
+            
             return (
               <div key={apt.id} className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm dark:border-stone-800 dark:bg-stone-900">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex items-center gap-4">
                     <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl bg-teal-50 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300">
-                      <span className="text-xs font-bold uppercase leading-none">{apt.month}</span>
-                      <span className="text-2xl font-black leading-none">{apt.day}</span>
+                      <span className="text-xs font-bold uppercase leading-none">{monthStr}</span>
+                      <span className="text-2xl font-black leading-none">{dayStr}</span>
                     </div>
                     <div>
-                      <p className="font-bold text-stone-900 dark:text-stone-100">{apt.provider}</p>
-                      <p className="text-sm text-stone-500 dark:text-stone-400">{apt.department} &middot; {apt.time}</p>
-                      {apt.notes && <p className="mt-1.5 text-xs text-amber-600 dark:text-amber-400">⚠ {apt.notes}</p>}
+                      <p className="font-bold text-stone-900 dark:text-stone-100">
+                        {apt.doctor ? `Dr. ${apt.doctor.name}` : 'General Clinic'}
+                      </p>
+                      <p className="text-sm text-stone-500 dark:text-stone-400">
+                        {apt.branch?.name} &middot; {apt.start_time.substring(0, 5)} - {apt.end_time.substring(0, 5)}
+                      </p>
+                      <p className="mt-1 text-xs text-stone-400">ID: {apt.appointment_number}</p>
                     </div>
                   </div>
                   <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
-                    <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${cfg.classes}`}>{cfg.label}</span>
-                    {apt.status === 'upcoming' && (
+                    <AppointmentStatusBadge status={apt.status} />
+                    
+                    {['scheduled', 'confirmed'].includes(apt.status) && (
                       <div className="flex gap-2">
-                        <button type="button" onClick={() => { setRescheduleTarget(apt); setRescheduleDate(''); }}
-                          className="rounded-lg bg-stone-100 px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300">
-                          Reschedule
-                        </button>
                         <button type="button" onClick={() => setCancelTarget(apt.id)}
                           className="rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 dark:border-stone-700 dark:text-red-400">
                           Cancel
@@ -171,8 +176,6 @@ export function PortalAppointments(): JSX.Element {
         )}
       </div>
 
-      {/* ── Modals ─── */}
-
       {/* Cancel Confirmation */}
       <ConfirmDialog
         isOpen={cancelTarget !== null}
@@ -180,67 +183,72 @@ export function PortalAppointments(): JSX.Element {
         onConfirm={() => { if (cancelTarget) handleCancel(cancelTarget); setCancelTarget(null); }}
         title="Cancel Appointment"
         message="Are you sure you want to cancel this appointment? This cannot be undone."
-        confirmLabel="Yes, Cancel"
+        confirmLabel={cancelMutation.isPending ? "Cancelling..." : "Yes, Cancel"}
         danger
       />
 
-      {/* Reschedule Modal */}
-      <PortalModal isOpen={rescheduleTarget !== null} onClose={() => setRescheduleTarget(null)} title="Reschedule Appointment">
-        {rescheduleTarget && (
-          <>
-            <p className="mb-4 text-sm text-stone-500 dark:text-stone-400">
-              Current: <span className="font-semibold text-stone-700 dark:text-stone-300">{rescheduleTarget.date} · {rescheduleTarget.time} — {rescheduleTarget.provider}</span>
-            </p>
-            <div className="space-y-4">
-              <div>
-                <label className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">New Date</label>
-                <input type="date" value={rescheduleDate} onChange={(e) => setRescheduleDate(e.target.value)}
-                  min={new Date().toISOString().split('T')[0]}
-                  className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-100" />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">New Time</label>
-                <select value={rescheduleTime} onChange={(e) => setRescheduleTime(e.target.value)}
-                  className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-100">
-                  {TIMES.map(t => <option key={t}>{t}</option>)}
-                </select>
-              </div>
-            </div>
-            <div className="mt-6 flex justify-end gap-3">
-              <button type="button" onClick={() => setRescheduleTarget(null)} className="rounded-xl border border-stone-200 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 dark:border-stone-700 dark:text-stone-300">Cancel</button>
-              <button type="button" onClick={handleReschedule} disabled={!rescheduleDate} className="rounded-xl bg-teal-600 px-4 py-2 text-sm font-bold text-white hover:bg-teal-700 disabled:opacity-50">Confirm Reschedule</button>
-            </div>
-          </>
-        )}
-      </PortalModal>
-
       {/* Book Appointment Modal */}
-      <PortalModal isOpen={bookingOpen} onClose={() => setBookingOpen(false)} title="Book New Appointment" maxWidth="max-w-lg">
-        <div className="space-y-4">
+      <PortalModal isOpen={bookingOpen} onClose={() => setBookingOpen(false)} title="Book New Appointment" maxWidth="max-w-xl">
+        <div className="space-y-6">
+          
           <div>
-            <label className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">Provider / Department</label>
-            <select value={bookProvider} onChange={(e) => setBookProvider(e.target.value)}
-              className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-100">
-              {PROVIDERS.map(p => <option key={p}>{p}</option>)}
+            <label className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-300">Select Clinic / Provider</label>
+            <select 
+              value={selectedScheduleId} 
+              onChange={(e) => setSelectedScheduleId(e.target.value)}
+              className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-100"
+            >
+              <option value="">-- Choose a Provider --</option>
+              {schedules.map(s => (
+                <option key={s.id} value={s.id}>
+                  {s.doctor?.name ? `Dr. ${s.doctor.name}` : s.name} - {s.branch?.name}
+                </option>
+              ))}
             </select>
           </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">Preferred Date</label>
-            <input type="date" value={bookDate} onChange={(e) => setBookDate(e.target.value)}
-              min={new Date().toISOString().split('T')[0]}
-              className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-100" />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">Preferred Time</label>
-            <select value={bookTime} onChange={(e) => setBookTime(e.target.value)}
-              className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-100">
-              {TIMES.map(t => <option key={t}>{t}</option>)}
-            </select>
-          </div>
+
+          {selectedScheduleId && (
+            <div>
+              <label className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-300">Select Date</label>
+              <input 
+                type="date" 
+                value={bookDate} 
+                onChange={(e) => { setBookDate(e.target.value); setBookSlot(null); }}
+                min={new Date().toISOString().split('T')[0]}
+                className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-100" 
+              />
+            </div>
+          )}
+
+          {selectedSchedule && bookDate && (
+            <div>
+              <label className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-300">Select Time Slot</label>
+              <div className="bg-stone-50 p-4 rounded-xl border border-stone-200 dark:bg-stone-900/50 dark:border-stone-700">
+                <SlotPicker 
+                  doctorId={selectedSchedule.doctor_id} 
+                  branchId={selectedSchedule.branch_id} 
+                  date={bookDate} 
+                  selectedStartTime={bookSlot?.start}
+                  onSelectSlot={(start, end) => setBookSlot({ start, end })}
+                />
+              </div>
+            </div>
+          )}
+          
         </div>
-        <div className="mt-6 flex justify-end gap-3">
-          <button type="button" onClick={() => setBookingOpen(false)} className="rounded-xl border border-stone-200 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 dark:border-stone-700 dark:text-stone-300">Cancel</button>
-          <button type="button" onClick={handleBook} disabled={!bookDate} className="rounded-xl bg-teal-600 px-5 py-2 text-sm font-bold text-white hover:bg-teal-700 disabled:opacity-50">Confirm Booking</button>
+        
+        <div className="mt-8 flex justify-end gap-3">
+          <button type="button" onClick={() => setBookingOpen(false)} className="rounded-xl border border-stone-200 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 dark:border-stone-700 dark:text-stone-300">
+            Cancel
+          </button>
+          <button 
+            type="button" 
+            onClick={handleBook} 
+            disabled={!bookSlot || bookMutation.isPending} 
+            className="rounded-xl bg-teal-600 px-5 py-2 text-sm font-bold text-white hover:bg-teal-700 disabled:opacity-50"
+          >
+            {bookMutation.isPending ? 'Booking...' : 'Confirm Booking'}
+          </button>
         </div>
       </PortalModal>
     </div>

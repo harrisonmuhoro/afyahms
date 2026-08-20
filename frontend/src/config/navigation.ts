@@ -44,6 +44,7 @@ export const NAV_ITEMS: NavItem[] = [
   { to: '/queue', key: 'nav:queue', icon: 'queue', permission: 'queue.read', hiddenForRoles: ['superadmin'] },
   { to: '/queue/board/TRI', key: 'nav:triage', icon: 'triage', permission: 'triage.create', hiddenForRoles: ['superadmin'] },
   { to: '/patients', key: 'nav:patients', icon: 'patients', permission: 'patients.read', hiddenForRoles: ['superadmin'] },
+  { to: '/appointments', key: 'nav:appointments', icon: 'calendar', permission: 'visits.create', hiddenForRoles: ['superadmin'] },
 
   // Clinical
   { to: '/queue/board/DOC', key: 'nav:emr', icon: 'emr', permission: 'emr.read', hiddenForRoles: ['superadmin'] },

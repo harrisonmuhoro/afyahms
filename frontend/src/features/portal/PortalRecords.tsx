@@ -1,68 +1,24 @@
 import { useState } from 'react';
 import { Icon } from '@/components/icons/Icon';
-import { ToastBanner } from './PortalModal';
+import { usePortalPrescriptions, usePortalDocuments, type PortalPrescription, type PortalDocument } from './api';
 
-interface Prescription {
-  id: string;
-  name: string;
-  dosage: string;
-  instructions: string;
-  prescribedBy: string;
-  startDate: string;
-  endDate?: string;
-  status: 'active' | 'completed' | 'stopped';
-  refillsLeft?: number;
-}
-
-interface ClinicalRecord {
-  id: string;
-  type: string;
-  date: string;
-  provider: string;
-  summary: string;
-}
-
-const PRESCRIPTIONS: Prescription[] = [];
-
-const CLINICAL_RECORDS: ClinicalRecord[] = [];
-
-const STATUS_CONFIG = {
-  active: { label: 'Active', classes: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' },
+const STATUS_CONFIG: Record<string, { label: string, classes: string }> = {
+  active:    { label: 'Active',    classes: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' },
   completed: { label: 'Completed', classes: 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400' },
-  stopped: { label: 'Stopped', classes: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' },
+  stopped:   { label: 'Stopped',   classes: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' },
 };
 
 export function PortalRecords(): JSX.Element {
   const [activeTab, setActiveTab] = useState<'prescriptions' | 'documents'>('prescriptions');
-  const [downloading, setDownloading] = useState<string | null>(null);
-  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'info' } | null>(null);
 
-  const showToast = (msg: string, type: 'success' | 'info' = 'success'): void => {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 4000);
-  };
+  const { data: rxData, isLoading: rxLoading } = usePortalPrescriptions();
+  const { data: docData, isLoading: docLoading } = usePortalDocuments();
 
-  const handleDownload = (id: string, name: string, content: string): void => {
-    setDownloading(id);
-    setTimeout(() => {
-      const blob = new Blob([content], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${name.replace(/\s+/g, '_')}_${id}.txt`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      setDownloading(null);
-      showToast(`"${name}" downloaded successfully.`);
-    }, 1000);
-  };
+  const prescriptions: PortalPrescription[] = (rxData as any)?.data ?? [];
+  const documents: PortalDocument[] = (docData as any)?.data ?? [];
 
   return (
     <div className="animate-fade-in space-y-6">
-      {toast && <ToastBanner message={toast.msg} type={toast.type} />}
-
       <div>
         <h1 className="text-2xl font-bold text-stone-900 dark:text-stone-100 sm:text-3xl">Records</h1>
         <p className="mt-1 text-stone-500 dark:text-stone-400">Your prescriptions and clinical documents in one place.</p>
@@ -81,8 +37,16 @@ export function PortalRecords(): JSX.Element {
       {/* Prescriptions */}
       {activeTab === 'prescriptions' && (
         <div className="space-y-4">
-          {PRESCRIPTIONS.map((rx) => {
-            const cfg = STATUS_CONFIG[rx.status];
+          {rxLoading && <p className="animate-pulse py-8 text-center text-sm text-stone-400">Loading prescriptions…</p>}
+          {!rxLoading && prescriptions.length === 0 && (
+            <div className="flex min-h-[200px] flex-col items-center justify-center rounded-2xl border border-dashed border-stone-300 bg-stone-50 text-stone-400 dark:border-stone-700 dark:bg-stone-900/30">
+              <Icon name="pharmacy" size={40} className="mb-3 opacity-30" />
+              <p className="text-sm">No prescriptions found.</p>
+            </div>
+          )}
+          {prescriptions.map((rx) => {
+            const cfg = STATUS_CONFIG[rx.status] ?? STATUS_CONFIG.completed;
+            const dateStr = new Date(rx.created_at).toLocaleDateString('en-GB');
             return (
               <div key={rx.id} className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm dark:border-stone-800 dark:bg-stone-900">
                 <div className="mb-3 flex items-start justify-between gap-3">
@@ -91,39 +55,25 @@ export function PortalRecords(): JSX.Element {
                       <Icon name="pharmacy" size={18} />
                     </div>
                     <div>
-                      <p className="font-bold text-stone-900 dark:text-stone-100">{rx.name}</p>
-                      <p className="text-sm text-stone-500">{rx.dosage}</p>
+                      <p className="font-bold text-stone-900 dark:text-stone-100">Prescription {rx.id}</p>
+                      <p className="text-sm text-stone-500">
+                        Dr. {rx.doctor?.first_name} {rx.doctor?.last_name} · {dateStr}
+                      </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleDownload(
-                        rx.id, 
-                        rx.name, 
-                        `Prescription: ${rx.name}\nDosage: ${rx.dosage}\nInstructions: ${rx.instructions}\nPrescribed by: ${rx.prescribedBy}\nStarted: ${rx.startDate}\nStatus: ${rx.status}`
-                      )}
-                      disabled={downloading === rx.id}
-                      className="flex shrink-0 items-center gap-1.5 rounded-lg border border-stone-200 px-3 py-1 text-xs font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-50 dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800"
-                    >
-                      {downloading === rx.id ? '...' : <><Icon name="download" size={14} /> Download</>}
-                    </button>
-                    <span className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${cfg.classes}`}>{cfg.label}</span>
+                  <span className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${cfg.classes}`}>{cfg.label}</span>
+                </div>
+                {rx.items && rx.items.length > 0 && (
+                  <div className="rounded-xl bg-stone-50 p-4 dark:bg-stone-800/50 space-y-2">
+                    {rx.items.map(item => (
+                      <div key={item.id} className="text-sm text-stone-700 dark:text-stone-300">
+                        <strong>{item.medication_name}</strong> - {item.dosage} ({item.frequency} for {item.duration})
+                        {item.instructions && <div className="text-xs text-stone-500 mt-0.5">{item.instructions}</div>}
+                      </div>
+                    ))}
                   </div>
-                </div>
-                <div className="rounded-xl bg-stone-50 p-4 dark:bg-stone-800/50">
-                  <p className="text-sm text-stone-700 dark:text-stone-300">{rx.instructions}</p>
-                </div>
-                <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-stone-500 dark:text-stone-400">
-                  <span>Prescribed by <span className="font-medium text-stone-700 dark:text-stone-300">{rx.prescribedBy}</span></span>
-                  <span>Started {rx.startDate}</span>
-                  {rx.endDate && <span>Ends {rx.endDate}</span>}
-                  {rx.status === 'active' && rx.refillsLeft !== undefined && (
-                    <span className="font-medium text-teal-600 dark:text-teal-400">
-                      {rx.refillsLeft} refill{rx.refillsLeft !== 1 ? 's' : ''} remaining
-                    </span>
-                  )}
-                </div>
+                )}
+                {rx.notes && <p className="mt-3 text-sm text-stone-600 dark:text-stone-400">{rx.notes}</p>}
               </div>
             );
           })}
@@ -133,47 +83,37 @@ export function PortalRecords(): JSX.Element {
       {/* Clinical Documents */}
       {activeTab === 'documents' && (
         <div className="space-y-4">
-          {CLINICAL_RECORDS.map((doc) => (
-            <div key={doc.id} className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm dark:border-stone-800 dark:bg-stone-900">
-              <div className="mb-3 flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
+          {docLoading && <p className="animate-pulse py-8 text-center text-sm text-stone-400">Loading documents…</p>}
+          {!docLoading && documents.length === 0 && (
+            <div className="flex min-h-[200px] flex-col items-center justify-center rounded-2xl border border-dashed border-stone-300 bg-stone-50 text-stone-400 dark:border-stone-700 dark:bg-stone-900/30">
+              <Icon name="clinical" size={40} className="mb-3 opacity-30" />
+              <p className="text-sm">No clinical records found.</p>
+            </div>
+          )}
+          {documents.map((doc) => {
+            const dateStr = new Date(doc.visit_date).toLocaleDateString('en-GB');
+            const summary = doc.soap_note?.assessment ?? doc.chief_complaint ?? 'Visit Record';
+            return (
+              <div key={doc.id} className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm dark:border-stone-800 dark:bg-stone-900">
+                <div className="mb-3 flex items-start gap-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
                     <Icon name="clinical" size={18} />
                   </div>
                   <div>
-                    <p className="font-bold text-stone-900 dark:text-stone-100">{doc.type}</p>
-                    <p className="text-sm text-stone-500">{doc.date} &middot; {doc.provider}</p>
+                    <p className="font-bold text-stone-900 dark:text-stone-100">
+                      {doc.encounter_type} Encounter ({doc.department})
+                    </p>
+                    <p className="text-sm text-stone-500">
+                      {dateStr} {doc.provider ? `· Dr. ${doc.provider.last_name}` : ''}
+                    </p>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => handleDownload(
-                    doc.id, 
-                    doc.type, 
-                    `Document: ${doc.type}\nDate: ${doc.date}\nProvider: ${doc.provider}\n\nSummary:\n${doc.summary}`
-                  )}
-                  disabled={downloading === doc.id}
-                  className="flex shrink-0 items-center gap-1.5 rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-50 dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800"
-                >
-                  {downloading === doc.id ? (
-                    <>
-                      <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-                      </svg>
-                      Downloading…
-                    </>
-                  ) : (
-                    <>
-                      <Icon name="download" size={14} />
-                      Download
-                    </>
-                  )}
-                </button>
+                <div className="rounded-xl bg-stone-50 p-4 dark:bg-stone-800/50">
+                  <p className="text-sm leading-relaxed text-stone-700 dark:text-stone-300">{summary}</p>
+                </div>
               </div>
-              <p className="text-sm leading-relaxed text-stone-600 dark:text-stone-400">{doc.summary}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

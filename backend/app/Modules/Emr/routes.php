@@ -69,4 +69,21 @@ Route::middleware(['auth:sanctum', 'break.glass'])->group(function (): void {
     Route::get('/diagnoses-catalog',           [EmrController::class, 'searchCatalog'])
         ->middleware('permission:diagnoses.read')
         ->name('diagnoses.catalog.search');
+
+    // eMAR
+    Route::get('/emar/pending', [\App\Modules\EMR\Controllers\EmrMedicationController::class, 'pending'])
+        ->middleware('permission:emr.read')
+        ->name('emar.pending');
+
+    Route::get('/encounters/visit/{visit}/emar',  [\App\Modules\EMR\Controllers\EmrMedicationController::class, 'index'])
+        ->middleware('permission:emr.read')
+        ->name('encounters.emar.index');
+
+    Route::post('/encounters/visit/{visit}/emar', [\App\Modules\EMR\Controllers\EmrMedicationController::class, 'store'])
+        ->middleware('permission:emr.create')
+        ->name('encounters.emar.store');
+
+    Route::patch('/encounters/visit/{visit}/emar/{emarRecord}', [\App\Modules\EMR\Controllers\EmrMedicationController::class, 'update'])
+        ->middleware('permission:emr.update')
+        ->name('encounters.emar.update');
 });

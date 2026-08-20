@@ -154,6 +154,9 @@ const AuditLogPage = lazy(() =>
   import('@/features/audit/AuditLogPage').then((m) => ({ default: m.AuditLogPage })),
 );
 const SettingsPage = lazy(() => import('@/features/settings/SettingsPage'));
+const AppointmentsCalendarPage = lazy(() =>
+  import('@/features/appointments').then((m) => ({ default: m.AppointmentsCalendarPage })),
+);
 
 // Reports (one chunk — all report components share the recharts dependency)
 const ReportsPage = lazy(() =>
@@ -359,6 +362,16 @@ export function App(): JSX.Element {
             element={
               <ProtectedRoute permission="patients.read">
                 <PatientDetailPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Appointments — reception, doctors, admin */}
+          <Route
+            path="appointments"
+            element={
+              <ProtectedRoute permission="visits.create">
+                <AppointmentsCalendarPage />
               </ProtectedRoute>
             }
           />

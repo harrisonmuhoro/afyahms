@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use App\Modules\Appointments\Jobs\MarkNoShowAppointments;
 
 Artisan::command('inspire', fn () => $this->comment(Inspiring::quote()))->purpose('Display an inspiring quote');
 
@@ -23,3 +24,5 @@ app(Schedule::class)
     ->command('cache:prune-stale-tags')->hourly();
 app(Schedule::class)
     ->command('staff:purge-expired-contact-changes')->hourly();
+app(Schedule::class)
+    ->job(new MarkNoShowAppointments)->everyFifteenMinutes();

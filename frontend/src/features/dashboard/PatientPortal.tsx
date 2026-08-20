@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { usePortalPatient } from '@/features/portal/api';
+import { usePortalPatient, usePortalInvoices, usePortalPrescriptions, usePortalResults } from '@/features/portal/api';
+import { useAppointments } from '@/features/appointments/api';
 
 /**
  * Patient portal bento dashboard wired to the portal API: greeting and
@@ -11,6 +12,23 @@ import { usePortalPatient } from '@/features/portal/api';
 export function PatientPortal(): JSX.Element {
   const { user } = useAuth();
   const { patient, isLoading } = usePortalPatient();
+  const { data: appointmentsResponse } = useAppointments();
+  const { data: billsResponse } = usePortalInvoices();
+  const { data: resultsResponse } = usePortalResults();
+  const { data: prescriptionsResponse } = usePortalPrescriptions();
+
+  const appointments = (appointmentsResponse as any)?.data ?? [];
+  const upcomingApt = appointments.filter((a: any) => ['scheduled', 'confirmed'].includes(a.status))[0] ?? null;
+
+  const bills = (billsResponse as any)?.data ?? [];
+  const pendingBills = bills.filter((b: any) => b.status === 'pending');
+  const outstandingAmount = pendingBills.reduce((sum: number, b: any) => sum + (Number(b.balance) || 0), 0);
+
+  const results = (resultsResponse as any)?.data ?? [];
+  const latestResult = results[0] ?? null;
+
+  const prescriptions = (prescriptionsResponse as any)?.data ?? [];
+  const activePrescriptions = prescriptions.filter((p: any) => p.status === 'dispensed');
 
   const firstName = patient?.first_name ?? user?.name.split(' ')[0] ?? 'there';
 
@@ -38,7 +56,13 @@ export function PatientPortal(): JSX.Element {
           <div className="flex-1 flex flex-col items-center justify-center text-center py-6 gap-2">
             <span className="material-symbols-outlined text-[36px] text-outline-variant">calendar_month</span>
             <p className="text-body-md text-on-surface-variant max-w-sm">
-              You have no upcoming appointments. Online booking will appear here once appointment scheduling is enabled.
+              {upcomingApt ? (
+                <>
+                  You have an appointment on <strong className="text-stone-900">{new Date(upcomingApt.appointment_date).toLocaleDateString()}</strong> at <strong className="text-stone-900">{upcomingApt.start_time.substring(0, 5)}</strong>.
+                </>
+              ) : (
+                'You have no upcoming appointments. Online booking will appear here once appointment scheduling is enabled.'
+              )}
             </p>
             <Link
               to="/portal/appointments"
@@ -58,7 +82,11 @@ export function PatientPortal(): JSX.Element {
             </div>
             <div className="mb-lg">
               <p className="text-body-md text-on-surface-variant py-4">
-                Your billing summary will appear here once invoices are issued for your visits.
+                {pendingBills.length > 0 ? (
+                  <>You have <strong className="text-red-600 dark:text-red-400">{pendingBills.length}</strong> outstanding bill(s) totaling <strong className="text-red-600 dark:text-red-400">KES {outstandingAmount.toLocaleString()}</strong>.</>
+                ) : (
+                  'Your billing summary will appear here once invoices are issued for your visits.'
+                )}
               </p>
             </div>
           </div>
@@ -82,7 +110,11 @@ export function PatientPortal(): JSX.Element {
           <div className="flex-1 flex flex-col items-center justify-center text-center py-10 gap-2">
             <span className="material-symbols-outlined text-[32px] text-outline-variant">labs</span>
             <p className="text-body-md text-on-surface-variant max-w-[260px]">
-              Verified lab results will appear here as soon as they are released by the laboratory.
+              {latestResult ? (
+                <>Your latest lab result from <strong className="text-stone-900">{new Date(latestResult.updated_at || latestResult.created_at).toLocaleDateString()}</strong> is ready.</>
+              ) : (
+                'Verified lab results will appear here as soon as they are released by the laboratory.'
+              )}
             </p>
           </div>
         </div>
@@ -95,7 +127,11 @@ export function PatientPortal(): JSX.Element {
           <div className="flex-1 flex flex-col items-center justify-center text-center py-8 gap-2">
             <span className="material-symbols-outlined text-[32px] text-outline-variant">medication</span>
             <p className="text-body-md text-on-surface-variant max-w-[260px]">
-              Active prescriptions and refill requests will appear here once dispensed by the pharmacy.
+              {activePrescriptions.length > 0 ? (
+                <>You have <strong className="text-stone-900">{activePrescriptions.length}</strong> active prescription(s).</>
+              ) : (
+                'Active prescriptions and refill requests will appear here once dispensed by the pharmacy.'
+              )}
             </p>
           </div>
           <div className="px-lg py-lg bg-surface-container-lowest mt-auto rounded-b-[14px]">

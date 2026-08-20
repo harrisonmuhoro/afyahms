@@ -22,6 +22,36 @@ final class QueueController extends Controller
 {
     public function __construct(private readonly QueueService $service) {}
 
+    /** GET /api/v1/queue/kpis — Dashboard summary KPIs */
+    public function kpis(Request $request): JsonResponse
+    {
+        $branchId = $this->resolveBranchId($request);
+
+        // 1. Active queue tickets (waiting or in_service across all stations in branch)
+        $activeTickets = QueueTicket::where('branch_id', $branchId)
+            ->whereIn('state', ['waiting', 'in_service'])
+            ->count();
+
+        // 2. Patients seen today (visits created today in this branch)
+        $patientsSeenToday = Visit::where('branch_id', $branchId)
+            ->whereDate('created_at', today())
+            ->count();
+
+        // 3. Awaiting triage (tickets in 'waiting' for TRI station)
+        $triageStationId = QueueStation::where('branch_id', $branchId)->where('code', 'TRI')->value('id');
+        $awaitingTriage = $triageStationId 
+            ? QueueTicket::where('station_id', $triageStationId)->where('state', 'waiting')->count() 
+            : 0;
+
+        return response()->json([
+            'data' => [
+                'active_tickets' => $activeTickets,
+                'patients_seen' => $patientsSeenToday,
+                'awaiting_triage' => $awaitingTriage,
+            ]
+        ]);
+    }
+
     /** GET /api/v1/queue/stations — list active stations in active branch. */
     public function stations(Request $request): JsonResource
     {

@@ -200,7 +200,7 @@ export function PortalProfile(): JSX.Element {
             </label>
             <label className="block">
               <span className="label">Date of Birth</span>
-              <input type="date" className="input" required value={form.date_of_birth} onChange={(e) => setForm({ ...form, date_of_birth: e.target.value })} />
+              <input type="date" className="input" max={new Date().toISOString().slice(0, 10)} required value={form.date_of_birth} onChange={(e) => setForm({ ...form, date_of_birth: e.target.value })} />
             </label>
             <label className="block">
               <span className="label">National ID (Adults)</span>
