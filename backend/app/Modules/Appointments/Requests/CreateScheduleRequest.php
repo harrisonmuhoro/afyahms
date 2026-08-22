@@ -22,8 +22,8 @@ class CreateScheduleRequest extends FormRequest
             'name' => ['required', 'string', 'max:100'],
             'slot_duration' => ['required', 'integer', 'min:5', 'max:120'],
             'max_concurrent' => ['required', 'integer', 'min:1'],
-            'valid_from' => ['required', 'date'],
-            'valid_until' => ['nullable', 'date', 'after:valid_from'],
+            'valid_from' => ['required', 'date', 'after_or_equal:today'],
+            'valid_until' => ['nullable', 'date', 'after_or_equal:valid_from'],
             
             'time_blocks' => ['required', 'array', 'min:1'],
             'time_blocks.*.day_of_week' => ['required', 'integer', 'min:0', 'max:6'],

@@ -7,5 +7,6 @@ return [
     App\Providers\BroadcastServiceProvider::class,
     App\Providers\ModuleServiceProvider::class,
     App\Providers\RouteServiceProvider::class,
+    App\Modules\Messages\Providers\MessagesServiceProvider::class,
     Laravel\Socialite\SocialiteServiceProvider::class,
 ];

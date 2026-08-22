@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { usePatient, useUpdatePatient } from './api';
 import { HttpError } from '@/lib/http';
 
@@ -49,12 +50,14 @@ export function PatientDetailPage(): JSX.Element {
   const { uuid } = useParams<{ uuid: string }>();
   const { patient, isLoading, error } = usePatient(uuid);
   const update = useUpdatePatient();
+  const { hasPermission } = useAuth();
+  const canEdit = hasPermission('patients.update');
 
   const [form, setForm] = useState<FormState | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [generalError, setGeneralError] = useState<string | null>(null);
-  const [editing, setEditing] = useState(true);
+  const [editing, setEditing] = useState(false); // Default to false until explicitly clicked
 
   // Populate form when patient data loads
   useEffect(() => {
@@ -187,37 +190,39 @@ export function PatientDetailPage(): JSX.Element {
           <p className="font-mono text-xs text-stone-500">{patient.patient_number}</p>
         </div>
         <div className="flex items-center gap-2">
-          {editing ? (
-            <>
+          {canEdit && (
+            editing ? (
+              <>
+                <button
+                  type="button"
+                  className="btn-ghost text-sm"
+                  onClick={() => {
+                    setEditing(false);
+                    setFieldErrors({});
+                    setGeneralError(null);
+                  }}
+                >
+                  View Only
+                </button>
+                <button
+                  type="submit"
+                  form="patient-edit-form"
+                  disabled={update.isPending}
+                  className="btn-primary text-sm disabled:opacity-50"
+                >
+                  {update.isPending ? 'Saving…' : 'Save Changes'}
+                </button>
+              </>
+            ) : (
               <button
                 type="button"
-                className="btn-ghost text-sm"
-                onClick={() => {
-                  setEditing(false);
-                  setFieldErrors({});
-                  setGeneralError(null);
-                }}
+                id="btn-edit-patient"
+                className="btn-primary text-sm"
+                onClick={() => { setEditing(true); setSuccessMsg(null); setGeneralError(null); }}
               >
-                View Only
+                Edit Patient
               </button>
-              <button
-                type="submit"
-                form="patient-edit-form"
-                disabled={update.isPending}
-                className="btn-primary text-sm disabled:opacity-50"
-              >
-                {update.isPending ? 'Saving…' : 'Save Changes'}
-              </button>
-            </>
-          ) : (
-            <button
-              type="button"
-              id="btn-edit-patient"
-              className="btn-primary text-sm"
-              onClick={() => { setEditing(true); setSuccessMsg(null); setGeneralError(null); }}
-            >
-              Edit Patient
-            </button>
+            )
           )}
           <Link to="/patients" className="btn-ghost text-sm">
             ← Back

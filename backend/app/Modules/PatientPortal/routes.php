@@ -40,6 +40,7 @@ Route::prefix('api/v1/portal')
             ->middleware('permission:data-corrections.create');
 
         // ── Messaging ────────────────────────────────────────────────────────
+        Route::get('/message-recipients', [PortalMessageController::class, 'recipients']);
         Route::get('/messages', [PortalMessageController::class, 'index']);
         Route::get('/messages/{conversation}', [PortalMessageController::class, 'show']);
         Route::post('/messages', [PortalMessageController::class, 'store']);
@@ -55,4 +56,3 @@ Route::prefix('api/v1/portal')
         Route::get('/prescriptions', [PortalRecordsController::class, 'prescriptions']);
         Route::get('/documents', [PortalRecordsController::class, 'documents']);
     });
-

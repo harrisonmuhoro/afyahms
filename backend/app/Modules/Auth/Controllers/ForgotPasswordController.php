@@ -112,7 +112,7 @@ final class ForgotPasswordController extends Controller
         $request->validate([
             'email' => 'required|email:rfc,strict',
             'reset_token' => 'required|string',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:5|confirmed',
         ]);
 
         $user = User::where('email', $request->email)->firstOrFail();

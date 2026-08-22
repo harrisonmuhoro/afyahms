@@ -18,6 +18,7 @@ use App\Modules\Patients\Models\Patient;
 use App\Modules\Tenancy\Models\Branch;
 use App\Modules\Tenancy\Models\UserBranchAccess;
 use App\Modules\Queue\Models\QueueStation;
+use App\Modules\Messages\Models\Conversation;
 
 /**
  * The single User model used by the entire application. Branch access and
@@ -100,6 +101,25 @@ class User extends Authenticatable
     public function patient()
     {
         return $this->hasOne(Patient::class, 'portal_user_id');
+    }
+
+    public function conversations(): BelongsToMany
+    {
+        return $this->belongsToMany(Conversation::class)->withPivot('last_read_at');
+    }
+
+    /**
+     * Compatibility accessor for portal code that scopes records by patient ID.
+     * The canonical relationship is patients.portal_user_id; users has no
+     * patient_id database column.
+     */
+    public function getPatientIdAttribute(): ?int
+    {
+        if ($this->relationLoaded('patient')) {
+            return $this->getRelation('patient')?->id;
+        }
+
+        return $this->patient()->value('id');
     }
 
     public function deactivatedBy()

@@ -105,7 +105,8 @@
     "inventory": "Hisa",
     "reports": "Ripoti",
     "settings": "Mipangilio",
-    "audit": "Kumbukumbu za Ukaguzi"
+    "audit": "Kumbukumbu za Ukaguzi",
+    "messages": "Messages"
   },
   "triage": {
     "title": "Tathmini ya triage",

@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { httpClient } from '@/lib/http';
 import type { HttpError } from '@/lib/http';
 import type { Patient } from '@/features/patients/types';
+import type { DoctorSchedule, Appointment, BookAppointmentPayload } from '@/features/appointments/types';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -23,7 +24,7 @@ export interface PortalConversation {
   subject: string | null;
   unread_count: number;
   updated_at: string;
-  users: Array<{ id: number; first_name: string; last_name: string }>;
+  users: Array<{ id: number; name: string }>;
 }
 
 export interface PortalMessage {
@@ -32,7 +33,14 @@ export interface PortalMessage {
   sender_id: number;
   body: string;
   created_at: string;
-  sender: { id: number; first_name: string; last_name: string } | null;
+  sender: { id: number; name: string } | null;
+}
+
+export interface PortalMessageRecipient {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
 }
 
 export interface PortalInvoice {
@@ -111,6 +119,14 @@ export function useUpdatePortalDemographics() {
 
 // ─── Messages ─────────────────────────────────────────────────────────────────
 
+export function usePortalMessageRecipients() {
+  return useQuery({
+    queryKey: ['portal', 'message-recipients'],
+    queryFn: () => httpClient.get<{ data: PortalMessageRecipient[] }>('/portal/message-recipients'),
+    staleTime: 60_000,
+  });
+}
+
 export function usePortalConversations() {
   return useQuery({
     queryKey: ['portal', 'messages'],
@@ -184,5 +200,64 @@ export function usePortalDocuments() {
     queryKey: ['portal', 'documents'],
     queryFn: () => httpClient.get<{ data: PortalDocument[] }>('/portal/documents'),
     staleTime: 60_000,
+  });
+}
+
+// ─── Appointments ─────────────────────────────────────────────────────────────
+
+export interface PortalAppointment {
+  id: string;
+  appointment_date: string;
+  start_time: string;
+  end_time: string;
+  status: string;
+  type: string;
+  doctor?: { id: string; name: string };
+  branch?: { id: string; name: string };
+}
+
+export type PortalBookAppointmentPayload = Omit<BookAppointmentPayload, 'patient_id' | 'booked_via'>;
+
+export function usePortalAppointments() {
+  return useQuery({
+    queryKey: ['portal', 'appointments'],
+    queryFn: () => httpClient.get<{ data: PortalAppointment[] }>('/portal/appointments'),
+    staleTime: 30_000,
+  });
+}
+
+export function usePortalSchedules() {
+  return useQuery({
+    queryKey: ['portal', 'appointment-schedules'],
+    queryFn: () => httpClient.get<{ data: DoctorSchedule[] }>('/portal/appointments/schedules'),
+    staleTime: 60_000,
+  });
+}
+
+export function usePortalBookAppointment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: PortalBookAppointmentPayload): Promise<Appointment> => {
+      const response = await httpClient.post<{ appointment: Appointment }>('/portal/appointments', payload);
+      return response.appointment;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['portal', 'appointments'] });
+      void queryClient.invalidateQueries({ queryKey: ['slots', 'available', '/portal/appointments/slots'] });
+    },
+  });
+}
+
+export function usePortalCancelAppointment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason: string }) =>
+      httpClient.post<{ message: string }>(`/portal/appointments/${id}/cancel`, { reason }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['portal', 'appointments'] });
+      void queryClient.invalidateQueries({ queryKey: ['slots', 'available', '/portal/appointments/slots'] });
+    },
   });
 }

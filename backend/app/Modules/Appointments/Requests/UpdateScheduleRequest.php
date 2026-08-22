@@ -19,8 +19,8 @@ class UpdateScheduleRequest extends FormRequest
             'name' => ['sometimes', 'string', 'max:100'],
             'slot_duration' => ['sometimes', 'integer', 'min:5', 'max:120'],
             'max_concurrent' => ['sometimes', 'integer', 'min:1'],
-            'valid_from' => ['sometimes', 'date'],
-            'valid_until' => ['nullable', 'date', 'after:valid_from'],
+            'valid_from' => ['sometimes', 'date', 'after_or_equal:today'],
+            'valid_until' => ['nullable', 'date', 'after_or_equal:valid_from'],
             'is_active' => ['sometimes', 'boolean'],
             
             'time_blocks' => ['sometimes', 'array'],

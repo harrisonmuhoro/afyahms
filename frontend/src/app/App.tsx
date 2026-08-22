@@ -157,6 +157,18 @@ const SettingsPage = lazy(() => import('@/features/settings/SettingsPage'));
 const AppointmentsCalendarPage = lazy(() =>
   import('@/features/appointments').then((m) => ({ default: m.AppointmentsCalendarPage })),
 );
+const ScheduleManagerPage = lazy(() =>
+  import('@/features/appointments').then((m) => ({ default: m.ScheduleManagerPage })),
+);
+const AppointmentBookingPage = lazy(() =>
+  import('@/features/appointments').then((m) => ({ default: m.AppointmentBookingPage })),
+);
+const AppointmentDetailPage = lazy(() =>
+  import('@/features/appointments').then((m) => ({ default: m.AppointmentDetailPage })),
+);
+const StaffMessages = lazy(() =>
+  import('@/features/messages').then((m) => ({ default: m.StaffMessages })),
+);
 
 // Reports (one chunk — all report components share the recharts dependency)
 const ReportsPage = lazy(() =>
@@ -321,6 +333,8 @@ export function App(): JSX.Element {
             }
           />
 
+          <Route path="messages" element={<StaffMessages />} />
+
           <Route
             path="admin/staff"
             element={
@@ -370,8 +384,32 @@ export function App(): JSX.Element {
           <Route
             path="appointments"
             element={
-              <ProtectedRoute permission="visits.create">
+              <ProtectedRoute permission="appointments.list">
                 <AppointmentsCalendarPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="appointments/schedules"
+            element={
+              <ProtectedRoute anyPermission={['appointments.create', 'appointments.update']}>
+                <ScheduleManagerPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="appointments/book"
+            element={
+              <ProtectedRoute permission="appointments.create">
+                <AppointmentBookingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="appointments/:id"
+            element={
+              <ProtectedRoute permission="appointments.read">
+                <AppointmentDetailPage />
               </ProtectedRoute>
             }
           />

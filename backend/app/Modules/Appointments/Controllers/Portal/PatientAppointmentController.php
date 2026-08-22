@@ -6,23 +6,28 @@ namespace App\Modules\Appointments\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Appointments\Models\Appointment;
-use App\Modules\Appointments\Requests\BookAppointmentRequest;
+use App\Modules\Appointments\Requests\StorePortalAppointmentRequest;
 use App\Modules\Appointments\Resources\AppointmentResource;
 use App\Modules\Appointments\Resources\AppointmentCollection;
+use App\Modules\Appointments\Resources\DoctorScheduleResource;
 use App\Modules\Appointments\Services\AppointmentService;
+use App\Modules\Appointments\Services\SlotGeneratorService;
+use App\Modules\Appointments\Models\DoctorSchedule;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class PatientAppointmentController extends Controller
 {
     public function __construct(
-        private readonly AppointmentService $appointmentService
+        private readonly AppointmentService $appointmentService,
+        private readonly SlotGeneratorService $slotService
     ) {}
 
     public function index(Request $request): AppointmentCollection
     {
-        // For patient portal, we must strictly scope to their own appointments
-        $patientId = $request->user()->patient_id;
+        $patientId = $this->patientId($request);
 
         $appointments = Appointment::with(['doctor', 'branch'])
             ->where('patient_id', $patientId)
@@ -33,16 +38,63 @@ class PatientAppointmentController extends Controller
         return new AppointmentCollection($appointments);
     }
 
-    public function store(BookAppointmentRequest $request): JsonResponse
+    public function doctors(): JsonResponse
     {
-        // Enforce patient can only book for themselves
-        $patientId = $request->user()->patient_id;
-        
-        $data = $request->validated();
-        if ($data['patient_id'] !== $patientId) {
-            return response()->json(['message' => 'Unauthorized patient ID.'], 403);
-        }
+        // Return active doctors who have at least one active schedule
+        $doctors = User::whereHas('roles', fn($q) => $q->where('name', 'doctor'))
+            ->whereHas('doctorSchedules', fn($q) => $q->where('is_active', true))
+            ->select('id', 'name', 'specialization')
+            ->get();
 
+        return response()->json(['data' => $doctors]);
+    }
+
+    /**
+     * List only active schedules that patients can use for self-booking.
+     */
+    public function schedules(Request $request)
+    {
+        $this->patientId($request);
+
+        $schedules = DoctorSchedule::with(['doctor', 'branch', 'timeBlocks'])
+            ->where('is_active', true)
+            ->whereDate('valid_from', '<=', today())
+            ->where(function ($query) {
+                $query->whereNull('valid_until')
+                    ->orWhereDate('valid_until', '>=', today());
+            })
+            ->when($request->branch_id, fn ($query, $branchId) => $query->where('branch_id', $branchId))
+            ->orderBy('name')
+            ->get();
+
+        return DoctorScheduleResource::collection($schedules);
+    }
+
+    public function slots(Request $request): JsonResponse
+    {
+        $this->patientId($request);
+
+        $request->validate([
+            'doctor_id' => ['required', 'exists:users,id'],
+            'branch_id' => ['required', 'exists:branches,id'],
+            'schedule_id' => ['required', 'exists:doctor_schedules,id'],
+            'date' => ['required', 'date', 'after_or_equal:today'],
+        ]);
+
+        $slots = $this->slotService->getAvailableSlots(
+            (int) $request->doctor_id,
+            Carbon::parse($request->date),
+            (int) $request->branch_id,
+            (string) $request->schedule_id,
+        );
+
+        return response()->json(['data' => $slots]);
+    }
+
+    public function store(StorePortalAppointmentRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+        $data['patient_id'] = $this->patientId($request);
         $data['booked_via'] = 'patient_portal';
 
         try {
@@ -58,8 +110,7 @@ class PatientAppointmentController extends Controller
 
     public function cancel(Request $request, Appointment $appointment): JsonResponse
     {
-        // Authorize patient owns the appointment
-        if ($appointment->patient_id !== $request->user()->patient_id) {
+        if ((int) $appointment->patient_id !== $this->patientId($request)) {
             return response()->json(['message' => 'Unauthorized.'], 403);
         }
 
@@ -74,5 +125,14 @@ class PatientAppointmentController extends Controller
         $this->appointmentService->cancel($appointment, $request->reason);
 
         return response()->json(['message' => 'Appointment cancelled.']);
+    }
+
+    private function patientId(Request $request): int
+    {
+        $patient = $request->user()?->patient;
+
+        abort_unless($patient !== null, 403, 'No patient record is linked to this account.');
+
+        return (int) $patient->id;
     }
 }

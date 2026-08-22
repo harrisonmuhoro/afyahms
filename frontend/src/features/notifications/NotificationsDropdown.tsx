@@ -41,6 +41,11 @@ export function NotificationsDropdown(): JSX.Element {
     queryFn: () => httpClient.get<NotificationsResponse>('/notifications').then(res => res),
     refetchInterval: 30000,
   });
+  const { data: conversationsData } = useQuery({
+    queryKey: ['staff', 'conversations', 'notification-count'],
+    queryFn: () => httpClient.get<{ data: Array<{ unread_count?: number }> }>('/messages/conversations'),
+    refetchInterval: 30000,
+  });
 
   const markAsRead = useMutation({
     mutationFn: (id: string) => httpClient.post(`/notifications/${id}/read`),
@@ -70,7 +75,8 @@ export function NotificationsDropdown(): JSX.Element {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
 
-  const unreadCount = data?.unread_count || 0;
+  const messageUnreadCount = (conversationsData?.data ?? []).reduce((sum, conversation) => sum + (conversation.unread_count ?? 0), 0);
+  const unreadCount = (data?.unread_count || 0) + messageUnreadCount;
   const notifications = data?.notifications.data || [];
 
   return (

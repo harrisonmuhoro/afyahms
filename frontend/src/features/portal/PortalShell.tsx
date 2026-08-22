@@ -3,6 +3,7 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useTheme } from '@/features/theme/ThemeProvider';
 import { Icon } from '@/components/icons/Icon';
+import { usePortalConversations } from './api';
 
 function initials(name: string): string {
   return name
@@ -29,6 +30,8 @@ export function PortalShell(): JSX.Element {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { data: messageData } = usePortalConversations();
+  const unreadMessages = ((messageData as any)?.data ?? []).reduce((sum: number, conversation: any) => sum + (conversation.unread_count ?? 0), 0);
 
   const handleLogout = async (): Promise<void> => {
     await logout();
@@ -145,8 +148,13 @@ export function PortalShell(): JSX.Element {
           >
             <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={24} />
           </button>
-          <button className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all">
+          <button
+            onClick={() => navigate('/portal/messages')}
+            aria-label={unreadMessages > 0 ? `${unreadMessages} unread messages` : 'Messages'}
+            className="relative p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all"
+          >
             <Icon name="bell" size={24} />
+            {unreadMessages > 0 && <span className="absolute right-0.5 top-0.5 flex min-h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">{unreadMessages > 99 ? '99+' : unreadMessages}</span>}
           </button>
           
           <div className="flex items-center gap-3 pl-2 sm:pl-md border-l border-outline-variant ml-1 sm:ml-md">

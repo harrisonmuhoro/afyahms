@@ -24,7 +24,7 @@ class MessageController extends Controller
 
         $conversations = $user->conversations()
             ->with(['users' => function($q) {
-                $q->select('users.id', 'first_name', 'last_name');
+                $q->select('users.id', 'name');
             }])
             ->withCount(['messages as unread_count' => function ($query) use ($user) {
                 // Approximate unread count based on created_at vs last_read_at
@@ -46,12 +46,12 @@ class MessageController extends Controller
         $this->messageService->markAsRead($conversation);
 
         $messages = $conversation->messages()
-            ->with('sender:id,first_name,last_name')
+            ->with('sender:id,name')
             ->orderBy('created_at', 'asc')
             ->get();
 
         return response()->json([
-            'conversation' => $conversation->load('users:id,first_name,last_name'),
+            'conversation' => $conversation->load('users:id,name'),
             'messages' => $messages,
         ]);
     }
@@ -62,7 +62,7 @@ class MessageController extends Controller
 
         return response()->json([
             'message' => 'Message sent successfully.',
-            'data' => $message->load('sender:id,first_name,last_name'),
+            'data' => $message->load('sender:id,name'),
         ], 201);
     }
 }

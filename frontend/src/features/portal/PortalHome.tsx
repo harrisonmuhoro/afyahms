@@ -6,8 +6,8 @@ import {
   usePortalResults,
   usePortalPrescriptions,
   usePortalDocuments,
+  usePortalAppointments,
 } from './api';
-import { useAppointments } from '../appointments/api';
 
 export function PortalHome(): JSX.Element {
   const { user } = useAuth();
@@ -18,13 +18,13 @@ export function PortalHome(): JSX.Element {
   const { data: resData }  = usePortalResults();
   const { data: rxData }   = usePortalPrescriptions();
   const { data: docData }  = usePortalDocuments();
-  const { data: apptData } = useAppointments({ start: new Date().toISOString() });
+  const { data: apptData } = usePortalAppointments();
 
   const invoices = (invData as any)?.data ?? [];
   const outstandingBillsTotal = invoices.reduce((sum: number, inv: any) => sum + Math.max(0, inv.total_amount - inv.paid_amount), 0);
   
-  const upcomingAppointments = (apptData as any)?.data ?? [];
-  const nextAppt = upcomingAppointments.length > 0 ? upcomingAppointments[0] : null;
+  const upcomingAppointments: any[] = (apptData as any)?.data ?? [];
+  const nextAppt = upcomingAppointments.find((a: any) => ['scheduled', 'confirmed'].includes(a.status)) ?? null;
 
   const recentLabResults = ((resData as any)?.data ?? []).filter((r: any) => r.source === 'lab');
   const prescriptionRefills = ((rxData as any)?.data ?? []).filter((rx: any) => rx.status === 'active');
@@ -49,7 +49,7 @@ export function PortalHome(): JSX.Element {
               </div>
               <h3 className="font-headline-md text-headline-md mb-1 text-on-surface">Next Appointment</h3>
               <p className="text-body-md text-on-surface-variant mb-4">
-                {new Date(nextAppt.date).toLocaleDateString('en-GB')} at {nextAppt.time}
+                {new Date(nextAppt.appointment_date).toLocaleDateString('en-GB')} at {nextAppt.start_time}
               </p>
               <Link to="/portal/appointments" className="bg-primary text-on-primary px-lg py-2.5 rounded-lg text-body-sm font-semibold hover:opacity-90 transition-opacity">
                 Manage Appointments

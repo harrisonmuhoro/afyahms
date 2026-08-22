@@ -19,22 +19,32 @@ class AppointmentController extends Controller
     public function __construct(
         private readonly AppointmentService $appointmentService
     ) {
-        $this->authorizeResource(Appointment::class, 'appointment');
+        // Note: authorizeResource() removed – incompatible with Laravel 11
+        // (it internally calls $this->middleware() which no longer exists).
+        // Per-action $this->authorize() calls are used instead.
     }
 
     public function index(Request $request): AppointmentCollection
     {
+        $this->authorize('viewAny', Appointment::class);
+
         $query = Appointment::with(['patient', 'doctor', 'branch', 'schedule'])
             ->when($request->date, fn ($q, $date) => $q->where('appointment_date', $date))
             ->when($request->doctor_id, fn ($q, $id) => $q->where('doctor_id', $id))
             ->when($request->branch_id, fn ($q, $id) => $q->where('branch_id', $id))
-            ->when($request->status, fn ($q, $status) => $q->where('status', $status));
+            ->when($request->status, fn ($q, $status) => $q->where('status', $status))
+            ->when($request->from, fn ($q, $from) => $q->where('appointment_date', '>=', substr($from, 0, 10)));
 
-        return new AppointmentCollection($query->paginate(20));
+        return new AppointmentCollection(
+            $query->orderBy('appointment_date')->orderBy('start_time')->paginate(
+                min(100, max(1, (int) $request->integer('per_page', 100)))
+            )
+        );
     }
 
     public function store(BookAppointmentRequest $request): JsonResponse
     {
+        $this->authorize('create', Appointment::class);
         try {
             $appointment = $this->appointmentService->book($request->validated());
             return response()->json([

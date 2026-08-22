@@ -16,7 +16,7 @@ final class ChangePasswordRequest extends FormRequest
     /** @return array<string, mixed> */
     public function rules(): array
     {
-        $min = (int) config('auth.password.min_length', 10);
+        $min = (int) config('auth.password.min_length', 5);
 
         return [
             'current_password' => ['required', 'string'],

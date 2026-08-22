@@ -1,18 +1,21 @@
 import { format, parse } from 'date-fns';
-import { useAvailableSlots } from '../api';
+import { useAvailableSlots } from '../hooks/useAvailableSlots';
 
 interface SlotPickerProps {
   doctorId: string;
   branchId: string;
+  scheduleId?: string;
   date: string; // YYYY-MM-DD
   onSelectSlot: (startTime: string, endTime: string) => void;
   selectedStartTime?: string;
+  slotsEndpoint?: string;
 }
 
-export function SlotPicker({ doctorId, branchId, date, onSelectSlot, selectedStartTime }: SlotPickerProps): JSX.Element {
-  const { data: slots, isLoading, isError } = useAvailableSlots(
-    { doctor_id: doctorId, branch_id: branchId, date },
+export function SlotPicker({ doctorId, branchId, scheduleId, date, onSelectSlot, selectedStartTime, slotsEndpoint }: SlotPickerProps): JSX.Element {
+  const { slots, isLoading, error } = useAvailableSlots(
+    { doctor_id: doctorId, branch_id: branchId, schedule_id: scheduleId, date },
     !!doctorId && !!branchId && !!date,
+    slotsEndpoint,
   );
 
   if (isLoading) {
@@ -25,7 +28,7 @@ export function SlotPicker({ doctorId, branchId, date, onSelectSlot, selectedSta
     );
   }
 
-  if (isError || !slots) {
+  if (error || !slots) {
     return <p className="text-sm text-error">Failed to load available slots. Please try again.</p>;
   }
 
@@ -39,7 +42,7 @@ export function SlotPicker({ doctorId, branchId, date, onSelectSlot, selectedSta
 
   return (
     <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
-      {slots.map((slot) => {
+      {slots.map((slot: any) => {
         const isSelected = selectedStartTime === slot.start_time;
         const isFull = slot.status === 'full';
         // Format "09:00:00" → "9:00 AM"

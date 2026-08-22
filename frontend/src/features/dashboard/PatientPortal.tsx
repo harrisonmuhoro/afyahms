@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { usePortalPatient, usePortalInvoices, usePortalPrescriptions, usePortalResults } from '@/features/portal/api';
-import { useAppointments } from '@/features/appointments/api';
+import { usePortalPatient, usePortalInvoices, usePortalPrescriptions, usePortalResults, usePortalAppointments } from '@/features/portal/api';
 
 /**
  * Patient portal bento dashboard wired to the portal API: greeting and
@@ -12,13 +11,13 @@ import { useAppointments } from '@/features/appointments/api';
 export function PatientPortal(): JSX.Element {
   const { user } = useAuth();
   const { patient, isLoading } = usePortalPatient();
-  const { data: appointmentsResponse } = useAppointments();
+  const { data: apptResponse } = usePortalAppointments();
   const { data: billsResponse } = usePortalInvoices();
   const { data: resultsResponse } = usePortalResults();
   const { data: prescriptionsResponse } = usePortalPrescriptions();
 
-  const appointments = (appointmentsResponse as any)?.data ?? [];
-  const upcomingApt = appointments.filter((a: any) => ['scheduled', 'confirmed'].includes(a.status))[0] ?? null;
+  const appointments: any[] = apptResponse?.data ?? [];
+  const upcomingApt = appointments.find((a: any) => ['scheduled', 'confirmed'].includes(a.status)) ?? null;
 
   const bills = (billsResponse as any)?.data ?? [];
   const pendingBills = bills.filter((b: any) => b.status === 'pending');

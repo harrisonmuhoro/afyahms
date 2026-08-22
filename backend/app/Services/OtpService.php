@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Mail\OtpMail;
+use App\Exceptions\Domain\MailDeliveryException;
 use App\Models\User;
 use App\Models\VerificationToken;
 use Illuminate\Support\Facades\Hash;
@@ -34,7 +35,7 @@ class OtpService
 
         $otp = $this->generateOtp();
 
-        VerificationToken::create([
+        $token = VerificationToken::create([
             'user_id'    => $user->id,
             'channel'    => 'email',
             'token'      => hash('sha256', $otp),
@@ -45,9 +46,21 @@ class OtpService
             'expires_at' => now()->addMinutes(self::OTP_EXPIRY_MINUTES),
         ]);
 
-        Mail::to($user->email)->send(
-            new OtpMail($otp, $this->purposeLabel($type))
-        );
+        try {
+            Mail::to($user->email)->send(
+                new OtpMail($otp, $this->purposeLabel($type))
+            );
+        } catch (\Throwable $exception) {
+            // Do not leave an OTP/cooldown behind when the provider fails.
+            // The user must be able to retry after fixing mail configuration.
+            VerificationToken::whereKey($token->id)->delete();
+
+            $message = str_contains(strtolower($exception->getMessage()), 'only send testing emails')
+                ? 'Resend is in testing mode and can only send to the Resend account email. Verify a sending domain in Resend before emailing staff addresses.'
+                : null;
+
+            throw new MailDeliveryException($message ?: '', $exception);
+        }
 
         // Increment rate limiter
         RateLimiter::hit($this->rateLimiterKey($user), 3600);

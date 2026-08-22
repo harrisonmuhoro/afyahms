@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Modules\Appointments\Services;
 
-use App\Exceptions\SlotUnavailableException;
 use App\Modules\Appointments\Enums\AppointmentStatus;
 use App\Modules\Appointments\Models\Appointment;
 use App\Modules\Appointments\Models\DoctorSchedule;
@@ -13,7 +12,8 @@ use Illuminate\Support\Facades\DB;
 class AppointmentService
 {
     public function __construct(
-        private readonly AppointmentNumberService $numberService
+        private readonly AppointmentNumberService $numberService,
+        private readonly SlotGeneratorService $slotService,
     ) {}
 
     public function book(array $data): Appointment
@@ -21,6 +21,8 @@ class AppointmentService
         return DB::transaction(function () use ($data) {
             // 1. Lock the schedule row
             $schedule = DoctorSchedule::lockForUpdate()->findOrFail($data['schedule_id']);
+
+            $this->assertRequestedSlotIsAvailable($schedule, $data);
 
             // 2. Validate slot is available
             $this->checkConflict(
@@ -115,6 +117,33 @@ class AppointmentService
 
         if ($conflictCount >= $schedule->max_concurrent) {
             throw new \Exception('Slot unavailable.');
+        }
+    }
+
+    /** @param array<string, mixed> $data */
+    private function assertRequestedSlotIsAvailable(DoctorSchedule $schedule, array $data): void
+    {
+        if (! $schedule->is_active
+            || (int) $schedule->doctor_id !== (int) $data['doctor_id']
+            || (int) $schedule->branch_id !== (int) $data['branch_id']) {
+            throw new \InvalidArgumentException('The selected schedule is not available for this provider and branch.');
+        }
+
+        $slots = $this->slotService->getAvailableSlots(
+            (int) $data['doctor_id'],
+            \Carbon\Carbon::parse((string) $data['appointment_date']),
+            (int) $data['branch_id'],
+            (string) $schedule->id,
+        );
+
+        $isAvailable = collect($slots)->contains(fn (array $slot): bool =>
+            $slot['start_time'] === $data['start_time']
+            && $slot['end_time'] === $data['end_time']
+            && $slot['status'] === 'available'
+        );
+
+        if (! $isAvailable) {
+            throw new \InvalidArgumentException('The selected appointment slot is no longer available.');
         }
     }
 }

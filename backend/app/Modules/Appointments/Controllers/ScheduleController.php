@@ -34,6 +34,10 @@ class ScheduleController extends Controller
         $this->authorize('create', DoctorSchedule::class);
         $data = $request->validated();
 
+        if ($request->user()->hasRole('doctor') && !$request->user()->hasRole('superadmin') && !$request->user()->hasRole('hospital-admin')) {
+            $data['doctor_id'] = $request->user()->id;
+        }
+
         $schedule = DB::transaction(function () use ($data) {
             $schedule = DoctorSchedule::create([
                 'branch_id' => $data['branch_id'],

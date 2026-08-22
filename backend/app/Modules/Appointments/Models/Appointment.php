@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Appointments\Models;
 
-use App\Models\Branch;
-use App\Models\Patient;
+use App\Modules\Tenancy\Models\Branch;
+use App\Modules\Patients\Models\Patient;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -42,6 +42,7 @@ class Appointment extends Model
         'cancelled_at',
         'cancelled_by',
         'cancellation_reason',
+        'consultation_start_time',
         'rescheduled_from',
         'encounter_id',
     ];
@@ -53,6 +54,7 @@ class Appointment extends Model
         'status' => \App\Modules\Appointments\Enums\AppointmentStatus::class,
         'confirmed_at' => 'datetime',
         'checked_in_at' => 'datetime',
+        'consultation_start_time' => 'datetime',
         'completed_at' => 'datetime',
         'cancelled_at' => 'datetime',
     ];

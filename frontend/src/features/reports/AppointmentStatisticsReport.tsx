@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { httpClient } from '@/lib/http';
 import { generateAndDownloadPdf } from '@/lib/pdf';
 import { useBranches } from '@/features/branches/BranchProvider';
@@ -13,6 +13,8 @@ interface AppointmentStatisticsResponse {
     attended: number;
     missed: number;
     attendance_rate: string;
+    cancellation_rate: string;
+    average_wait_time: number;
   };
   chart_data: Array<{
     date: string;
@@ -27,7 +29,12 @@ interface AppointmentStatisticsResponse {
     missed: number;
     rate: string;
   }>;
+  channel_split: Array<{ channel: string; count: number }>;
+  peak_hours: Array<{ hour: string; count: number }>;
+  doctor_utilization: Array<{ doctor: string; appointments: number }>;
 }
+
+const COLORS = ['#3b82f6', '#10b981', '#f43f5e', '#f59e0b', '#8b5cf6', '#06b6d4'];
 
 export function AppointmentStatisticsReport(): JSX.Element {
   const navigate = useNavigate();
@@ -74,7 +81,7 @@ export function AppointmentStatisticsReport(): JSX.Element {
         <div>
           <button onClick={() => navigate('/reports')} className="text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 text-sm font-medium mb-2 flex items-center gap-1 transition-colors">&larr; Back to Reports</button>
           <h1 className="text-2xl font-bold text-stone-900 dark:text-white">Appointment Statistics</h1>
-          <p className="text-stone-500 text-sm">Appointment bookings, attendance, and missed visits.</p>
+          <p className="text-stone-500 text-sm">Appointment bookings, attendance, wait times, and channel metrics.</p>
         </div>
         <div className="flex flex-col sm:flex-row flex-wrap sm:items-center gap-3 bg-stone-50 w-full sm:w-auto dark:bg-stone-950 p-2 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-sm print:hidden">
           {isSuperadmin && (
@@ -108,44 +115,133 @@ export function AppointmentStatisticsReport(): JSX.Element {
 
       {data && (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
-              <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Total Booked</h3>
-              <p className="mt-2 text-3xl font-black text-blue-600">{data.kpis.total_booked.toLocaleString()}</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-5 shadow-sm">
+              <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wide">Total Booked</h3>
+              <p className="mt-2 text-2xl font-black text-blue-600">{data.kpis.total_booked.toLocaleString()}</p>
             </div>
-            <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
-              <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Attended</h3>
-              <p className="mt-2 text-3xl font-black text-emerald-600">{data.kpis.attended.toLocaleString()}</p>
+            <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-5 shadow-sm">
+              <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wide">Attended</h3>
+              <p className="mt-2 text-2xl font-black text-emerald-600">{data.kpis.attended.toLocaleString()}</p>
             </div>
-            <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
-              <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Missed</h3>
-              <p className="mt-2 text-3xl font-black text-rose-600">{data.kpis.missed.toLocaleString()}</p>
+            <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-5 shadow-sm">
+              <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wide">Missed</h3>
+              <p className="mt-2 text-2xl font-black text-rose-600">{data.kpis.missed.toLocaleString()}</p>
             </div>
-            <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
-              <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Attendance Rate</h3>
-              <p className="mt-2 text-3xl font-black text-purple-600">{data.kpis.attendance_rate}</p>
+            <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-5 shadow-sm">
+              <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wide">Attendance</h3>
+              <p className="mt-2 text-2xl font-black text-purple-600">{data.kpis.attendance_rate}</p>
+            </div>
+            <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-5 shadow-sm">
+              <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wide">Cancellation</h3>
+              <p className="mt-2 text-2xl font-black text-orange-600">{data.kpis.cancellation_rate}</p>
+            </div>
+            <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-5 shadow-sm">
+              <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wide">Avg Wait</h3>
+              <p className="mt-2 text-2xl font-black text-stone-800 dark:text-stone-100">{data.kpis.average_wait_time} <span className="text-sm font-medium text-stone-500">mins</span></p>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-stone-800 dark:text-stone-100 mb-6">Appointment Trend</h3>
-            <div className="h-72 w-full">
-              {data.chart_data.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={data.chart_data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                    <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} dy={10} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} />
-                    <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} labelFormatter={(l) => `Date: ${l}`} />
-                    <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
-                    <Bar dataKey="booked" name="Booked" fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarSize={30} />
-                    <Bar dataKey="attended" name="Attended" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={30} />
-                    <Bar dataKey="missed" name="Missed" fill="#f43f5e" radius={[4, 4, 0, 0]} maxBarSize={30} />
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="flex h-full items-center justify-center text-stone-400 text-sm">No data available for selected period.</div>
-              )}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
+              <h3 className="text-lg font-bold text-stone-800 dark:text-stone-100 mb-6">Appointment Trend</h3>
+              <div className="h-72 w-full">
+                {data.chart_data.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={data.chart_data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                      <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} dy={10} />
+                      <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} />
+                      <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} labelFormatter={(l) => `Date: ${l}`} />
+                      <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
+                      <Bar dataKey="booked" name="Booked" fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarSize={30} />
+                      <Bar dataKey="attended" name="Attended" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={30} />
+                      <Bar dataKey="missed" name="Missed" fill="#f43f5e" radius={[4, 4, 0, 0]} maxBarSize={30} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex h-full items-center justify-center text-stone-400 text-sm">No data available for selected period.</div>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
+              <h3 className="text-lg font-bold text-stone-800 dark:text-stone-100 mb-6">Booking Channels</h3>
+              <div className="h-64 w-full">
+                {data.channel_split && data.channel_split.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={data.channel_split}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="count"
+                        nameKey="channel"
+                      >
+                        {data.channel_split.map((_, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex h-full items-center justify-center text-stone-400 text-sm">No data available.</div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
+              <h3 className="text-lg font-bold text-stone-800 dark:text-stone-100 mb-6">Peak Hours (Booked Slots)</h3>
+              <div className="h-64 w-full">
+                {data.peak_hours && data.peak_hours.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={data.peak_hours} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                      <XAxis dataKey="hour" axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} dy={10} />
+                      <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} />
+                      <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} />
+                      <Line type="monotone" dataKey="count" name="Appointments" stroke="#8b5cf6" strokeWidth={3} dot={{ r: 4, fill: '#8b5cf6', strokeWidth: 0 }} activeDot={{ r: 6 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex h-full items-center justify-center text-stone-400 text-sm">No data available.</div>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+              <div className="px-6 py-4 border-b border-stone-100 dark:border-stone-800">
+                <h3 className="text-lg font-bold text-stone-800 dark:text-stone-100">Doctor Utilization</h3>
+              </div>
+              <div className="overflow-y-auto flex-1 max-h-64">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-stone-50 dark:bg-stone-950 text-stone-500 font-medium sticky top-0">
+                    <tr>
+                      <th className="px-6 py-3 whitespace-nowrap">Doctor</th>
+                      <th className="px-6 py-3 text-right whitespace-nowrap">Appointments</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-stone-100 dark:divide-stone-800 text-stone-700 dark:text-stone-300">
+                    {data.doctor_utilization && data.doctor_utilization.length === 0 ? (
+                      <tr><td colSpan={2} className="px-6 py-8 text-center text-stone-400">No utilization data available.</td></tr>
+                    ) : (
+                      data.doctor_utilization?.map((row) => (
+                        <tr key={row.doctor} className="hover:bg-stone-50/50 dark:hover:bg-stone-900/50 transition-colors">
+                          <td className="px-6 py-3 font-medium">{row.doctor}</td>
+                          <td className="px-6 py-3 text-right tabular-nums font-bold text-stone-900 dark:text-stone-100">{row.appointments}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 

@@ -64,7 +64,7 @@ final class UsersController extends Controller
             'name'        => ['required', 'string', 'max:255'],
             'email'       => ['required', 'email', 'unique:users,email'],
             'phone'       => ['nullable', 'string', 'max:32'],
-            'password'    => ['required', 'string', 'min:'.config('auth.password.min_length', 10)],
+            'password'    => ['required', 'string', 'min:'.config('auth.password.min_length', 5)],
             'roles'       => ['required', 'array'],
             'roles.*'     => ['string', Rule::in(array_keys(\App\Modules\Admin\Rbac::ROLES))],
             'home_branch_id' => ['nullable', 'integer', 'exists:branches,id'],

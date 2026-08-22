@@ -134,6 +134,8 @@ export function ForgotPasswordPage(): JSX.Element {
                 required
                 className="input w-full text-center tracking-widest"
                 placeholder="000000"
+                inputMode="numeric"
+                maxLength={6}
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
               />
@@ -156,6 +158,7 @@ export function ForgotPasswordPage(): JSX.Element {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="new-password"
                   required
+                  minLength={5}
                   className="input w-full pr-10"
                   placeholder="••••••••"
                   value={password}
@@ -173,6 +176,7 @@ export function ForgotPasswordPage(): JSX.Element {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="new-password"
                   required
+                  minLength={5}
                   className="input w-full pr-10"
                   placeholder="••••••••"
                   value={passwordConfirmation}

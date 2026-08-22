@@ -14,26 +14,26 @@ class AppointmentPolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('view_appointments');
+        return $user->hasPermissionTo('appointments.list');
     }
 
     public function view(User $user, Appointment $appointment): bool
     {
-        return $user->hasPermissionTo('view_appointments');
+        return $user->hasPermissionTo('appointments.read');
     }
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create_appointments');
+        return $user->hasPermissionTo('appointments.create');
     }
 
     public function update(User $user, Appointment $appointment): bool
     {
-        return $user->hasPermissionTo('edit_appointments');
+        return $user->hasPermissionTo('appointments.update');
     }
 
     public function delete(User $user, Appointment $appointment): bool
     {
-        return $user->hasPermissionTo('delete_appointments');
+        return $user->hasPermissionTo('appointments.delete');
     }
 }

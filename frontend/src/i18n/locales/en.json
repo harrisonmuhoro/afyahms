@@ -105,7 +105,8 @@
     "inventory": "Inventory",
     "reports": "Reports",
     "settings": "Settings",
-    "audit": "Audit log"
+    "audit": "Audit log",
+    "messages": "Messages"
   },
   "triage": {
     "title": "Triage assessment",

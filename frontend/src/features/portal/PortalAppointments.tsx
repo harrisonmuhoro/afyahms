@@ -1,20 +1,19 @@
 import { useState } from 'react';
 import { Icon } from '@/components/icons/Icon';
 import { PortalModal, ConfirmDialog, ToastBanner } from './PortalModal';
-import { usePortalPatient } from './api';
 import {
-  useAppointments,
-  useBookAppointment,
-  useCancelAppointment,
-  useSchedules,
-} from '../appointments/api';
+  usePortalAppointments,
+  usePortalBookAppointment,
+  usePortalCancelAppointment,
+  usePortalPatient,
+  usePortalSchedules,
+} from './api';
 import { SlotPicker } from '../appointments/components/SlotPicker';
 import { AppointmentStatusBadge } from '../appointments/components/AppointmentStatusBadge';
-import type { Appointment, DoctorSchedule } from '../appointments/types';
+import type { DoctorSchedule } from '../appointments/types';
 
 export function PortalAppointments(): JSX.Element {
-  const { patient } = usePortalPatient();
-  const patientId = patient?.id;
+  const { patient, isLoading: isLoadingPatient, error: patientError } = usePortalPatient();
   
   // Local state
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
@@ -28,14 +27,14 @@ export function PortalAppointments(): JSX.Element {
   const [bookSlot, setBookSlot] = useState<{ start: string; end: string } | null>(null);
 
   // API Hooks
-  const { data: appointmentsData, isLoading: isLoadingApts } = useAppointments();
-  const { data: schedulesData } = useSchedules();
+  const { data: appointmentsResponse, isLoading: isLoadingApts } = usePortalAppointments();
+  const { data: schedulesData } = usePortalSchedules();
   
-  const bookMutation = useBookAppointment();
-  const cancelMutation = useCancelAppointment();
+  const bookMutation = usePortalBookAppointment();
+  const cancelMutation = usePortalCancelAppointment();
 
   // Data processing
-  const appointments: Appointment[] = (appointmentsData as any)?.data ?? [];
+  const appointments: any[] = appointmentsResponse?.data ?? [];
   const schedules: DoctorSchedule[] = (schedulesData as any)?.data ?? [];
 
   const upcoming = appointments.filter((a) => ['scheduled', 'confirmed'].includes(a.status));
@@ -43,6 +42,7 @@ export function PortalAppointments(): JSX.Element {
   const displayed = activeTab === 'upcoming' ? upcoming : past;
 
   const selectedSchedule = schedules.find(s => s.id === selectedScheduleId);
+  const canBook = patient !== null && !isLoadingPatient;
 
   const showToast = (msg: string, type: 'success' | 'info' | 'error' = 'success'): void => {
     setToast({ msg, type });
@@ -59,19 +59,17 @@ export function PortalAppointments(): JSX.Element {
   };
 
   const handleBook = async (): Promise<void> => {
-    if (!selectedSchedule || !bookDate || !bookSlot || !patientId) return;
+    if (!selectedSchedule || !bookDate || !bookSlot || !patient) return;
     
     try {
       await bookMutation.mutateAsync({
-        patient_id: String(patientId),
         doctor_id: selectedSchedule.doctor_id,
         branch_id: selectedSchedule.branch_id,
         schedule_id: selectedSchedule.id,
-        type: 'general_consultation', // default for portal
+        type: 'new_patient',
         appointment_date: bookDate,
         start_time: bookSlot.start,
         end_time: bookSlot.end,
-        booked_via: 'patient_portal',
       });
       
       setBookingOpen(false);
@@ -98,13 +96,20 @@ export function PortalAppointments(): JSX.Element {
         </div>
         <button
           type="button"
-          onClick={() => setBookingOpen(true)}
-          className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-teal-600 px-5 py-3 font-bold text-white transition-colors hover:bg-teal-700"
+          onClick={() => canBook && setBookingOpen(true)}
+          disabled={!canBook}
+          className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-teal-600 px-5 py-3 font-bold text-white transition-colors hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Icon name="plus" size={18} />
           Book Appointment
         </button>
       </div>
+
+      {patientError && (
+        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/30 dark:text-red-200">
+          Your account is not linked to a patient record. Please contact the hospital reception before booking an appointment.
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex gap-1 rounded-xl bg-stone-100 p-1 dark:bg-stone-900">
@@ -128,7 +133,7 @@ export function PortalAppointments(): JSX.Element {
             <Icon name="calendar" size={40} className="mb-3 opacity-40" />
             <p className="text-sm">No {activeTab} appointments.</p>
             {activeTab === 'upcoming' && (
-              <button type="button" onClick={() => setBookingOpen(true)} className="mt-3 text-sm font-semibold text-teal-600 hover:underline dark:text-teal-400">
+              <button type="button" disabled={!canBook} onClick={() => canBook && setBookingOpen(true)} className="mt-3 text-sm font-semibold text-teal-600 hover:underline disabled:cursor-not-allowed disabled:opacity-50 dark:text-teal-400">
                 Book one now →
               </button>
             )}
@@ -227,7 +232,9 @@ export function PortalAppointments(): JSX.Element {
                 <SlotPicker 
                   doctorId={selectedSchedule.doctor_id} 
                   branchId={selectedSchedule.branch_id} 
+                  scheduleId={selectedSchedule.id}
                   date={bookDate} 
+                  slotsEndpoint="/portal/appointments/slots"
                   selectedStartTime={bookSlot?.start}
                   onSelectSlot={(start, end) => setBookSlot({ start, end })}
                 />

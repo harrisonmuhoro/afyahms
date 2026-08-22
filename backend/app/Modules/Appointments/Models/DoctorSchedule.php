@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Appointments\Models;
 
-use App\Models\Branch;
+use App\Modules\Tenancy\Models\Branch;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

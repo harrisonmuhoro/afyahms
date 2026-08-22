@@ -44,18 +44,20 @@ function roleLabel(role: string): string {
 /* ── Create Staff Modal ─────────────────────────────────────────────────────── */
 interface CreateStaffModalProps {
   branches: Branch[];
+  activeBranchId: number | null;
+  isSuperadmin: boolean;
   onClose: () => void;
   onCreated: (user: AuthUser) => void;
 }
 
-function CreateStaffModal({ branches, onClose, onCreated }: CreateStaffModalProps): JSX.Element {
+function CreateStaffModal({ branches, activeBranchId, isSuperadmin, onClose, onCreated }: CreateStaffModalProps): JSX.Element {
   const createStaff = useCreateStaff();
   const [form, setForm] = useState({
     name: '',
     email: '',
     phone: '',
     role: 'doctor',
-    home_branch_id: branches[0]?.id ?? 0,
+    home_branch_id: activeBranchId ?? branches[0]?.id ?? 0,
   });
 
   const handleSubmit = async (e: FormEvent) => {
@@ -110,11 +112,12 @@ function CreateStaffModal({ branches, onClose, onCreated }: CreateStaffModalProp
             </label>
             <label className="col-span-full block">
               <span className="label">Home Branch <span className="text-red-500">*</span></span>
-              <select className="input" value={form.home_branch_id} onChange={(e) => setForm({ ...form, home_branch_id: Number(e.target.value) })}>
-                {branches.map((b) => (
+              <select className="input" value={form.home_branch_id} disabled={!isSuperadmin} onChange={(e) => setForm({ ...form, home_branch_id: Number(e.target.value) })}>
+                {branches.filter((b) => isSuperadmin || b.id === activeBranchId).map((b) => (
                   <option key={b.id} value={b.id}>{b.name}</option>
                 ))}
               </select>
+              {!isSuperadmin && <span className="mt-1 block text-xs text-stone-500">Staff accounts must be created in your active branch.</span>}
             </label>
           </div>
 
@@ -375,6 +378,7 @@ export function AdminStaffPage(): JSX.Element {
   const { branches } = useBranches();
   const { user } = useAuth();
   const isSuperadmin = user?.roles.includes('superadmin') ?? false;
+  const activeBranchId = user?.current_branch?.id ?? user?.home_branch?.id ?? null;
   const [selected, setSelected] = useState<AuthUser | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCreateAdminModal, setShowCreateAdminModal] = useState(false);
@@ -487,6 +491,8 @@ export function AdminStaffPage(): JSX.Element {
       {showCreateModal && branches.length > 0 && (
         <CreateStaffModal
           branches={branches}
+          activeBranchId={activeBranchId}
+          isSuperadmin={isSuperadmin}
           onClose={() => setShowCreateModal(false)}
           onCreated={(user) => setSelected(user)}
         />
@@ -657,14 +663,16 @@ export function AdminStaffPage(): JSX.Element {
                     <Icon name="mail" size={16} />
                     {passwordReset.isPending ? 'Sending...' : 'Send password reset'}
                   </button>
-                  <textarea className="input min-h-24" value={statusReason} onChange={(e) => setStatusReason(e.target.value)} placeholder="Reason for activation/deactivation" />
-                  <div className="flex flex-wrap gap-3">
-                    <button type="button" className="btn-danger" onClick={() => void handleActiveState(false)} disabled={activeState.isPending || !selected.is_active}>
-                      Deactivate
-                    </button>
-                    <button type="button" className="btn-secondary" onClick={() => void handleActiveState(true)} disabled={activeState.isPending || selected.is_active}>
-                      Reactivate
-                    </button>
+                  <div className="flex flex-col gap-2">
+                    <textarea className="input min-h-24" value={statusReason} onChange={(e) => setStatusReason(e.target.value)} placeholder="Reason for activation/deactivation (required, min 5 chars)" />
+                    <div className="flex flex-wrap gap-3">
+                      <button type="button" className="btn-danger" onClick={() => void handleActiveState(false)} disabled={activeState.isPending || !selected.is_active || statusReason.trim().length < 5}>
+                        Deactivate
+                      </button>
+                      <button type="button" className="btn-secondary" onClick={() => void handleActiveState(true)} disabled={activeState.isPending || selected.is_active || statusReason.trim().length < 5}>
+                        Reactivate
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

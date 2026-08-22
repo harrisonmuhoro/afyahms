@@ -32,7 +32,10 @@ class AppointmentObserver
     {
         // Check if status changed
         if ($appointment->isDirty('status')) {
-            $oldStatus = AppointmentStatus::tryFrom($appointment->getOriginal('status'));
+            $originalStatus = $appointment->getOriginal('status');
+            $oldStatus = $originalStatus instanceof AppointmentStatus
+                ? $originalStatus
+                : AppointmentStatus::tryFrom((string) $originalStatus);
             $newStatus = $appointment->status;
 
             if ($newStatus === AppointmentStatus::Cancelled && $oldStatus !== AppointmentStatus::Cancelled) {

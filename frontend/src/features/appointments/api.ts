@@ -1,85 +1,34 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { httpClient } from '@/lib/http';
-import type { Appointment, AvailableSlot, DoctorSchedule, BookAppointmentPayload } from './types';
+import type { DoctorSchedule } from './types';
 
-// API Functions — httpClient.get<T>() returns T directly (not a wrapper)
-const fetchAppointments = async (params?: Record<string, string>) => {
-  return httpClient.get<{ data: Appointment[]; meta?: unknown }>('/v1/appointments', { params });
-};
 
-const fetchSlots = async (params: { doctor_id: string; branch_id: string; date: string }) => {
-  const res = await httpClient.get<{ data: AvailableSlot[] }>('/v1/appointments/slots', { params });
-  return res.data;
-};
 
 const fetchSchedules = async (params?: Record<string, string>) => {
-  const res = await httpClient.get<{ data: DoctorSchedule[] }>('/v1/appointments/schedules', { params });
+  const res = await httpClient.get<{ data: DoctorSchedule[] }>('/appointments/schedules', { params });
   return res.data;
 };
 
-const bookAppointment = async (payload: BookAppointmentPayload) => {
-  const res = await httpClient.post<{ appointment: Appointment }>('/v1/appointments', payload);
-  return res.appointment;
-};
 
-const cancelAppointment = async ({ id, reason }: { id: string; reason?: string }) => {
-  return httpClient.post<{ message: string }>(`/v1/appointments/${id}/cancel`, { reason });
-};
 
-const confirmAppointment = async (id: string) => {
-  return httpClient.post<{ message: string }>(`/v1/appointments/${id}/confirm`);
-};
+export async function confirmAppointment(id: number): Promise<{ message: string }> {
+  return httpClient.post<{ message: string }>(`/appointments/${id}/confirm`);
+}
 
-const checkInPatient = async (id: string) => {
-  return httpClient.post<{ message: string }>(`/v1/appointments/${id}/check-in`);
-};
+export async function checkInAppointment(id: number): Promise<{ message: string }> {
+  return httpClient.post<{ message: string }>(`/appointments/${id}/check-in`);
+}
+
+export async function submitClinicalVitals(appointmentId: number, data: unknown): Promise<{ message: string }> {
+  return httpClient.post<{ message: string }>(`/appointments/${appointmentId}/vitals`, data);
+}
 
 // ── React Query Hooks ─────────────────────────────────────────────────────────
-
-export function useAppointments(params?: Record<string, string>) {
-  return useQuery({
-    queryKey: ['appointments', params],
-    queryFn: () => fetchAppointments(params),
-  });
-}
-
-export function useAvailableSlots(
-  params: { doctor_id: string; branch_id: string; date: string },
-  enabled = true,
-) {
-  return useQuery({
-    queryKey: ['slots', params],
-    queryFn: () => fetchSlots(params),
-    enabled: enabled && !!params.doctor_id && !!params.branch_id && !!params.date,
-  });
-}
 
 export function useSchedules(params?: Record<string, string>) {
   return useQuery({
     queryKey: ['schedules', params],
     queryFn: () => fetchSchedules(params),
-  });
-}
-
-export function useBookAppointment() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: bookAppointment,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
-      queryClient.invalidateQueries({ queryKey: ['slots'] });
-    },
-  });
-}
-
-export function useCancelAppointment() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: cancelAppointment,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
-      queryClient.invalidateQueries({ queryKey: ['slots'] });
-    },
   });
 }
 
@@ -94,7 +43,49 @@ export function useConfirmAppointment() {
 export function useCheckInPatient() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: checkInPatient,
+    mutationFn: checkInAppointment,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['appointments'] }),
+  });
+}
+
+// ── Schedule Management ───────────────────────────────────────────────────────
+
+export interface SaveSchedulePayload {
+  doctor_id: number;
+  branch_id: number;
+  name: string;
+  slot_duration: number;
+  max_concurrent: number;
+  valid_from: string;
+  valid_until: string | null;
+  is_active: boolean;
+  time_blocks: {
+    day_of_week: number;
+    start_time: string;
+    end_time: string;
+  }[];
+}
+
+export async function createSchedule(data: SaveSchedulePayload): Promise<{ message: string; schedule: DoctorSchedule }> {
+  return httpClient.post<{ message: string, schedule: DoctorSchedule }>('/appointments/schedules', data);
+}
+
+export async function updateSchedule(id: number, data: SaveSchedulePayload): Promise<{ message: string; schedule: DoctorSchedule }> {
+  return httpClient.put<{ message: string, schedule: DoctorSchedule }>(`/appointments/schedules/${id}`, data);
+}
+
+export function useCreateSchedule() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createSchedule,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['schedules'] }),
+  });
+}
+
+export function useUpdateSchedule() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: SaveSchedulePayload }) => updateSchedule(id, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['schedules'] }),
   });
 }

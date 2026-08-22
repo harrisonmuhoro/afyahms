@@ -6,8 +6,8 @@ namespace App\Modules\Appointments\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\UserResource;
-use App\Http\Resources\BranchResource;
+use App\Resources\UserResource;
+use App\Modules\Tenancy\Resources\BranchResource;
 
 class DoctorScheduleResource extends JsonResource
 {
@@ -16,6 +16,8 @@ class DoctorScheduleResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'doctor_id' => $this->doctor_id,
+            'branch_id' => $this->branch_id,
             'slot_duration' => $this->slot_duration,
             'max_concurrent' => $this->max_concurrent,
             'valid_from' => $this->valid_from?->format('Y-m-d'),

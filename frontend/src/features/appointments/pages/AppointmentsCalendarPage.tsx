@@ -1,23 +1,13 @@
-import { useState } from 'react';
-import { format, addDays } from 'date-fns';
+import { format } from 'date-fns';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAppointments } from '../api';
+import { useAppointments } from '../hooks/useAppointments';
 import { AppointmentStatusBadge } from '../components/AppointmentStatusBadge';
-import type { Appointment } from '../types';
+
 
 export function AppointmentsCalendarPage(): JSX.Element {
-  const [currentDate, setCurrentDate] = useState(new Date());
   const navigate = useNavigate();
-  const dateStr = format(currentDate, 'yyyy-MM-dd');
-
-  const { data, isLoading } = useAppointments({ date: dateStr });
-  const appointments: Appointment[] = (data as any)?.data ?? [];
-
-  const handlePrevDay = () => setCurrentDate((prev) => addDays(prev, -1));
-  const handleNextDay = () => setCurrentDate((prev) => addDays(prev, 1));
-  const handleToday = () => setCurrentDate(new Date());
-
-  const isToday = dateStr === format(new Date(), 'yyyy-MM-dd');
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const { appointments, isLoading } = useAppointments({ from: today, per_page: 100 });
 
   return (
     <div className="space-y-6">
@@ -43,51 +33,11 @@ export function AppointmentsCalendarPage(): JSX.Element {
         </div>
       </div>
 
-      {/* Date Navigator */}
-      <div className="card p-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-primary">calendar_month</span>
-            <div>
-              <p className="text-base font-semibold text-on-surface">
-                {format(currentDate, 'EEEE, MMMM d, yyyy')}
-              </p>
-              {!isToday && (
-                <p className="text-xs text-on-surface-variant">
-                  {appointments.length} appointment{appointments.length !== 1 ? 's' : ''} scheduled
-                </p>
-              )}
-              {isToday && (
-                <p className="text-xs text-primary font-medium">Today</p>
-              )}
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handlePrevDay}
-              className="rounded-lg border border-outline-variant p-2 text-on-surface-variant hover:bg-surface-container transition-colors"
-              aria-label="Previous day"
-            >
-              <span className="material-symbols-outlined text-[18px]">chevron_left</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleToday}
-              disabled={isToday}
-              className="rounded-lg border border-outline-variant px-3 py-2 text-xs font-medium text-on-surface-variant hover:bg-surface-container transition-colors disabled:opacity-40"
-            >
-              Today
-            </button>
-            <button
-              type="button"
-              onClick={handleNextDay}
-              className="rounded-lg border border-outline-variant p-2 text-on-surface-variant hover:bg-surface-container transition-colors"
-              aria-label="Next day"
-            >
-              <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-            </button>
-          </div>
+      <div className="card flex items-center gap-3 p-4">
+        <span className="material-symbols-outlined text-primary">calendar_month</span>
+        <div>
+          <p className="text-base font-semibold text-on-surface">Upcoming appointments</p>
+          <p className="text-xs text-on-surface-variant">Showing appointments from today onward, in date and time order.</p>
         </div>
       </div>
 
@@ -115,11 +65,24 @@ export function AppointmentsCalendarPage(): JSX.Element {
 
         {!isLoading && appointments.length > 0 && (
           <div className="divide-y divide-outline-variant/30">
-            {appointments.map((apt) => (
+            {appointments.map((apt) => {
+              const appointmentDate = new Date(`${apt.appointment_date}T00:00:00`);
+              const isToday = apt.appointment_date === today;
+
+              return (
               <div
                 key={apt.id}
                 className="flex items-center justify-between gap-4 p-4 hover:bg-surface-container/50 transition-colors"
               >
+                <div className={`flex h-16 w-14 shrink-0 flex-col items-center justify-center rounded-xl border ${
+                  isToday
+                    ? 'border-teal-200 bg-teal-50 text-teal-700 dark:border-teal-800 dark:bg-teal-950/40 dark:text-teal-300'
+                    : 'border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-900 dark:bg-indigo-950/40 dark:text-indigo-300'
+                }`}>
+                  <span className="text-[10px] font-bold uppercase tracking-wide">{format(appointmentDate, 'EEE')}</span>
+                  <span className="text-2xl font-black leading-tight">{format(appointmentDate, 'd')}</span>
+                  <span className="text-[10px] font-semibold uppercase">{format(appointmentDate, 'MMM')}</span>
+                </div>
                 <div className="flex min-w-0 flex-col gap-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-mono text-sm font-semibold text-on-surface">
@@ -133,9 +96,10 @@ export function AppointmentsCalendarPage(): JSX.Element {
                     )}
                   </div>
                   <p className="text-sm font-medium text-on-surface truncate">
-                    {(apt as any).patient?.name ?? 'Unknown Patient'}
+                    {(apt as any).patient?.full_name ?? (apt as any).patient?.name ?? 'Unknown Patient'}
                   </p>
-                  <p className="text-xs text-on-surface-variant capitalize">
+                  <p className="text-xs text-on-surface-variant">
+                    {format(new Date(`${apt.appointment_date}T00:00:00`), 'EEE, MMM d')} ·{' '}
                     {apt.type?.replace(/_/g, ' ')}
                     {(apt as any).doctor?.name && (
                       <> &middot; Dr. {(apt as any).doctor.name}</>
@@ -150,7 +114,8 @@ export function AppointmentsCalendarPage(): JSX.Element {
                   Details
                 </button>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

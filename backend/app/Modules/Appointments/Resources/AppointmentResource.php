@@ -6,9 +6,9 @@ namespace App\Modules\Appointments\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\UserResource;
-use App\Http\Resources\PatientResource;
-use App\Http\Resources\BranchResource;
+use App\Resources\UserResource;
+use App\Modules\Patients\Resources\PatientResource;
+use App\Modules\Tenancy\Resources\BranchResource;
 
 class AppointmentResource extends JsonResource
 {
@@ -16,6 +16,7 @@ class AppointmentResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'patient_id' => $this->patient?->public_id,
             'appointment_number' => $this->appointment_number,
             'type' => $this->type,
             'status' => $this->status,

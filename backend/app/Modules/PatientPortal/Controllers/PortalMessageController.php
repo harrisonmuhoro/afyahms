@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Modules\PatientPortal\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Modules\Appointments\Models\Appointment;
 use App\Modules\Messages\Models\Conversation;
 use App\Modules\Messages\Services\MessageService;
 use Illuminate\Http\JsonResponse;
@@ -25,7 +27,7 @@ class PortalMessageController extends Controller
         $user = Auth::user();
 
         $conversations = $user->conversations()
-            ->with(['users' => fn ($q) => $q->select('users.id', 'first_name', 'last_name', 'role')])
+            ->with(['users' => fn ($q) => $q->select('users.id', 'name')])
             ->withCount(['messages as unread_count' => function ($query) use ($user) {
                 $query->whereColumn('messages.created_at', '>', 'conversation_user.last_read_at')
                       ->whereColumn('messages.sender_id', '!=', \Illuminate\Support\Facades\DB::raw($user->id));
@@ -50,14 +52,36 @@ class PortalMessageController extends Controller
         $this->messageService->markAsRead($conversation);
 
         $messages = $conversation->messages()
-            ->with('sender:id,first_name,last_name')
+            ->with('sender:id,name')
             ->oldest()
             ->get();
 
         return response()->json([
-            'conversation' => $conversation->load('users:id,first_name,last_name'),
+            'conversation' => $conversation->load('users:id,name'),
             'messages'     => $messages,
         ]);
+    }
+
+    public function recipients(): JsonResponse
+    {
+        $patientId = Auth::user()?->patient?->id;
+        abort_unless($patientId !== null, 403, 'No patient record is linked to this account.');
+
+        $doctorIds = Appointment::where('patient_id', $patientId)
+            ->whereNotNull('doctor_id')->distinct()->pluck('doctor_id');
+        $doctors = User::whereIn('id', $doctorIds)->where('is_active', true)
+            ->whereHas('roles', fn ($q) => $q->where('name', 'doctor'))
+            ->get(['id', 'name', 'email'])->map(fn (User $user) => [
+                'id' => $user->id, 'name' => $user->name, 'email' => $user->email, 'role' => 'Doctor',
+            ]);
+        $support = User::where('is_active', true)
+            ->whereHas('roles', fn ($q) => $q->whereIn('name', ['receptionist', 'hospital-admin']))
+            ->get(['id', 'name', 'email'])->map(fn (User $user) => [
+                'id' => $user->id, 'name' => $user->name, 'email' => $user->email,
+                'role' => $user->getRoleNames()->first() ?? 'Hospital Support',
+            ]);
+
+        return response()->json(['data' => $doctors->concat($support)->unique('id')->values()]);
     }
 
     /**
@@ -69,7 +93,7 @@ class PortalMessageController extends Controller
         $data = $request->validate([
             'subject'         => ['nullable', 'string', 'max:200'],
             'body'            => ['required', 'string', 'max:5000'],
-            'conversation_id' => ['nullable', 'string', 'exists:conversations,id'],
+            'conversation_id' => ['nullable', 'string'],
             'recipient_ids'   => ['nullable', 'array'],
             'recipient_ids.*' => ['integer', 'exists:users,id'],
         ]);
@@ -79,11 +103,25 @@ class PortalMessageController extends Controller
             $data['recipient_ids'] = [1]; // Hospital support user
         }
 
+        if (! empty($data['conversation_id'])) {
+            $conversation = Conversation::where('public_id', $data['conversation_id'])->first();
+            if (! $conversation && ctype_digit((string) $data['conversation_id'])) {
+                $conversation = Conversation::find((int) $data['conversation_id']);
+            }
+
+            if (! $conversation || ! $conversation->users()->whereKey(Auth::id())->exists()) {
+                return response()->json(['message' => 'This conversation is not available.'], 422);
+            }
+
+            // MessageService uses the database primary key internally.
+            $data['conversation_id'] = (string) $conversation->getKey();
+        }
+
         $message = $this->messageService->sendMessage($data);
 
         return response()->json([
             'message' => 'Message sent.',
-            'data'    => $message->load('sender:id,first_name,last_name', 'conversation'),
+            'data'    => $message->load('sender:id,name', 'conversation'),
         ], 201);
     }
 }

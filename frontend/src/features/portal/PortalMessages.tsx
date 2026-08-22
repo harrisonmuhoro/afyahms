@@ -4,6 +4,7 @@ import { ToastBanner } from './PortalModal';
 import {
   usePortalConversations,
   usePortalConversation,
+  usePortalMessageRecipients,
   useSendPortalMessage,
   type PortalConversation,
 } from './api';
@@ -23,11 +24,14 @@ export function PortalMessages(): JSX.Element {
   const [showNewForm, setShowNewForm] = useState(false);
   const [newSubject, setNewSubject]  = useState('');
   const [newBody, setNewBody]       = useState('');
+  const [recipientId, setRecipientId] = useState('');
   const [toast, setToast]           = useState<string | null>(null);
 
   const { data: convoData, isLoading } = usePortalConversations();
   const { data: threadData }           = usePortalConversation(selectedId);
   const sendMutation                   = useSendPortalMessage();
+  const { data: recipientData, isLoading: recipientsLoading } = usePortalMessageRecipients();
+  const recipients = (recipientData as any)?.data ?? [];
 
   const conversations: PortalConversation[] = (convoData as any)?.data ?? [];
   const messages      = threadData?.messages ?? [];
@@ -41,20 +45,24 @@ export function PortalMessages(): JSX.Element {
   const handleSendReply = async (): Promise<void> => {
     if (!replyText.trim() || !selectedId) return;
     try {
-      await sendMutation.mutateAsync({ body: replyText.trim(), conversation_id: selectedId });
+      await sendMutation.mutateAsync({
+        body: replyText.trim(),
+        conversation_id: String((conversation as any)?.id ?? selectedId),
+      });
       setReplyText('');
-    } catch {
-      showToast('Failed to send message. Please try again.');
+    } catch (error: any) {
+      showToast(error?.message ?? 'Failed to send message. Please try again.');
     }
   };
 
   const handleSendNew = async (): Promise<void> => {
-    if (!newBody.trim()) return;
+    if (!newBody.trim() || !recipientId) return;
     try {
-      const res = await sendMutation.mutateAsync({ subject: newSubject, body: newBody.trim() });
+      const res = await sendMutation.mutateAsync({ subject: newSubject, body: newBody.trim(), recipient_ids: [Number(recipientId)] });
       setShowNewForm(false);
       setNewSubject('');
       setNewBody('');
+      setRecipientId('');
       setSelectedId((res as any).data?.conversation_id ?? null);
       showToast('Message sent successfully.');
     } catch {
@@ -102,6 +110,19 @@ export function PortalMessages(): JSX.Element {
           </div>
           <div className="space-y-3">
             <div>
+              <label className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">Send to</label>
+              <select value={recipientId} onChange={(e) => setRecipientId(e.target.value)}
+                className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-100">
+                <option value="">{recipientsLoading ? 'Loading care team…' : '-- Choose a doctor or staff member --'}</option>
+                {recipients.map((recipient: any) => (
+                  <option key={recipient.id} value={recipient.id}>
+                    {recipient.role}: {recipient.name} ({recipient.email})
+                  </option>
+                ))}
+              </select>
+              {!recipientsLoading && recipients.length === 0 && <p className="mt-1 text-xs text-amber-600">No care team recipients are available yet.</p>}
+            </div>
+            <div>
               <label className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">Subject (optional)</label>
               <input type="text" value={newSubject} onChange={(e) => setNewSubject(e.target.value)}
                 placeholder="e.g. Question about my medication"
@@ -116,7 +137,7 @@ export function PortalMessages(): JSX.Element {
           </div>
           <div className="mt-4 flex justify-end gap-2">
             <button type="button" onClick={() => setShowNewForm(false)} className="rounded-lg border border-stone-200 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 dark:border-stone-700 dark:text-stone-300">Cancel</button>
-            <button type="button" onClick={handleSendNew} disabled={!newBody.trim() || sendMutation.isPending}
+            <button type="button" onClick={handleSendNew} disabled={!newBody.trim() || !recipientId || sendMutation.isPending}
               className="flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-bold text-white hover:bg-teal-700 disabled:opacity-50">
               {sendMutation.isPending ? 'Sending…' : <><Icon name="message" size={15} />Send Message</>}
             </button>
@@ -140,7 +161,7 @@ export function PortalMessages(): JSX.Element {
           {conversations.map((conv) => {
             const otherUsers = conv.users.filter((u: any) => u.id !== undefined);
             const fromName = otherUsers.length > 0
-              ? otherUsers.map((u: any) => `${u.first_name} ${u.last_name}`).join(', ')
+              ? otherUsers.map((u: any) => u.name ?? `${u.first_name ?? ''} ${u.last_name ?? ''}`.trim()).join(', ')
               : 'Hospital Team';
             return (
               <button key={conv.id} type="button" onClick={() => setSelectedId(conv.id)}
@@ -173,7 +194,7 @@ export function PortalMessages(): JSX.Element {
                     <div key={msg.id} className={`flex ${msg.sender?.id ? 'justify-start' : 'justify-end'}`}>
                       <div className={`max-w-[85%] rounded-2xl px-4 py-3 ${msg.sender?.id ? 'rounded-bl-sm bg-stone-100 text-stone-900 dark:bg-stone-800 dark:text-stone-100' : 'rounded-br-sm bg-teal-600 text-white'}`}>
                         <p className="text-xs font-semibold mb-1 opacity-70">
-                          {msg.sender ? `${msg.sender.first_name} ${msg.sender.last_name}` : 'You'}
+                          {msg.sender ? msg.sender.name : 'You'}
                         </p>
                         <p className="whitespace-pre-line text-sm leading-relaxed">{msg.body}</p>
                         <p className="mt-1.5 text-right text-xs opacity-60">{formatDate(msg.created_at)}</p>

@@ -17,7 +17,7 @@ class SlotGeneratorService
      *
      * @return array<int, array{start_time: string, end_time: string, status: string}>
      */
-    public function getAvailableSlots(int $doctorId, Carbon $date, int $branchId): array
+    public function getAvailableSlots(int $doctorId, Carbon $date, int $branchId, ?string $scheduleId = null): array
     {
         // 1. Fetch active schedule
         $schedule = DoctorSchedule::with(['timeBlocks', 'overrides' => function ($q) use ($date) {
@@ -25,6 +25,7 @@ class SlotGeneratorService
         }])
         ->where('doctor_id', $doctorId)
         ->where('branch_id', $branchId)
+        ->when($scheduleId !== null, fn ($query) => $query->whereKey($scheduleId))
         ->where('is_active', true)
         ->where('valid_from', '<=', $date->toDateString())
         ->where(function ($q) use ($date) {

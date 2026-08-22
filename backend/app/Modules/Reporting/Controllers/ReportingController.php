@@ -831,11 +831,11 @@ final class ReportingController extends Controller
         $from = $request->query('from');
         $to = $request->query('to');
 
-        // Use visits with visit_type = appointment to derive appointment data
-        $query = \App\Modules\Queue\Models\Visit::where('visit_type', 'appointment');
+        // Use new Appointment model
+        $query = \App\Modules\Appointments\Models\Appointment::with(['doctor', 'branch']);
 
-        if ($from) $query->whereDate('visit_date', '>=', $from);
-        if ($to) $query->whereDate('visit_date', '<=', $to);
+        if ($from) $query->whereDate('appointment_date', '>=', $from);
+        if ($to) $query->whereDate('appointment_date', '<=', $to);
 
         $user = $request->user();
         if ($request->has('branch_id') && $user !== null && method_exists($user, 'hasRole') && $user->hasRole('superadmin')) {
@@ -843,28 +843,37 @@ final class ReportingController extends Controller
             if ($branchId && $branchId !== 'all') $query->where('branch_id', $branchId);
         }
 
-        $visits = $query->get();
-        $totalBooked = $visits->count();
-        $attended = $visits->whereIn('status', ['completed', 'in_progress'])->count();
-        $missed = $visits->where('status', 'cancelled')->count();
+        $appointments = $query->get();
+        $totalBooked = $appointments->count();
+        $attended = $appointments->filter(fn($a) => in_array($a->status->value ?? $a->status, ['completed', 'checked_in']))->count();
+        $missed = $appointments->filter(fn($a) => ($a->status->value ?? $a->status) === 'no_show')->count();
+        $cancelled = $appointments->filter(fn($a) => ($a->status->value ?? $a->status) === 'cancelled')->count();
+        
         $attendanceRate = $totalBooked > 0 ? round(($attended / $totalBooked) * 100, 1) . '%' : '0%';
+        $cancellationRate = $totalBooked > 0 ? round(($cancelled / $totalBooked) * 100, 1) . '%' : '0%';
+
+        // Wait Time Calculation (Check-in vs Consultation Start)
+        $waitTimes = $appointments->filter(fn($a) => $a->checked_in_at && $a->consultation_start_time)
+            ->map(fn($a) => $a->checked_in_at->diffInMinutes($a->consultation_start_time));
+        
+        $averageWaitTime = $waitTimes->count() > 0 ? round($waitTimes->average(), 0) : 0;
 
         // Chart: daily booked/attended/missed
-        $chartData = $visits->groupBy(fn($v) => $v->visit_date->format('Y-m-d'))
+        $chartData = $appointments->groupBy(fn($a) => $a->appointment_date->format('Y-m-d'))
             ->map(function ($group, $date) {
                 return [
                     'date' => $date,
                     'booked' => $group->count(),
-                    'attended' => $group->whereIn('status', ['completed', 'in_progress'])->count(),
-                    'missed' => $group->where('status', 'cancelled')->count(),
+                    'attended' => $group->filter(fn($a) => in_array($a->status->value ?? $a->status, ['completed', 'checked_in']))->count(),
+                    'missed' => $group->filter(fn($a) => ($a->status->value ?? $a->status) === 'no_show')->count(),
                 ];
             })->sortBy('date')->values()->toArray();
 
-        $tableData = $visits->groupBy(fn($v) => $v->visit_date->format('Y-m-d'))
+        $tableData = $appointments->groupBy(fn($a) => $a->appointment_date->format('Y-m-d'))
             ->map(function ($group, $date) {
                 $booked = $group->count();
-                $att = $group->whereIn('status', ['completed', 'in_progress'])->count();
-                $miss = $group->where('status', 'cancelled')->count();
+                $att = $group->filter(fn($a) => in_array($a->status->value ?? $a->status, ['completed', 'checked_in']))->count();
+                $miss = $group->filter(fn($a) => ($a->status->value ?? $a->status) === 'no_show')->count();
                 return [
                     'date' => $date,
                     'booked' => $booked,
@@ -874,15 +883,43 @@ final class ReportingController extends Controller
                 ];
             })->sortByDesc('date')->values()->toArray();
 
+        // Channel Split
+        $channelSplit = $appointments->groupBy(fn($a) => $a->booked_via ?? 'unknown')
+            ->map(fn($group, $channel) => [
+                'channel' => ucfirst(str_replace('_', ' ', $channel)),
+                'count' => $group->count()
+            ])->values()->toArray();
+
+        // Peak Hours
+        $peakHours = $appointments->filter(fn($a) => $a->start_time)
+            ->groupBy(fn($a) => substr((string)$a->start_time, 0, 2) . ':00')
+            ->map(fn($group, $hour) => [
+                'hour' => $hour,
+                'count' => $group->count()
+            ])->sortBy('hour')->values()->toArray();
+
+        // Doctor Utilization (simple booked count for now)
+        $doctorUtilization = $appointments->filter(fn($a) => $a->doctor)
+            ->groupBy(fn($a) => $a->doctor->name)
+            ->map(fn($group, $doctor) => [
+                'doctor' => 'Dr. ' . $doctor,
+                'appointments' => $group->count()
+            ])->sortByDesc('appointments')->values()->toArray();
+
         return response()->json([
             'kpis' => [
                 'total_booked' => $totalBooked,
                 'attended' => $attended,
                 'missed' => $missed,
                 'attendance_rate' => $attendanceRate,
+                'cancellation_rate' => $cancellationRate,
+                'average_wait_time' => $averageWaitTime,
             ],
             'chart_data' => $chartData,
             'table_data' => $tableData,
+            'channel_split' => $channelSplit,
+            'peak_hours' => $peakHours,
+            'doctor_utilization' => $doctorUtilization,
         ]);
     }
 
