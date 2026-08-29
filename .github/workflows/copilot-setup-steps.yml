@@ -5,6 +5,7 @@ on:
 
 jobs:
   copilot-setup-steps:
+    permissions: {}
     runs-on: ubuntu-latest
     env:
       COPILOT_AGENT_MODEL: gpt-5
