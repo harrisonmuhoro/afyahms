@@ -8,6 +8,7 @@ on:
 
 jobs:
   analyze:
+    if: ${{ github.repository_visibility == 'public' || vars.ENABLE_PRIVATE_CODEQL == 'true' }}
     name: Analyze
     runs-on: ubuntu-latest
     permissions:
