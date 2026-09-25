@@ -22,7 +22,7 @@ export interface AuthUser {
   employment_type: string | null;
   employment_start_date: string | null;
   locale: string;
-  theme: 'light' | 'dark';
+  theme: 'light' | 'dark' | 'system';
   is_active: boolean;
   profile_complete: boolean;
   deactivated_at: string | null;
@@ -59,7 +59,7 @@ interface SwitchBranchResponse {
 
 export interface PreferencesPayload {
   locale?: string;
-  theme?: 'light' | 'dark';
+  theme?: 'light' | 'dark' | 'system';
 }
 
 interface PreferencesResponse {

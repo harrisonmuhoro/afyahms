@@ -23,7 +23,7 @@ return new class extends Migration
             }
 
             if ($needsTheme) {
-                $table->string('theme', 16)->default('light');
+                $table->string('theme', 16)->default('system');
             }
         });
     }

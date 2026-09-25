@@ -7,6 +7,8 @@ namespace App\Modules\PatientPortal\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Billing\Models\Bill;
 use App\Modules\Billing\Models\BillItem;
+use App\Modules\Billing\Services\MpesaDarajaService;
+use RuntimeException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,7 +35,7 @@ class PortalInvoiceController extends Controller
      * Simulate an M-Pesa payment for a specific bill.
      * In production, this would initiate a real STK push via Daraja API.
      */
-    public function pay(Request $request, string $publicId): JsonResponse
+    public function pay(Request $request, string $publicId, MpesaDarajaService $mpesa): JsonResponse
     {
         $patientId = Auth::user()->patient_id;
 
@@ -50,17 +52,41 @@ class PortalInvoiceController extends Controller
             'phone' => ['required', 'string', 'min:9', 'max:15'],
         ]);
 
-        // Simulate successful payment (replace with Daraja STK push in production)
-        $bill->update([
-            'paid_amount'    => $bill->total_amount,
-            'status'         => 'cleared',
-            'payment_method' => 'mpesa',
-            'notes'          => 'M-Pesa payment via patient portal. Phone: ' . $request->string('phone'),
-        ]);
+        try {
+            $amount = max(0, (float) $bill->total_amount - (float) $bill->paid_amount);
+            $result = $mpesa->initiateStkPush($bill, $request->string('phone')->toString(), $amount);
+        } catch (RuntimeException $exception) {
+            return response()->json(['message' => $exception->getMessage()], 422);
+        }
+
+        $bill->forceFill([
+            'mpesa_merchant_request_id' => $result['merchant_request_id'],
+            'mpesa_checkout_request_id' => $result['checkout_request_id'],
+            'mpesa_phone' => $request->string('phone')->toString(),
+            'mpesa_amount' => $amount,
+            'mpesa_status' => 'pending',
+            'mpesa_result_code' => null,
+            'mpesa_result_description' => $result['customer_message'],
+        ])->save();
 
         return response()->json([
-            'message' => 'Payment recorded successfully.',
+            'message' => $result['customer_message'],
+            'status' => 'pending',
             'bill'    => $bill->fresh(['items']),
+        ]);
+    }
+
+    public function paymentStatus(Request $request, string $publicId): JsonResponse
+    {
+        $bill = Bill::withoutGlobalScope(\App\Modules\Tenancy\Scopes\BranchScope::class)
+            ->where('public_id', $publicId)
+            ->where('patient_id', Auth::user()->patient_id)
+            ->firstOrFail();
+
+        return response()->json([
+            'status' => $bill->mpesa_status,
+            'message' => $bill->mpesa_result_description,
+            'bill' => $bill->load('items'),
         ]);
     }
 }

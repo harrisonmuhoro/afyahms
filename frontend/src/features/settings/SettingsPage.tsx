@@ -92,7 +92,7 @@ export default function SettingsPage(): JSX.Element {
     verifyMfaEnrollment,
     disableMfa,
   } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, preference, setTheme } = useTheme();
   const { activeBranch } = useBranches();
   const [activeTab, setActiveTab] = useState<'profile' | 'appearance' | 'security' | 'system'>('profile');
   const [securityModal, setSecurityModal] = useState<SecurityModal>(null);
@@ -307,18 +307,21 @@ export default function SettingsPage(): JSX.Element {
                       {t('settings:appearance.theme', 'Theme Preference')}
                     </p>
                     <p className="text-sm text-stone-500">
-                      Switch between light and dark mode.
+                      Choose light, dark, or your device's system preference.
                     </p>
                   </div>
-                  {/* Animated Toggle Switch */}
-                  <button 
-                    onClick={toggleTheme}
-                    className={`relative w-14 h-8 rounded-full transition-colors duration-300 focus:outline-none ${isDark ? 'bg-brand-500' : 'bg-stone-300 dark:bg-stone-700'}`}
-                  >
-                    <span className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full transition-transform duration-300 flex items-center justify-center shadow-sm ${isDark ? 'translate-x-6' : 'translate-x-0'}`}>
-                      <Icon name={isDark ? 'moon' : 'sun'} size={12} className={isDark ? 'text-brand-500' : 'text-stone-500'} />
-                    </span>
-                  </button>
+                  <div className="flex rounded-xl bg-stone-200 p-1 dark:bg-stone-900" role="group" aria-label="Theme preference">
+                    {(['system', 'light', 'dark'] as const).map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        onClick={() => setTheme(option)}
+                        className={`rounded-lg px-3 py-2 text-xs font-semibold capitalize transition-all ${preference === option ? 'bg-white text-stone-900 shadow-sm dark:bg-stone-800 dark:text-white' : 'text-stone-500 hover:text-stone-700 dark:hover:text-stone-300'}`}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 

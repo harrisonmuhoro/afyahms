@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { httpClient } from '@/lib/http';
 
 export const GoogleSignInButton: React.FC = () => {
     const [loading, setLoading] = useState(false);
@@ -6,12 +7,7 @@ export const GoogleSignInButton: React.FC = () => {
     const handleGoogleSignIn = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:8080/api/v1/auth/google/redirect', {
-                headers: {
-                    'Accept': 'application/json',
-                }
-            });
-            const data = await response.json();
+            const data = await httpClient.get<{ url?: string }>('/auth/google/redirect');
             if (data.url) {
                 window.location.href = data.url;
             } else {

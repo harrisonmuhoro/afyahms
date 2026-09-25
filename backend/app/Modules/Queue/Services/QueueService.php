@@ -9,6 +9,7 @@ use App\Exceptions\Domain\ForbiddenException;
 use App\Exceptions\Domain\NotFoundException;
 use App\Exceptions\Domain\ValidationFailedException;
 use App\Models\User;
+use App\Modules\Billing\Services\BillingService;
 use App\Modules\Patients\Models\Patient;
 use App\Modules\Queue\Models\QueueEvent;
 use App\Modules\Queue\Models\QueueStation;
@@ -59,6 +60,7 @@ final class QueueService
     public function __construct(
         private readonly QueueRepository $queue,
         private readonly SequenceService $sequences,
+        private readonly BillingService $billing,
     ) {}
 
     /**
@@ -142,11 +144,16 @@ final class QueueService
                 'visit_number'  => $visitNumber,
                 'branch_id'     => $branchId,
                 'patient_id'    => $patientId,
+                'appointment_id'=> $visitAttributes['appointment_id'] ?? null,
                 'visit_date'    => today()->toDateString(),
                 'visit_type'    => $visitAttributes['visit_type'] ?? 'walk_in',
                 'status'        => 'open',
                 'registered_by' => $actor->id,
             ]);
+
+            // Appointment visits receive their configured consultation fee as
+            // the first billing line item; walk-ins still get a normal bill.
+            $this->billing->createForVisit($visit);
 
             // Issue ticket at Reception (entry station).
             $this->issueTicket($visit, 'REC', $actor, [
@@ -230,6 +237,7 @@ final class QueueService
                 'visit_id'       => (int) $visit->id,
                 'station_id'     => (int) $station->id,
                 'patient_id'     => (int) $visit->patient_id,
+                'appointment_id' => $overrides['appointment_id'] ?? $visit->appointment_id,
                 'ticket_number'  => $number,
                 'sequence_value' => $sequenceValue,
                 'ticket_date'    => $date,

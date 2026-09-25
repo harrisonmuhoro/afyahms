@@ -19,6 +19,18 @@
     </noscript>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <title>Afya HMS — Clinical Management Platform</title>
+    <script>
+      (() => {
+        const key = 'afya-theme';
+        const stored = localStorage.getItem(key);
+        const preference = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
+        const resolved = preference === 'system'
+          ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          : preference;
+        document.documentElement.classList.toggle('dark', resolved === 'dark');
+        document.documentElement.style.colorScheme = resolved;
+      })();
+    </script>
   </head>
   
   <body class="h-full antialiased">

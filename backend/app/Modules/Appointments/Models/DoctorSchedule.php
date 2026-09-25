@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Appointments\Models;
 
 use App\Modules\Tenancy\Models\Branch;
+use App\Modules\Tenancy\Scopes\BranchScope;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -35,6 +36,11 @@ class DoctorSchedule extends Model
         'valid_until' => 'date',
         'is_active' => 'boolean',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new BranchScope());
+    }
 
     public function branch(): BelongsTo
     {

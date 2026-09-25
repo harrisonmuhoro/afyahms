@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for D:\wamp64\www\hospital\backend\app\Modules\Queue</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../../_css/bootstrap.min.css?v=11.0.12" rel="stylesheet" type="text/css">
+  <link href="../../_css/nv.d3.min.css?v=11.0.12" rel="stylesheet" type="text/css">
+  <link href="../../_css/style.css?v=11.0.12" rel="stylesheet" type="text/css">
+  <link href="../../_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="../../index.html">D:\wamp64\www\hospital\backend\app</a></li>
+         <li class="breadcrumb-item"><a href="../index.html">Modules</a></li>
+         <li class="breadcrumb-item"><a href="index.html">Queue</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Controllers/QueueController.php.html#21">App\Modules\Queue\Controllers\QueueController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/StationCheckInController.php.html#20">App\Modules\Queue\Controllers\StationCheckInController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/QueueEvent.php.html#27">App\Modules\Queue\Models\QueueEvent</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/QueueStation.php.html#22">App\Modules\Queue\Models\QueueStation</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/QueueTicket.php.html#28">App\Modules\Queue\Models\QueueTicket</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Visit.php.html#25">App\Modules\Queue\Models\Visit</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Policies/QueueTicketPolicy.php.html#11">App\Modules\Queue\Policies\QueueTicketPolicy</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentQueueRepository.php.html#19">App\Modules\Queue\Repositories\Eloquent\EloquentQueueRepository</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/OpenVisitRequest.php.html#9">App\Modules\Queue\Requests\OpenVisitRequest</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/QueueActionRequest.php.html#9">App\Modules\Queue\Requests\QueueActionRequest</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Resources/QueueStationResource.php.html#13">App\Modules\Queue\Resources\QueueStationResource</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Resources/QueueTicketResource.php.html#13">App\Modules\Queue\Resources\QueueTicketResource</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Resources/VisitResource.php.html#13">App\Modules\Queue\Resources\VisitResource</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#34">App\Modules\Queue\Services\QueueService</a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Services/QueueService.php.html#34">App\Modules\Queue\Services\QueueService</a></td><td class="text-right">3540</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#21">App\Modules\Queue\Controllers\QueueController</a></td><td class="text-right">600</td></tr>
+       <tr><td><a href="Controllers/StationCheckInController.php.html#20">App\Modules\Queue\Controllers\StationCheckInController</a></td><td class="text-right">342</td></tr>
+       <tr><td><a href="Models/Visit.php.html#25">App\Modules\Queue\Models\Visit</a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Policies/QueueTicketPolicy.php.html#11">App\Modules\Queue\Policies\QueueTicketPolicy</a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Resources/QueueTicketResource.php.html#13">App\Modules\Queue\Resources\QueueTicketResource</a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Resources/VisitResource.php.html#13">App\Modules\Queue\Resources\VisitResource</a></td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Controllers/QueueController.php.html#23"><abbr title="App\Modules\Queue\Controllers\QueueController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#26"><abbr title="App\Modules\Queue\Controllers\QueueController::kpis">kpis</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#56"><abbr title="App\Modules\Queue\Controllers\QueueController::stations">stations</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#68"><abbr title="App\Modules\Queue\Controllers\QueueController::board">board</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#96"><abbr title="App\Modules\Queue\Controllers\QueueController::publicBoard">publicBoard</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#125"><abbr title="App\Modules\Queue\Controllers\QueueController::openVisit">openVisit</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#144"><abbr title="App\Modules\Queue\Controllers\QueueController::showVisit">showVisit</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#152"><abbr title="App\Modules\Queue\Controllers\QueueController::callNext">callNext</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#161"><abbr title="App\Modules\Queue\Controllers\QueueController::startServing">startServing</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#171"><abbr title="App\Modules\Queue\Controllers\QueueController::complete">complete</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#187"><abbr title="App\Modules\Queue\Controllers\QueueController::hold">hold</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#197"><abbr title="App\Modules\Queue\Controllers\QueueController::resume">resume</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#207"><abbr title="App\Modules\Queue\Controllers\QueueController::noShow">noShow</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#217"><abbr title="App\Modules\Queue\Controllers\QueueController::emergencyBypass">emergencyBypass</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#226"><abbr title="App\Modules\Queue\Controllers\QueueController::updateMts">updateMts</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#235"><abbr title="App\Modules\Queue\Controllers\QueueController::resolveBranchId">resolveBranchId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/StationCheckInController.php.html#23"><abbr title="App\Modules\Queue\Controllers\StationCheckInController::checkIn">checkIn</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/StationCheckInController.php.html#59"><abbr title="App\Modules\Queue\Controllers\StationCheckInController::checkOut">checkOut</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/StationCheckInController.php.html#76"><abbr title="App\Modules\Queue\Controllers\StationCheckInController::resolveBranchId">resolveBranchId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/QueueEvent.php.html#44"><abbr title="App\Modules\Queue\Models\QueueEvent::booted">booted</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/QueueEvent.php.html#57"><abbr title="App\Modules\Queue\Models\QueueEvent::ticket">ticket</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/QueueStation.php.html#42"><abbr title="App\Modules\Queue\Models\QueueStation::booted">booted</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/QueueStation.php.html#47"><abbr title="App\Modules\Queue\Models\QueueStation::tickets">tickets</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/QueueStation.php.html#52"><abbr title="App\Modules\Queue\Models\QueueStation::branch">branch</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/QueueTicket.php.html#51"><abbr title="App\Modules\Queue\Models\QueueTicket::booted">booted</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/QueueTicket.php.html#56"><abbr title="App\Modules\Queue\Models\QueueTicket::station">station</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/QueueTicket.php.html#61"><abbr title="App\Modules\Queue\Models\QueueTicket::patient">patient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/QueueTicket.php.html#66"><abbr title="App\Modules\Queue\Models\QueueTicket::visit">visit</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/QueueTicket.php.html#71"><abbr title="App\Modules\Queue\Models\QueueTicket::events">events</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Visit.php.html#46"><abbr title="App\Modules\Queue\Models\Visit::booted">booted</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Visit.php.html#60"><abbr title="App\Modules\Queue\Models\Visit::patient">patient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Visit.php.html#65"><abbr title="App\Modules\Queue\Models\Visit::tickets">tickets</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Visit.php.html#70"><abbr title="App\Modules\Queue\Models\Visit::triageAssessment">triageAssessment</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Policies/QueueTicketPolicy.php.html#19"><abbr title="App\Modules\Queue\Policies\QueueTicketPolicy::manage">manage</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentQueueRepository.php.html#23"><abbr title="App\Modules\Queue\Repositories\Eloquent\EloquentQueueRepository::listActiveStations">listActiveStations</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentQueueRepository.php.html#32"><abbr title="App\Modules\Queue\Repositories\Eloquent\EloquentQueueRepository::findStation">findStation</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentQueueRepository.php.html#38"><abbr title="App\Modules\Queue\Repositories\Eloquent\EloquentQueueRepository::findStationByCode">findStationByCode</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentQueueRepository.php.html#47"><abbr title="App\Modules\Queue\Repositories\Eloquent\EloquentQueueRepository::findTicket">findTicket</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentQueueRepository.php.html#53"><abbr title="App\Modules\Queue\Repositories\Eloquent\EloquentQueueRepository::findTicketForVisit">findTicketForVisit</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentQueueRepository.php.html#63"><abbr title="App\Modules\Queue\Repositories\Eloquent\EloquentQueueRepository::ticketForUpdate">ticketForUpdate</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentQueueRepository.php.html#69"><abbr title="App\Modules\Queue\Repositories\Eloquent\EloquentQueueRepository::waitingAtStation">waitingAtStation</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentQueueRepository.php.html#83"><abbr title="App\Modules\Queue\Repositories\Eloquent\EloquentQueueRepository::createTicket">createTicket</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentQueueRepository.php.html#89"><abbr title="App\Modules\Queue\Repositories\Eloquent\EloquentQueueRepository::updateTicket">updateTicket</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentQueueRepository.php.html#97"><abbr title="App\Modules\Queue\Repositories\Eloquent\EloquentQueueRepository::createEvent">createEvent</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentQueueRepository.php.html#102"><abbr title="App\Modules\Queue\Repositories\Eloquent\EloquentQueueRepository::createVisit">createVisit</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentQueueRepository.php.html#108"><abbr title="App\Modules\Queue\Repositories\Eloquent\EloquentQueueRepository::updateVisit">updateVisit</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentQueueRepository.php.html#116"><abbr title="App\Modules\Queue\Repositories\Eloquent\EloquentQueueRepository::findVisit">findVisit</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentQueueRepository.php.html#122"><abbr title="App\Modules\Queue\Repositories\Eloquent\EloquentQueueRepository::openVisitsForPatient">openVisitsForPatient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/OpenVisitRequest.php.html#11"><abbr title="App\Modules\Queue\Requests\OpenVisitRequest::authorize">authorize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/OpenVisitRequest.php.html#17"><abbr title="App\Modules\Queue\Requests\OpenVisitRequest::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/QueueActionRequest.php.html#11"><abbr title="App\Modules\Queue\Requests\QueueActionRequest::authorize">authorize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/QueueActionRequest.php.html#17"><abbr title="App\Modules\Queue\Requests\QueueActionRequest::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Resources/QueueStationResource.php.html#16"><abbr title="App\Modules\Queue\Resources\QueueStationResource::toArray">toArray</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Resources/QueueTicketResource.php.html#16"><abbr title="App\Modules\Queue\Resources\QueueTicketResource::toArray">toArray</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Resources/VisitResource.php.html#16"><abbr title="App\Modules\Queue\Resources\VisitResource::toArray">toArray</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#60"><abbr title="App\Modules\Queue\Services\QueueService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#72"><abbr title="App\Modules\Queue\Services\QueueService::openVisit">openVisit</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#175"><abbr title="App\Modules\Queue\Services\QueueService::issueTicket">issueTicket</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#261"><abbr title="App\Modules\Queue\Services\QueueService::callNext">callNext</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#303"><abbr title="App\Modules\Queue\Services\QueueService::startServing">startServing</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#331"><abbr title="App\Modules\Queue\Services\QueueService::complete">complete</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#377"><abbr title="App\Modules\Queue\Services\QueueService::hold">hold</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#390"><abbr title="App\Modules\Queue\Services\QueueService::resume">resume</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#412"><abbr title="App\Modules\Queue\Services\QueueService::markNoShow">markNoShow</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#428"><abbr title="App\Modules\Queue\Services\QueueService::emergencyBypass">emergencyBypass</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#447"><abbr title="App\Modules\Queue\Services\QueueService::updateMtsCategory">updateMtsCategory</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#469"><abbr title="App\Modules\Queue\Services\QueueService::boardSnapshot">boardSnapshot</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#489"><abbr title="App\Modules\Queue\Services\QueueService::mtsWeight">mtsWeight</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#502"><abbr title="App\Modules\Queue\Services\QueueService::listActiveStationsInternal">listActiveStationsInternal</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#507"><abbr title="App\Modules\Queue\Services\QueueService::recordEvent">recordEvent</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#530"><abbr title="App\Modules\Queue\Services\QueueService::resolveBranchId">resolveBranchId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#542"><abbr title="App\Modules\Queue\Services\QueueService::branchCode">branchCode</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#547"><abbr title="App\Modules\Queue\Services\QueueService::activeTicketForPatient">activeTicketForPatient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#560"><abbr title="App\Modules\Queue\Services\QueueService::ticketForPatientOnDate">ticketForPatientOnDate</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Providers/QueueServiceProvider.php.html#30"><abbr title="App\Modules\Queue\Providers\QueueServiceProvider::bootRoutes">bootRoutes</abbr></a></td><td class="text-right">83%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Controllers/StationCheckInController.php.html#23"><abbr title="App\Modules\Queue\Controllers\StationCheckInController::checkIn">checkIn</abbr></a></td><td class="text-right">156</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#72"><abbr title="App\Modules\Queue\Services\QueueService::openVisit">openVisit</abbr></a></td><td class="text-right">156</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#175"><abbr title="App\Modules\Queue\Services\QueueService::issueTicket">issueTicket</abbr></a></td><td class="text-right">110</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#489"><abbr title="App\Modules\Queue\Services\QueueService::mtsWeight">mtsWeight</abbr></a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#331"><abbr title="App\Modules\Queue\Services\QueueService::complete">complete</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#235"><abbr title="App\Modules\Queue\Controllers\QueueController::resolveBranchId">resolveBranchId</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Controllers/StationCheckInController.php.html#76"><abbr title="App\Modules\Queue\Controllers\StationCheckInController::resolveBranchId">resolveBranchId</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Policies/QueueTicketPolicy.php.html#19"><abbr title="App\Modules\Queue\Policies\QueueTicketPolicy::manage">manage</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#171"><abbr title="App\Modules\Queue\Controllers\QueueController::complete">complete</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Models/Visit.php.html#46"><abbr title="App\Modules\Queue\Models\Visit::booted">booted</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#261"><abbr title="App\Modules\Queue\Services\QueueService::callNext">callNext</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#303"><abbr title="App\Modules\Queue\Services\QueueService::startServing">startServing</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#447"><abbr title="App\Modules\Queue\Services\QueueService::updateMtsCategory">updateMtsCategory</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#530"><abbr title="App\Modules\Queue\Services\QueueService::resolveBranchId">resolveBranchId</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#26"><abbr title="App\Modules\Queue\Controllers\QueueController::kpis">kpis</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#68"><abbr title="App\Modules\Queue\Controllers\QueueController::board">board</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Controllers/QueueController.php.html#125"><abbr title="App\Modules\Queue\Controllers\QueueController::openVisit">openVisit</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Controllers/StationCheckInController.php.html#59"><abbr title="App\Modules\Queue\Controllers\StationCheckInController::checkOut">checkOut</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Resources/QueueTicketResource.php.html#16"><abbr title="App\Modules\Queue\Resources\QueueTicketResource::toArray">toArray</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Resources/VisitResource.php.html#16"><abbr title="App\Modules\Queue\Resources\VisitResource::toArray">toArray</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/QueueService.php.html#390"><abbr title="App\Modules\Queue\Services\QueueService::resume">resume</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Providers/QueueServiceProvider.php.html#30"><abbr title="App\Modules\Queue\Providers\QueueServiceProvider::bootRoutes">bootRoutes</abbr></a></td><td class="text-right">2</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 11.0.12</a> using <a href="https://www.php.net/" target="_top">PHP 8.3.28</a> and <a href="https://phpunit.de/">PHPUnit 11.5.50</a> at Sun Aug 23 7:49:36 EAT 2026.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="../../_js/jquery.min.js?v=11.0.12" type="text/javascript"></script>
+  <script src="../../_js/d3.min.js?v=11.0.12" type="text/javascript"></script>
+  <script src="../../_js/nv.d3.min.js?v=11.0.12" type="text/javascript"></script>
+  <script type="text/javascript">
+$(document).ready(function() {
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#classCoverageDistribution svg')
+      .datum(getCoverageDistributionData([14,0,0,0,0,0,0,0,0,0,1,1], "Class Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#methodCoverageDistribution svg')
+      .datum(getCoverageDistributionData([74,0,0,0,0,0,0,0,0,1,0,4], "Method Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getCoverageDistributionData(data, label) {
+    var labels = [
+      '0%',
+      '0-10%',
+      '10-20%',
+      '20-30%',
+      '30-40%',
+      '40-50%',
+      '50-60%',
+      '60-70%',
+      '70-80%',
+      '80-90%',
+      '90-100%',
+      '100%'
+    ];
+    var values = [];
+    $.each(labels, function(key) {
+      values.push({x: labels[key], y: data[key]});
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Cyclomatic Complexity');
+
+    d3.select('#classComplexity svg')
+      .datum(getComplexityData([[0,24,"<a href=\"Controllers\/QueueController.php.html#21\">App\\Modules\\Queue\\Controllers\\QueueController<\/a>"],[0,18,"<a href=\"Controllers\/StationCheckInController.php.html#20\">App\\Modules\\Queue\\Controllers\\StationCheckInController<\/a>"],[0,2,"<a href=\"Models\/QueueEvent.php.html#27\">App\\Modules\\Queue\\Models\\QueueEvent<\/a>"],[0,3,"<a href=\"Models\/QueueStation.php.html#22\">App\\Modules\\Queue\\Models\\QueueStation<\/a>"],[0,5,"<a href=\"Models\/QueueTicket.php.html#28\">App\\Modules\\Queue\\Models\\QueueTicket<\/a>"],[0,6,"<a href=\"Models\/Visit.php.html#25\">App\\Modules\\Queue\\Models\\Visit<\/a>"],[100,2,"<a href=\"Module.php.html#7\">App\\Modules\\Queue\\Module<\/a>"],[0,4,"<a href=\"Policies\/QueueTicketPolicy.php.html#11\">App\\Modules\\Queue\\Policies\\QueueTicketPolicy<\/a>"],[90,4,"<a href=\"Providers\/QueueServiceProvider.php.html#16\">App\\Modules\\Queue\\Providers\\QueueServiceProvider<\/a>"],[0,14,"<a href=\"Repositories\/Eloquent\/EloquentQueueRepository.php.html#19\">App\\Modules\\Queue\\Repositories\\Eloquent\\EloquentQueueRepository<\/a>"],[0,2,"<a href=\"Requests\/OpenVisitRequest.php.html#9\">App\\Modules\\Queue\\Requests\\OpenVisitRequest<\/a>"],[0,2,"<a href=\"Requests\/QueueActionRequest.php.html#9\">App\\Modules\\Queue\\Requests\\QueueActionRequest<\/a>"],[0,1,"<a href=\"Resources\/QueueStationResource.php.html#13\">App\\Modules\\Queue\\Resources\\QueueStationResource<\/a>"],[0,2,"<a href=\"Resources\/QueueTicketResource.php.html#13\">App\\Modules\\Queue\\Resources\\QueueTicketResource<\/a>"],[0,2,"<a href=\"Resources\/VisitResource.php.html#13\">App\\Modules\\Queue\\Resources\\VisitResource<\/a>"],[0,59,"<a href=\"Services\/QueueService.php.html#34\">App\\Modules\\Queue\\Services\\QueueService<\/a>"]], 'Class Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Method Complexity');
+
+    d3.select('#methodComplexity svg')
+      .datum(getComplexityData([[0,1,"<a href=\"Controllers\/QueueController.php.html#23\">App\\Modules\\Queue\\Controllers\\QueueController::__construct<\/a>"],[0,2,"<a href=\"Controllers\/QueueController.php.html#26\">App\\Modules\\Queue\\Controllers\\QueueController::kpis<\/a>"],[0,1,"<a href=\"Controllers\/QueueController.php.html#56\">App\\Modules\\Queue\\Controllers\\QueueController::stations<\/a>"],[0,2,"<a href=\"Controllers\/QueueController.php.html#68\">App\\Modules\\Queue\\Controllers\\QueueController::board<\/a>"],[0,1,"<a href=\"Controllers\/QueueController.php.html#96\">App\\Modules\\Queue\\Controllers\\QueueController::publicBoard<\/a>"],[0,2,"<a href=\"Controllers\/QueueController.php.html#125\">App\\Modules\\Queue\\Controllers\\QueueController::openVisit<\/a>"],[0,1,"<a href=\"Controllers\/QueueController.php.html#144\">App\\Modules\\Queue\\Controllers\\QueueController::showVisit<\/a>"],[0,1,"<a href=\"Controllers\/QueueController.php.html#152\">App\\Modules\\Queue\\Controllers\\QueueController::callNext<\/a>"],[0,1,"<a href=\"Controllers\/QueueController.php.html#161\">App\\Modules\\Queue\\Controllers\\QueueController::startServing<\/a>"],[0,3,"<a href=\"Controllers\/QueueController.php.html#171\">App\\Modules\\Queue\\Controllers\\QueueController::complete<\/a>"],[0,1,"<a href=\"Controllers\/QueueController.php.html#187\">App\\Modules\\Queue\\Controllers\\QueueController::hold<\/a>"],[0,1,"<a href=\"Controllers\/QueueController.php.html#197\">App\\Modules\\Queue\\Controllers\\QueueController::resume<\/a>"],[0,1,"<a href=\"Controllers\/QueueController.php.html#207\">App\\Modules\\Queue\\Controllers\\QueueController::noShow<\/a>"],[0,1,"<a href=\"Controllers\/QueueController.php.html#217\">App\\Modules\\Queue\\Controllers\\QueueController::emergencyBypass<\/a>"],[0,1,"<a href=\"Controllers\/QueueController.php.html#226\">App\\Modules\\Queue\\Controllers\\QueueController::updateMts<\/a>"],[0,4,"<a href=\"Controllers\/QueueController.php.html#235\">App\\Modules\\Queue\\Controllers\\QueueController::resolveBranchId<\/a>"],[0,12,"<a href=\"Controllers\/StationCheckInController.php.html#23\">App\\Modules\\Queue\\Controllers\\StationCheckInController::checkIn<\/a>"],[0,2,"<a href=\"Controllers\/StationCheckInController.php.html#59\">App\\Modules\\Queue\\Controllers\\StationCheckInController::checkOut<\/a>"],[0,4,"<a href=\"Controllers\/StationCheckInController.php.html#76\">App\\Modules\\Queue\\Controllers\\StationCheckInController::resolveBranchId<\/a>"],[0,1,"<a href=\"Models\/QueueEvent.php.html#44\">App\\Modules\\Queue\\Models\\QueueEvent::booted<\/a>"],[0,1,"<a href=\"Models\/QueueEvent.php.html#57\">App\\Modules\\Queue\\Models\\QueueEvent::ticket<\/a>"],[0,1,"<a href=\"Models\/QueueStation.php.html#42\">App\\Modules\\Queue\\Models\\QueueStation::booted<\/a>"],[0,1,"<a href=\"Models\/QueueStation.php.html#47\">App\\Modules\\Queue\\Models\\QueueStation::tickets<\/a>"],[0,1,"<a href=\"Models\/QueueStation.php.html#52\">App\\Modules\\Queue\\Models\\QueueStation::branch<\/a>"],[0,1,"<a href=\"Models\/QueueTicket.php.html#51\">App\\Modules\\Queue\\Models\\QueueTicket::booted<\/a>"],[0,1,"<a href=\"Models\/QueueTicket.php.html#56\">App\\Modules\\Queue\\Models\\QueueTicket::station<\/a>"],[0,1,"<a href=\"Models\/QueueTicket.php.html#61\">App\\Modules\\Queue\\Models\\QueueTicket::patient<\/a>"],[0,1,"<a href=\"Models\/QueueTicket.php.html#66\">App\\Modules\\Queue\\Models\\QueueTicket::visit<\/a>"],[0,1,"<a href=\"Models\/QueueTicket.php.html#71\">App\\Modules\\Queue\\Models\\QueueTicket::events<\/a>"],[0,3,"<a href=\"Models\/Visit.php.html#46\">App\\Modules\\Queue\\Models\\Visit::booted<\/a>"],[0,1,"<a href=\"Models\/Visit.php.html#60\">App\\Modules\\Queue\\Models\\Visit::patient<\/a>"],[0,1,"<a href=\"Models\/Visit.php.html#65\">App\\Modules\\Queue\\Models\\Visit::tickets<\/a>"],[0,1,"<a href=\"Models\/Visit.php.html#70\">App\\Modules\\Queue\\Models\\Visit::triageAssessment<\/a>"],[100,1,"<a href=\"Module.php.html#9\">App\\Modules\\Queue\\Module::register<\/a>"],[100,1,"<a href=\"Module.php.html#11\">App\\Modules\\Queue\\Module::boot<\/a>"],[0,4,"<a href=\"Policies\/QueueTicketPolicy.php.html#19\">App\\Modules\\Queue\\Policies\\QueueTicketPolicy::manage<\/a>"],[100,1,"<a href=\"Providers\/QueueServiceProvider.php.html#18\">App\\Modules\\Queue\\Providers\\QueueServiceProvider::register<\/a>"],[100,1,"<a href=\"Providers\/QueueServiceProvider.php.html#24\">App\\Modules\\Queue\\Providers\\QueueServiceProvider::boot<\/a>"],[83.33333333333334,2,"<a href=\"Providers\/QueueServiceProvider.php.html#30\">App\\Modules\\Queue\\Providers\\QueueServiceProvider::bootRoutes<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentQueueRepository.php.html#23\">App\\Modules\\Queue\\Repositories\\Eloquent\\EloquentQueueRepository::listActiveStations<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentQueueRepository.php.html#32\">App\\Modules\\Queue\\Repositories\\Eloquent\\EloquentQueueRepository::findStation<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentQueueRepository.php.html#38\">App\\Modules\\Queue\\Repositories\\Eloquent\\EloquentQueueRepository::findStationByCode<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentQueueRepository.php.html#47\">App\\Modules\\Queue\\Repositories\\Eloquent\\EloquentQueueRepository::findTicket<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentQueueRepository.php.html#53\">App\\Modules\\Queue\\Repositories\\Eloquent\\EloquentQueueRepository::findTicketForVisit<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentQueueRepository.php.html#63\">App\\Modules\\Queue\\Repositories\\Eloquent\\EloquentQueueRepository::ticketForUpdate<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentQueueRepository.php.html#69\">App\\Modules\\Queue\\Repositories\\Eloquent\\EloquentQueueRepository::waitingAtStation<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentQueueRepository.php.html#83\">App\\Modules\\Queue\\Repositories\\Eloquent\\EloquentQueueRepository::createTicket<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentQueueRepository.php.html#89\">App\\Modules\\Queue\\Repositories\\Eloquent\\EloquentQueueRepository::updateTicket<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentQueueRepository.php.html#97\">App\\Modules\\Queue\\Repositories\\Eloquent\\EloquentQueueRepository::createEvent<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentQueueRepository.php.html#102\">App\\Modules\\Queue\\Repositories\\Eloquent\\EloquentQueueRepository::createVisit<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentQueueRepository.php.html#108\">App\\Modules\\Queue\\Repositories\\Eloquent\\EloquentQueueRepository::updateVisit<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentQueueRepository.php.html#116\">App\\Modules\\Queue\\Repositories\\Eloquent\\EloquentQueueRepository::findVisit<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentQueueRepository.php.html#122\">App\\Modules\\Queue\\Repositories\\Eloquent\\EloquentQueueRepository::openVisitsForPatient<\/a>"],[0,1,"<a href=\"Requests\/OpenVisitRequest.php.html#11\">App\\Modules\\Queue\\Requests\\OpenVisitRequest::authorize<\/a>"],[0,1,"<a href=\"Requests\/OpenVisitRequest.php.html#17\">App\\Modules\\Queue\\Requests\\OpenVisitRequest::rules<\/a>"],[0,1,"<a href=\"Requests\/QueueActionRequest.php.html#11\">App\\Modules\\Queue\\Requests\\QueueActionRequest::authorize<\/a>"],[0,1,"<a href=\"Requests\/QueueActionRequest.php.html#17\">App\\Modules\\Queue\\Requests\\QueueActionRequest::rules<\/a>"],[0,1,"<a href=\"Resources\/QueueStationResource.php.html#16\">App\\Modules\\Queue\\Resources\\QueueStationResource::toArray<\/a>"],[0,2,"<a href=\"Resources\/QueueTicketResource.php.html#16\">App\\Modules\\Queue\\Resources\\QueueTicketResource::toArray<\/a>"],[0,2,"<a href=\"Resources\/VisitResource.php.html#16\">App\\Modules\\Queue\\Resources\\VisitResource::toArray<\/a>"],[0,1,"<a href=\"Services\/QueueService.php.html#60\">App\\Modules\\Queue\\Services\\QueueService::__construct<\/a>"],[0,12,"<a href=\"Services\/QueueService.php.html#72\">App\\Modules\\Queue\\Services\\QueueService::openVisit<\/a>"],[0,10,"<a href=\"Services\/QueueService.php.html#175\">App\\Modules\\Queue\\Services\\QueueService::issueTicket<\/a>"],[0,3,"<a href=\"Services\/QueueService.php.html#261\">App\\Modules\\Queue\\Services\\QueueService::callNext<\/a>"],[0,3,"<a href=\"Services\/QueueService.php.html#303\">App\\Modules\\Queue\\Services\\QueueService::startServing<\/a>"],[0,6,"<a href=\"Services\/QueueService.php.html#331\">App\\Modules\\Queue\\Services\\QueueService::complete<\/a>"],[0,1,"<a href=\"Services\/QueueService.php.html#377\">App\\Modules\\Queue\\Services\\QueueService::hold<\/a>"],[0,2,"<a href=\"Services\/QueueService.php.html#390\">App\\Modules\\Queue\\Services\\QueueService::resume<\/a>"],[0,1,"<a href=\"Services\/QueueService.php.html#412\">App\\Modules\\Queue\\Services\\QueueService::markNoShow<\/a>"],[0,1,"<a href=\"Services\/QueueService.php.html#428\">App\\Modules\\Queue\\Services\\QueueService::emergencyBypass<\/a>"],[0,3,"<a href=\"Services\/QueueService.php.html#447\">App\\Modules\\Queue\\Services\\QueueService::updateMtsCategory<\/a>"],[0,1,"<a href=\"Services\/QueueService.php.html#469\">App\\Modules\\Queue\\Services\\QueueService::boardSnapshot<\/a>"],[0,7,"<a href=\"Services\/QueueService.php.html#489\">App\\Modules\\Queue\\Services\\QueueService::mtsWeight<\/a>"],[0,1,"<a href=\"Services\/QueueService.php.html#502\">App\\Modules\\Queue\\Services\\QueueService::listActiveStationsInternal<\/a>"],[0,1,"<a href=\"Services\/QueueService.php.html#507\">App\\Modules\\Queue\\Services\\QueueService::recordEvent<\/a>"],[0,3,"<a href=\"Services\/QueueService.php.html#530\">App\\Modules\\Queue\\Services\\QueueService::resolveBranchId<\/a>"],[0,1,"<a href=\"Services\/QueueService.php.html#542\">App\\Modules\\Queue\\Services\\QueueService::branchCode<\/a>"],[0,1,"<a href=\"Services\/QueueService.php.html#547\">App\\Modules\\Queue\\Services\\QueueService::activeTicketForPatient<\/a>"],[0,1,"<a href=\"Services\/QueueService.php.html#560\">App\\Modules\\Queue\\Services\\QueueService::ticketForPatientOnDate<\/a>"]], 'Method Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getComplexityData(data, label) {
+    var values = [];
+    $.each(data, function(key) {
+      var value = Math.round(data[key][0]*100) / 100;
+      values.push({
+        x: value,
+        y: data[key][1],
+        class: data[key][2],
+        size: 0.05,
+        shape: 'diamond'
+      });
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+});
+  </script>
+ </body>
+</html>

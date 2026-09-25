@@ -196,4 +196,12 @@ class Patient extends Model
     {
         return $this->merged_at !== null && $this->merged_into_public_id !== null;
     }
+
+    public function getNoShowCountAttribute(): int
+    {
+        return \App\Modules\Appointments\Models\Appointment::withoutGlobalScopes()
+            ->where('patient_id', $this->id)
+            ->where('status', 'no_show')
+            ->count();
+    }
 }

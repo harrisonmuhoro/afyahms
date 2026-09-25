@@ -45,7 +45,12 @@ return [
     | Per-event routing. Falls back to default if unset.
     */
     'routing' => [
-        'appointment_reminder' => ['sms'],
+        // Appointment reminders currently use email by default. WhatsApp can
+        // be enabled with APPOINTMENT_REMINDER_CHANNELS=email,whatsapp.
+        'appointment_reminder' => array_values(array_filter(array_map(
+            'trim',
+            explode(',', env('APPOINTMENT_REMINDER_CHANNELS', 'email')),
+        ))),
         'result_ready'         => ['sms', 'email'],
         'payment_confirmed'    => ['sms', 'email'],
         'otp_code'             => ['sms'],
@@ -59,4 +64,12 @@ return [
     ],
 
     'rate_limit_per_minute' => (int) env('NOTIFICATIONS_RATE_LIMIT', 60),
+
+    'whatsapp' => [
+        'access_token' => env('WHATSAPP_ACCESS_TOKEN'),
+        'phone_number_id' => env('WHATSAPP_PHONE_NUMBER_ID'),
+        'api_version' => env('WHATSAPP_API_VERSION', 'v20.0'),
+        'base_url' => env('WHATSAPP_BASE_URL', 'https://graph.facebook.com'),
+        'default_country_code' => env('WHATSAPP_DEFAULT_COUNTRY_CODE', '254'),
+    ],
 ];

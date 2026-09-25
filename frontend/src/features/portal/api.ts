@@ -50,6 +50,8 @@ export interface PortalInvoice {
   paid_amount: number;
   status: 'pending' | 'partial' | 'cleared' | 'waived';
   payment_method: string | null;
+  mpesa_status?: 'pending' | 'success' | 'failed' | null;
+  mpesa_receipt?: string | null;
   notes: string | null;
   created_at: string;
   visit: { id: number; created_at: string } | null;
@@ -161,6 +163,7 @@ export function usePortalInvoices() {
     queryKey: ['portal', 'invoices'],
     queryFn: () => httpClient.get<{ data: PortalInvoice[] }>('/portal/invoices'),
     staleTime: 60_000,
+    refetchInterval: (query) => query.state.data?.data.some((invoice) => invoice.mpesa_status === 'pending') ? 4_000 : false,
   });
 }
 
@@ -168,7 +171,7 @@ export function usePayPortalInvoice() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ publicId, phone }: { publicId: string; phone: string }) =>
-      httpClient.post<{ message: string; bill: PortalInvoice }>(`/portal/invoices/${publicId}/pay`, { phone }),
+      httpClient.post<{ message: string; status: string; bill: PortalInvoice }>(`/portal/invoices/${publicId}/pay`, { phone }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['portal', 'invoices'] });
     },
@@ -254,7 +257,7 @@ export function usePortalCancelAppointment() {
 
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
-      httpClient.post<{ message: string }>(`/portal/appointments/${id}/cancel`, { reason }),
+      httpClient.patch<{ message: string }>(`/portal/appointments/${id}/cancel`, { reason }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['portal', 'appointments'] });
       void queryClient.invalidateQueries({ queryKey: ['slots', 'available', '/portal/appointments/slots'] });

@@ -21,11 +21,11 @@ export function useRescheduleAppointment(): {
 
   const mutation = useMutation({
     mutationFn: async ({ id, ...body }: ReschedulePayload) => {
-      const res = await httpClient.post<{ message: string; data: Appointment }>(
+      const res = await httpClient.patch<{ message: string; appointment: Appointment }>(
         `/appointments/${id}/reschedule`,
         body,
       );
-      return res.data;
+      return res.appointment;
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['appointments'] });

@@ -1,6 +1,6 @@
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 
-export type CalendarViewMode = 'day' | 'week';
+export type CalendarViewMode = 'day' | 'week' | 'month';
 
 interface CalendarHeaderProps {
   currentDate: Date;
@@ -24,10 +24,12 @@ export function CalendarHeader({
   const title =
     viewMode === 'day'
       ? format(currentDate, 'EEEE, MMMM d, yyyy')
-      : `${format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'MMM d')} – ${format(
+      : viewMode === 'week'
+        ? `${format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'MMM d')} – ${format(
           endOfWeek(currentDate, { weekStartsOn: 1 }),
           'MMM d, yyyy',
-        )}`;
+        )}`
+        : format(currentDate, 'MMMM yyyy');
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-outline-variant bg-surface p-3 dark:bg-stone-900">
@@ -50,7 +52,7 @@ export function CalendarHeader({
           aria-label="Calendar view"
           className="flex rounded-lg border border-outline-variant overflow-hidden text-xs font-medium"
         >
-          {(['day', 'week'] as const).map((mode) => (
+          {(['day', 'week', 'month'] as const).map((mode) => (
             <button
               key={mode}
               type="button"

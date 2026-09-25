@@ -17,3 +17,5 @@ parameters:
     ignoreErrors:
         - '#PHPDoc tag @var#'
         - '#PHPDoc tag @param#'
+
+        

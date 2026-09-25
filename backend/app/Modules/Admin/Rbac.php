@@ -412,6 +412,7 @@ final class Rbac
         'cashier' => [
             'branches.read', 'branches.list', 'branch.switch',
             'patients.read', 'patients.list',
+            'appointments.read', 'appointments.list',
             'queue.read', 'queue.list', 'queue.call-next', 'queue.advance',
             'invoices.create', 'invoices.read', 'invoices.update', 'invoices.list',
             'payments.create', 'payments.read', 'payments.list',

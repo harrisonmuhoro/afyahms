@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Billing\Controllers\BillingController;
+use App\Modules\Billing\Controllers\MpesaWebhookController;
 use App\Modules\Queue\Models\Visit;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,10 @@ use Illuminate\Support\Facades\Route;
  * All routes require auth:sanctum.
  * Visit model is resolved by its primary key (integer id).
  */
+
+Route::post('/webhooks/mpesa/stk-callback', [MpesaWebhookController::class, 'stkCallback'])
+    ->middleware('throttle:webhooks')
+    ->name('webhooks.mpesa.stk-callback');
 
 Route::middleware(['auth:sanctum'])->group(function (): void {
 

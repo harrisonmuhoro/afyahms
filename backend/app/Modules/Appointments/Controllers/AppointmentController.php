@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Modules\Appointments\Models\Appointment;
 use App\Modules\Appointments\Requests\BookAppointmentRequest;
 use App\Modules\Appointments\Requests\RescheduleAppointmentRequest;
+use App\Modules\Appointments\Requests\TriggerAppointmentReminderRequest;
+use App\Modules\Appointments\Requests\UpdateAppointmentRequest;
 use App\Modules\Appointments\Resources\AppointmentResource;
 use App\Modules\Appointments\Resources\AppointmentCollection;
 use App\Modules\Appointments\Services\AppointmentService;
@@ -33,7 +35,11 @@ class AppointmentController extends Controller
             ->when($request->doctor_id, fn ($q, $id) => $q->where('doctor_id', $id))
             ->when($request->branch_id, fn ($q, $id) => $q->where('branch_id', $id))
             ->when($request->status, fn ($q, $status) => $q->where('status', $status))
-            ->when($request->from, fn ($q, $from) => $q->where('appointment_date', '>=', substr($from, 0, 10)));
+            ->when($request->patient_id, fn ($q, $id) => $q->where('patient_id', $id))
+            ->when($request->type, fn ($q, $type) => $q->where('type', $type))
+            ->when($request->booked_via, fn ($q, $via) => $q->where('booked_via', $via))
+            ->when($request->from, fn ($q, $from) => $q->where('appointment_date', '>=', substr($from, 0, 10)))
+            ->when($request->to, fn ($q, $to) => $q->where('appointment_date', '<=', substr($to, 0, 10)));
 
         return new AppointmentCollection(
             $query->orderBy('appointment_date')->orderBy('start_time')->paginate(
@@ -58,9 +64,30 @@ class AppointmentController extends Controller
 
     public function show(Appointment $appointment): AppointmentResource
     {
+        $this->authorize('view', $appointment);
+
         return new AppointmentResource($appointment->load([
             'patient', 'doctor', 'branch', 'schedule', 'bookedBy', 'cancelledBy',
         ]));
+    }
+
+    public function update(UpdateAppointmentRequest $request, Appointment $appointment): JsonResponse
+    {
+        $this->authorize('update', $appointment);
+        $updated = $this->appointmentService->update($appointment, $request->validated());
+
+        return response()->json([
+            'message' => 'Appointment updated successfully.',
+            'appointment' => new AppointmentResource($updated->load(['patient', 'doctor', 'branch', 'schedule'])),
+        ]);
+    }
+
+    public function destroy(Appointment $appointment): JsonResponse
+    {
+        $this->authorize('delete', $appointment);
+        $appointment->delete();
+
+        return response()->json(['message' => 'Appointment deleted.']);
     }
 
     public function reschedule(RescheduleAppointmentRequest $request, Appointment $appointment): JsonResponse
@@ -99,8 +126,33 @@ class AppointmentController extends Controller
     public function checkIn(Appointment $appointment): JsonResponse
     {
         $this->authorize('update', $appointment);
-        $this->appointmentService->checkIn($appointment);
+        $this->appointmentService->checkIn($appointment, request()->user());
         
         return response()->json(['message' => 'Patient checked in.']);
+    }
+
+    public function noShow(Request $request, Appointment $appointment): JsonResponse
+    {
+        $this->authorize('update', $appointment);
+        $request->validate(['reason' => 'nullable|string|max:255']);
+        $this->appointmentService->markNoShow($appointment, $request->input('reason'));
+
+        return response()->json(['message' => 'Appointment marked as no-show.']);
+    }
+
+    public function reminders(Appointment $appointment): JsonResponse
+    {
+        $this->authorize('view', $appointment);
+
+        return response()->json(['data' => $appointment->reminders()->latest('scheduled_at')->get()]);
+    }
+
+    public function triggerReminder(TriggerAppointmentReminderRequest $request, Appointment $appointment): JsonResponse
+    {
+        $this->authorize('update', $appointment);
+        app(\App\Modules\Appointments\Services\ReminderSchedulerService::class)
+            ->dispatchImmediate($appointment, $request->string('type')->toString());
+
+        return response()->json(['message' => 'Appointment reminder queued.']);
     }
 }

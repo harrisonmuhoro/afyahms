@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for D:\wamp64\www\hospital\backend\app\Modules\Patients</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../../_css/bootstrap.min.css?v=11.0.12" rel="stylesheet" type="text/css">
+  <link href="../../_css/nv.d3.min.css?v=11.0.12" rel="stylesheet" type="text/css">
+  <link href="../../_css/style.css?v=11.0.12" rel="stylesheet" type="text/css">
+  <link href="../../_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="../../index.html">D:\wamp64\www\hospital\backend\app</a></li>
+         <li class="breadcrumb-item"><a href="../index.html">Modules</a></li>
+         <li class="breadcrumb-item"><a href="index.html">Patients</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Controllers/AllergyController.php.html#15">App\Modules\Patients\Controllers\AllergyController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/DataCorrectionRequestController.php.html#19">App\Modules\Patients\Controllers\DataCorrectionRequestController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/NextOfKinController.php.html#16">App\Modules\Patients\Controllers\NextOfKinController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/PatientController.php.html#20">App\Modules\Patients\Controllers\PatientController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/PatientInsuranceController.php.html#16">App\Modules\Patients\Controllers\PatientInsuranceController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/PatientSearchController.php.html#18">App\Modules\Patients\Controllers\PatientSearchController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Dto/PatientDto.php.html#14">App\Modules\Patients\Dto\PatientDto</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Allergy.php.html#32">App\Modules\Patients\Models\Allergy</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/DataCorrectionRequest.php.html#15">App\Modules\Patients\Models\DataCorrectionRequest</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Patient.php.html#63">App\Modules\Patients\Models\Patient</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/PatientInsurance.php.html#35">App\Modules\Patients\Models\PatientInsurance</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/PatientNextOfKin.php.html#33">App\Modules\Patients\Models\PatientNextOfKin</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/PatientRelationship.php.html#25">App\Modules\Patients\Models\PatientRelationship</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Policies/PatientPolicy.php.html#12">App\Modules\Patients\Policies\PatientPolicy</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentAllergyRepository.php.html#16">App\Modules\Patients\Repositories\Eloquent\EloquentAllergyRepository</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentNextOfKinRepository.php.html#16">App\Modules\Patients\Repositories\Eloquent\EloquentNextOfKinRepository</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientInsuranceRepository.php.html#16">App\Modules\Patients\Repositories\Eloquent\EloquentPatientInsuranceRepository</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientRepository.php.html#19">App\Modules\Patients\Repositories\Eloquent\EloquentPatientRepository</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/MergePatientRequest.php.html#9">App\Modules\Patients\Requests\MergePatientRequest</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ReviewDataCorrectionRequest.php.html#10">App\Modules\Patients\Requests\ReviewDataCorrectionRequest</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/StoreAllergyRequest.php.html#9">App\Modules\Patients\Requests\StoreAllergyRequest</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/StoreDataCorrectionRequest.php.html#9">App\Modules\Patients\Requests\StoreDataCorrectionRequest</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/StoreNextOfKinRequest.php.html#9">App\Modules\Patients\Requests\StoreNextOfKinRequest</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/StorePatientInsuranceRequest.php.html#9">App\Modules\Patients\Requests\StorePatientInsuranceRequest</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/StorePatientRequest.php.html#9">App\Modules\Patients\Requests\StorePatientRequest</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/UpdateNextOfKinRequest.php.html#9">App\Modules\Patients\Requests\UpdateNextOfKinRequest</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/UpdatePatientInsuranceRequest.php.html#9">App\Modules\Patients\Requests\UpdatePatientInsuranceRequest</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/UpdatePatientRequest.php.html#9">App\Modules\Patients\Requests\UpdatePatientRequest</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Resources/AllergyResource.php.html#13">App\Modules\Patients\Resources\AllergyResource</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Resources/DataCorrectionRequestResource.php.html#10">App\Modules\Patients\Resources\DataCorrectionRequestResource</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Resources/NextOfKinResource.php.html#13">App\Modules\Patients\Resources\NextOfKinResource</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Resources/PatientInsuranceResource.php.html#13">App\Modules\Patients\Resources\PatientInsuranceResource</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Resources/PatientResource.php.html#19">App\Modules\Patients\Resources\PatientResource</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Scopes/OwnPatientDataScope.php.html#16">App\Modules\Patients\Scopes\OwnPatientDataScope</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/AllergyService.php.html#14">App\Modules\Patients\Services\AllergyService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/DataCorrectionRequestService.php.html#17">App\Modules\Patients\Services\DataCorrectionRequestService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/DedupeMatcher.php.html#22">App\Modules\Patients\Services\DedupeMatcher</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/NextOfKinService.php.html#13">App\Modules\Patients\Services\NextOfKinService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PatientInsuranceService.php.html#14">App\Modules\Patients\Services\PatientInsuranceService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PatientService.php.html#27">App\Modules\Patients\Services\PatientService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/HasOwnPatientDataScope.php.html#9">App\Modules\Patients\Traits\HasOwnPatientDataScope</a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientRepository.php.html#19">App\Modules\Patients\Repositories\Eloquent\EloquentPatientRepository</a></td><td class="text-right">1056</td></tr>
+       <tr><td><a href="Services/PatientService.php.html#27">App\Modules\Patients\Services\PatientService</a></td><td class="text-right">812</td></tr>
+       <tr><td><a href="Services/DedupeMatcher.php.html#22">App\Modules\Patients\Services\DedupeMatcher</a></td><td class="text-right">702</td></tr>
+       <tr><td><a href="Services/PatientInsuranceService.php.html#14">App\Modules\Patients\Services\PatientInsuranceService</a></td><td class="text-right">420</td></tr>
+       <tr><td><a href="Models/Patient.php.html#63">App\Modules\Patients\Models\Patient</a></td><td class="text-right">272</td></tr>
+       <tr><td><a href="Policies/PatientPolicy.php.html#12">App\Modules\Patients\Policies\PatientPolicy</a></td><td class="text-right">272</td></tr>
+       <tr><td><a href="Services/NextOfKinService.php.html#13">App\Modules\Patients\Services\NextOfKinService</a></td><td class="text-right">210</td></tr>
+       <tr><td><a href="Services/AllergyService.php.html#14">App\Modules\Patients\Services\AllergyService</a></td><td class="text-right">132</td></tr>
+       <tr><td><a href="Models/PatientInsurance.php.html#35">App\Modules\Patients\Models\PatientInsurance</a></td><td class="text-right">90</td></tr>
+       <tr><td><a href="Services/DataCorrectionRequestService.php.html#17">App\Modules\Patients\Services\DataCorrectionRequestService</a></td><td class="text-right">90</td></tr>
+       <tr><td><a href="Dto/PatientDto.php.html#14">App\Modules\Patients\Dto\PatientDto</a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="Scopes/OwnPatientDataScope.php.html#16">App\Modules\Patients\Scopes\OwnPatientDataScope</a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Controllers/PatientSearchController.php.html#18">App\Modules\Patients\Controllers\PatientSearchController</a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Resources/PatientInsuranceResource.php.html#13">App\Modules\Patients\Resources\PatientInsuranceResource</a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Resources/PatientResource.php.html#19">App\Modules\Patients\Resources\PatientResource</a></td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Controllers/AllergyController.php.html#17"><abbr title="App\Modules\Patients\Controllers\AllergyController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/AllergyController.php.html#19"><abbr title="App\Modules\Patients\Controllers\AllergyController::index">index</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/AllergyController.php.html#27"><abbr title="App\Modules\Patients\Controllers\AllergyController::store">store</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/AllergyController.php.html#37"><abbr title="App\Modules\Patients\Controllers\AllergyController::destroy">destroy</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/DataCorrectionRequestController.php.html#21"><abbr title="App\Modules\Patients\Controllers\DataCorrectionRequestController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/DataCorrectionRequestController.php.html#23"><abbr title="App\Modules\Patients\Controllers\DataCorrectionRequestController::index">index</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/DataCorrectionRequestController.php.html#45"><abbr title="App\Modules\Patients\Controllers\DataCorrectionRequestController::store">store</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/DataCorrectionRequestController.php.html#61"><abbr title="App\Modules\Patients\Controllers\DataCorrectionRequestController::review">review</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/NextOfKinController.php.html#18"><abbr title="App\Modules\Patients\Controllers\NextOfKinController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/NextOfKinController.php.html#20"><abbr title="App\Modules\Patients\Controllers\NextOfKinController::index">index</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/NextOfKinController.php.html#28"><abbr title="App\Modules\Patients\Controllers\NextOfKinController::store">store</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/NextOfKinController.php.html#38"><abbr title="App\Modules\Patients\Controllers\NextOfKinController::update">update</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/NextOfKinController.php.html#48"><abbr title="App\Modules\Patients\Controllers\NextOfKinController::destroy">destroy</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/PatientController.php.html#22"><abbr title="App\Modules\Patients\Controllers\PatientController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/PatientController.php.html#24"><abbr title="App\Modules\Patients\Controllers\PatientController::index">index</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/PatientController.php.html#46"><abbr title="App\Modules\Patients\Controllers\PatientController::store">store</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/PatientController.php.html#56"><abbr title="App\Modules\Patients\Controllers\PatientController::show">show</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/PatientController.php.html#63"><abbr title="App\Modules\Patients\Controllers\PatientController::update">update</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/PatientController.php.html#71"><abbr title="App\Modules\Patients\Controllers\PatientController::destroy">destroy</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/PatientController.php.html#81"><abbr title="App\Modules\Patients\Controllers\PatientController::merge">merge</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/PatientInsuranceController.php.html#18"><abbr title="App\Modules\Patients\Controllers\PatientInsuranceController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/PatientInsuranceController.php.html#20"><abbr title="App\Modules\Patients\Controllers\PatientInsuranceController::index">index</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/PatientInsuranceController.php.html#28"><abbr title="App\Modules\Patients\Controllers\PatientInsuranceController::store">store</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/PatientInsuranceController.php.html#38"><abbr title="App\Modules\Patients\Controllers\PatientInsuranceController::update">update</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/PatientInsuranceController.php.html#48"><abbr title="App\Modules\Patients\Controllers\PatientInsuranceController::destroy">destroy</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/PatientSearchController.php.html#20"><abbr title="App\Modules\Patients\Controllers\PatientSearchController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/PatientSearchController.php.html#22"><abbr title="App\Modules\Patients\Controllers\PatientSearchController::__invoke">__invoke</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Dto/PatientDto.php.html#16"><abbr title="App\Modules\Patients\Dto\PatientDto::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Dto/PatientDto.php.html#40"><abbr title="App\Modules\Patients\Dto\PatientDto::fromArray">fromArray</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Dto/PatientDto.php.html#68"><abbr title="App\Modules\Patients\Dto\PatientDto::toModelAttributes">toModelAttributes</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Allergy.php.html#60"><abbr title="App\Modules\Patients\Models\Allergy::booted">booted</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Allergy.php.html#65"><abbr title="App\Modules\Patients\Models\Allergy::patient">patient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Allergy.php.html#70"><abbr title="App\Modules\Patients\Models\Allergy::branch">branch</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Allergy.php.html#75"><abbr title="App\Modules\Patients\Models\Allergy::recordedBy">recordedBy</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/DataCorrectionRequest.php.html#46"><abbr title="App\Modules\Patients\Models\DataCorrectionRequest::booted">booted</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/DataCorrectionRequest.php.html#51"><abbr title="App\Modules\Patients\Models\DataCorrectionRequest::branch">branch</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/DataCorrectionRequest.php.html#56"><abbr title="App\Modules\Patients\Models\DataCorrectionRequest::patient">patient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/DataCorrectionRequest.php.html#61"><abbr title="App\Modules\Patients\Models\DataCorrectionRequest::requester">requester</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/DataCorrectionRequest.php.html#66"><abbr title="App\Modules\Patients\Models\DataCorrectionRequest::reviewer">reviewer</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Patient.php.html#122"><abbr title="App\Modules\Patients\Models\Patient::booted">booted</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Patient.php.html#127"><abbr title="App\Modules\Patients\Models\Patient::getActivitylogOptions">getActivitylogOptions</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Patient.php.html#140"><abbr title="App\Modules\Patients\Models\Patient::branch">branch</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Patient.php.html#145"><abbr title="App\Modules\Patients\Models\Patient::registeredBy">registeredBy</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Patient.php.html#150"><abbr title="App\Modules\Patients\Models\Patient::nextOfKin">nextOfKin</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Patient.php.html#155"><abbr title="App\Modules\Patients\Models\Patient::primaryNextOfKin">primaryNextOfKin</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Patient.php.html#160"><abbr title="App\Modules\Patients\Models\Patient::insurance">insurance</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Patient.php.html#165"><abbr title="App\Modules\Patients\Models\Patient::primaryInsurance">primaryInsurance</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Patient.php.html#170"><abbr title="App\Modules\Patients\Models\Patient::allergies">allergies</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Patient.php.html#175"><abbr title="App\Modules\Patients\Models\Patient::activeAllergies">activeAllergies</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Patient.php.html#180"><abbr title="App\Modules\Patients\Models\Patient::relationships">relationships</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Patient.php.html#185"><abbr title="App\Modules\Patients\Models\Patient::fullName">fullName</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Patient.php.html#190"><abbr title="App\Modules\Patients\Models\Patient::ageYears">ageYears</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Patient.php.html#195"><abbr title="App\Modules\Patients\Models\Patient::isMerged">isMerged</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/Patient.php.html#200"><abbr title="App\Modules\Patients\Models\Patient::getNoShowCountAttribute">getNoShowCountAttribute</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/PatientInsurance.php.html#70"><abbr title="App\Modules\Patients\Models\PatientInsurance::booted">booted</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/PatientInsurance.php.html#75"><abbr title="App\Modules\Patients\Models\PatientInsurance::patient">patient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/PatientInsurance.php.html#80"><abbr title="App\Modules\Patients\Models\PatientInsurance::branch">branch</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/PatientInsurance.php.html#85"><abbr title="App\Modules\Patients\Models\PatientInsurance::isCurrentlyValid">isCurrentlyValid</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/PatientNextOfKin.php.html#62"><abbr title="App\Modules\Patients\Models\PatientNextOfKin::booted">booted</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/PatientNextOfKin.php.html#67"><abbr title="App\Modules\Patients\Models\PatientNextOfKin::patient">patient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/PatientNextOfKin.php.html#72"><abbr title="App\Modules\Patients\Models\PatientNextOfKin::branch">branch</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/PatientRelationship.php.html#46"><abbr title="App\Modules\Patients\Models\PatientRelationship::patient">patient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/PatientRelationship.php.html#51"><abbr title="App\Modules\Patients\Models\PatientRelationship::relatedPatient">relatedPatient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Policies/PatientPolicy.php.html#28"><abbr title="App\Modules\Patients\Policies\PatientPolicy::view">view</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Policies/PatientPolicy.php.html#37"><abbr title="App\Modules\Patients\Policies\PatientPolicy::update">update</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Policies/PatientPolicy.php.html#58"><abbr title="App\Modules\Patients\Policies\PatientPolicy::merge">merge</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Policies/PatientPolicy.php.html#67"><abbr title="App\Modules\Patients\Policies\PatientPolicy::create">create</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Policies/PatientPolicy.php.html#72"><abbr title="App\Modules\Patients\Policies\PatientPolicy::delete">delete</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentAllergyRepository.php.html#20"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentAllergyRepository::listForPatient">listForPatient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentAllergyRepository.php.html#30"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentAllergyRepository::find">find</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentAllergyRepository.php.html#36"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentAllergyRepository::create">create</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentAllergyRepository.php.html#42"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentAllergyRepository::update">update</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentAllergyRepository.php.html#50"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentAllergyRepository::delete">delete</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentAllergyRepository.php.html#55"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentAllergyRepository::activeDrugAllergiesFor">activeDrugAllergiesFor</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentNextOfKinRepository.php.html#20"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentNextOfKinRepository::listForPatient">listForPatient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentNextOfKinRepository.php.html#30"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentNextOfKinRepository::find">find</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentNextOfKinRepository.php.html#36"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentNextOfKinRepository::create">create</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentNextOfKinRepository.php.html#42"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentNextOfKinRepository::update">update</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentNextOfKinRepository.php.html#50"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentNextOfKinRepository::delete">delete</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentNextOfKinRepository.php.html#55"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentNextOfKinRepository::setPrimary">setPrimary</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientInsuranceRepository.php.html#20"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentPatientInsuranceRepository::listForPatient">listForPatient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientInsuranceRepository.php.html#30"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentPatientInsuranceRepository::find">find</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientInsuranceRepository.php.html#36"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentPatientInsuranceRepository::create">create</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientInsuranceRepository.php.html#42"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentPatientInsuranceRepository::update">update</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientInsuranceRepository.php.html#50"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentPatientInsuranceRepository::delete">delete</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientInsuranceRepository.php.html#55"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentPatientInsuranceRepository::setPrimary">setPrimary</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientRepository.php.html#23"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentPatientRepository::findById">findById</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientRepository.php.html#29"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentPatientRepository::findByPublicId">findByPublicId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientRepository.php.html#35"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentPatientRepository::findByPatientNumber">findByPatientNumber</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientRepository.php.html#41"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentPatientRepository::search">search</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientRepository.php.html#66"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentPatientRepository::paginate">paginate</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientRepository.php.html#111"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentPatientRepository::findPotentialDuplicates">findPotentialDuplicates</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientRepository.php.html#139"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentPatientRepository::create">create</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientRepository.php.html#145"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentPatientRepository::update">update</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientRepository.php.html#152"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentPatientRepository::softMerge">softMerge</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientRepository.php.html#162"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentPatientRepository::normalizeName">normalizeName</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/MergePatientRequest.php.html#11"><abbr title="App\Modules\Patients\Requests\MergePatientRequest::authorize">authorize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/MergePatientRequest.php.html#17"><abbr title="App\Modules\Patients\Requests\MergePatientRequest::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ReviewDataCorrectionRequest.php.html#12"><abbr title="App\Modules\Patients\Requests\ReviewDataCorrectionRequest::authorize">authorize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ReviewDataCorrectionRequest.php.html#18"><abbr title="App\Modules\Patients\Requests\ReviewDataCorrectionRequest::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/StoreAllergyRequest.php.html#11"><abbr title="App\Modules\Patients\Requests\StoreAllergyRequest::authorize">authorize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/StoreAllergyRequest.php.html#17"><abbr title="App\Modules\Patients\Requests\StoreAllergyRequest::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/StoreDataCorrectionRequest.php.html#11"><abbr title="App\Modules\Patients\Requests\StoreDataCorrectionRequest::authorize">authorize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/StoreDataCorrectionRequest.php.html#17"><abbr title="App\Modules\Patients\Requests\StoreDataCorrectionRequest::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/StoreNextOfKinRequest.php.html#11"><abbr title="App\Modules\Patients\Requests\StoreNextOfKinRequest::authorize">authorize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/StoreNextOfKinRequest.php.html#17"><abbr title="App\Modules\Patients\Requests\StoreNextOfKinRequest::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/StorePatientInsuranceRequest.php.html#11"><abbr title="App\Modules\Patients\Requests\StorePatientInsuranceRequest::authorize">authorize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/StorePatientInsuranceRequest.php.html#17"><abbr title="App\Modules\Patients\Requests\StorePatientInsuranceRequest::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/StorePatientRequest.php.html#11"><abbr title="App\Modules\Patients\Requests\StorePatientRequest::authorize">authorize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/StorePatientRequest.php.html#17"><abbr title="App\Modules\Patients\Requests\StorePatientRequest::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/UpdateNextOfKinRequest.php.html#11"><abbr title="App\Modules\Patients\Requests\UpdateNextOfKinRequest::authorize">authorize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/UpdateNextOfKinRequest.php.html#17"><abbr title="App\Modules\Patients\Requests\UpdateNextOfKinRequest::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/UpdatePatientInsuranceRequest.php.html#11"><abbr title="App\Modules\Patients\Requests\UpdatePatientInsuranceRequest::authorize">authorize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/UpdatePatientInsuranceRequest.php.html#17"><abbr title="App\Modules\Patients\Requests\UpdatePatientInsuranceRequest::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/UpdatePatientRequest.php.html#11"><abbr title="App\Modules\Patients\Requests\UpdatePatientRequest::authorize">authorize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/UpdatePatientRequest.php.html#17"><abbr title="App\Modules\Patients\Requests\UpdatePatientRequest::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Resources/AllergyResource.php.html#16"><abbr title="App\Modules\Patients\Resources\AllergyResource::toArray">toArray</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Resources/DataCorrectionRequestResource.php.html#13"><abbr title="App\Modules\Patients\Resources\DataCorrectionRequestResource::toArray">toArray</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Resources/NextOfKinResource.php.html#16"><abbr title="App\Modules\Patients\Resources\NextOfKinResource::toArray">toArray</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Resources/PatientInsuranceResource.php.html#16"><abbr title="App\Modules\Patients\Resources\PatientInsuranceResource::toArray">toArray</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Resources/PatientResource.php.html#22"><abbr title="App\Modules\Patients\Resources\PatientResource::toArray">toArray</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Scopes/OwnPatientDataScope.php.html#18"><abbr title="App\Modules\Patients\Scopes\OwnPatientDataScope::apply">apply</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/AllergyService.php.html#16"><abbr title="App\Modules\Patients\Services\AllergyService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/AllergyService.php.html#21"><abbr title="App\Modules\Patients\Services\AllergyService::listForPatient">listForPatient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/AllergyService.php.html#26"><abbr title="App\Modules\Patients\Services\AllergyService::create">create</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/AllergyService.php.html#37"><abbr title="App\Modules\Patients\Services\AllergyService::update">update</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/AllergyService.php.html#48"><abbr title="App\Modules\Patients\Services\AllergyService::delete">delete</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/AllergyService.php.html#59"><abbr title="App\Modules\Patients\Services\AllergyService::requirePatient">requirePatient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/DataCorrectionRequestService.php.html#19"><abbr title="App\Modules\Patients\Services\DataCorrectionRequestService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/DataCorrectionRequestService.php.html#22"><abbr title="App\Modules\Patients\Services\DataCorrectionRequestService::createForPatient">createForPatient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/DataCorrectionRequestService.php.html#63"><abbr title="App\Modules\Patients\Services\DataCorrectionRequestService::review">review</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/DedupeMatcher.php.html#24"><abbr title="App\Modules\Patients\Services\DedupeMatcher::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/DedupeMatcher.php.html#29"><abbr title="App\Modules\Patients\Services\DedupeMatcher::candidatesFor">candidatesFor</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/DedupeMatcher.php.html#78"><abbr title="App\Modules\Patients\Services\DedupeMatcher::bothPresent">bothPresent</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/DedupeMatcher.php.html#83"><abbr title="App\Modules\Patients\Services\DedupeMatcher::normalizePhone">normalizePhone</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/DedupeMatcher.php.html#96"><abbr title="App\Modules\Patients\Services\DedupeMatcher::nameMatches">nameMatches</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/NextOfKinService.php.html#15"><abbr title="App\Modules\Patients\Services\NextOfKinService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/NextOfKinService.php.html#20"><abbr title="App\Modules\Patients\Services\NextOfKinService::listForPatient">listForPatient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/NextOfKinService.php.html#25"><abbr title="App\Modules\Patients\Services\NextOfKinService::create">create</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/NextOfKinService.php.html#39"><abbr title="App\Modules\Patients\Services\NextOfKinService::update">update</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/NextOfKinService.php.html#54"><abbr title="App\Modules\Patients\Services\NextOfKinService::delete">delete</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/NextOfKinService.php.html#65"><abbr title="App\Modules\Patients\Services\NextOfKinService::requirePatient">requirePatient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PatientInsuranceService.php.html#16"><abbr title="App\Modules\Patients\Services\PatientInsuranceService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PatientInsuranceService.php.html#21"><abbr title="App\Modules\Patients\Services\PatientInsuranceService::listForPatient">listForPatient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PatientInsuranceService.php.html#26"><abbr title="App\Modules\Patients\Services\PatientInsuranceService::create">create</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PatientInsuranceService.php.html#42"><abbr title="App\Modules\Patients\Services\PatientInsuranceService::update">update</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PatientInsuranceService.php.html#59"><abbr title="App\Modules\Patients\Services\PatientInsuranceService::delete">delete</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PatientInsuranceService.php.html#73"><abbr title="App\Modules\Patients\Services\PatientInsuranceService::assertSchemeRules">assertSchemeRules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PatientInsuranceService.php.html#91"><abbr title="App\Modules\Patients\Services\PatientInsuranceService::requirePatient">requirePatient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PatientService.php.html#29"><abbr title="App\Modules\Patients\Services\PatientService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PatientService.php.html#42"><abbr title="App\Modules\Patients\Services\PatientService::register">register</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PatientService.php.html#89"><abbr title="App\Modules\Patients\Services\PatientService::update">update</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PatientService.php.html#138"><abbr title="App\Modules\Patients\Services\PatientService::softDelete">softDelete</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PatientService.php.html#143"><abbr title="App\Modules\Patients\Services\PatientService::findByPublicId">findByPublicId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PatientService.php.html#154"><abbr title="App\Modules\Patients\Services\PatientService::findByPatientNumber">findByPatientNumber</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PatientService.php.html#168"><abbr title="App\Modules\Patients\Services\PatientService::search">search</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PatientService.php.html#176"><abbr title="App\Modules\Patients\Services\PatientService::paginate">paginate</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PatientService.php.html#185"><abbr title="App\Modules\Patients\Services\PatientService::merge">merge</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PatientService.php.html#200"><abbr title="App\Modules\Patients\Services\PatientService::resolveBranchId">resolveBranchId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Traits/HasOwnPatientDataScope.php.html#14"><abbr title="App\Modules\Patients\Traits\HasOwnPatientDataScope::bootHasOwnPatientDataScope">bootHasOwnPatientDataScope</abbr></a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientRepository.php.html#66"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentPatientRepository::paginate">paginate</abbr></a></td><td class="text-right">306</td></tr>
+       <tr><td><a href="Services/DedupeMatcher.php.html#29"><abbr title="App\Modules\Patients\Services\DedupeMatcher::candidatesFor">candidatesFor</abbr></a></td><td class="text-right">132</td></tr>
+       <tr><td><a href="Services/PatientService.php.html#89"><abbr title="App\Modules\Patients\Services\PatientService::update">update</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Services/DedupeMatcher.php.html#96"><abbr title="App\Modules\Patients\Services\DedupeMatcher::nameMatches">nameMatches</abbr></a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="Models/PatientInsurance.php.html#85"><abbr title="App\Modules\Patients\Models\PatientInsurance::isCurrentlyValid">isCurrentlyValid</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientRepository.php.html#111"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentPatientRepository::findPotentialDuplicates">findPotentialDuplicates</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Services/PatientInsuranceService.php.html#73"><abbr title="App\Modules\Patients\Services\PatientInsuranceService::assertSchemeRules">assertSchemeRules</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="Policies/PatientPolicy.php.html#37"><abbr title="App\Modules\Patients\Policies\PatientPolicy::update">update</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Services/DataCorrectionRequestService.php.html#22"><abbr title="App\Modules\Patients\Services\DataCorrectionRequestService::createForPatient">createForPatient</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Services/NextOfKinService.php.html#39"><abbr title="App\Modules\Patients\Services\NextOfKinService::update">update</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Services/PatientInsuranceService.php.html#42"><abbr title="App\Modules\Patients\Services\PatientInsuranceService::update">update</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Services/PatientService.php.html#200"><abbr title="App\Modules\Patients\Services\PatientService::resolveBranchId">resolveBranchId</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Dto/PatientDto.php.html#40"><abbr title="App\Modules\Patients\Dto\PatientDto::fromArray">fromArray</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Policies/PatientPolicy.php.html#72"><abbr title="App\Modules\Patients\Policies\PatientPolicy::delete">delete</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Scopes/OwnPatientDataScope.php.html#18"><abbr title="App\Modules\Patients\Scopes\OwnPatientDataScope::apply">apply</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Services/DedupeMatcher.php.html#78"><abbr title="App\Modules\Patients\Services\DedupeMatcher::bothPresent">bothPresent</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Services/PatientService.php.html#185"><abbr title="App\Modules\Patients\Services\PatientService::merge">merge</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Policies/PatientPolicy.php.html#28"><abbr title="App\Modules\Patients\Policies\PatientPolicy::view">view</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Policies/PatientPolicy.php.html#58"><abbr title="App\Modules\Patients\Policies\PatientPolicy::merge">merge</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Services/AllergyService.php.html#37"><abbr title="App\Modules\Patients\Services\AllergyService::update">update</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Services/AllergyService.php.html#48"><abbr title="App\Modules\Patients\Services\AllergyService::delete">delete</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Services/DataCorrectionRequestService.php.html#63"><abbr title="App\Modules\Patients\Services\DataCorrectionRequestService::review">review</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Services/DedupeMatcher.php.html#83"><abbr title="App\Modules\Patients\Services\DedupeMatcher::normalizePhone">normalizePhone</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Services/NextOfKinService.php.html#54"><abbr title="App\Modules\Patients\Services\NextOfKinService::delete">delete</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Services/PatientInsuranceService.php.html#59"><abbr title="App\Modules\Patients\Services\PatientInsuranceService::delete">delete</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Services/PatientService.php.html#42"><abbr title="App\Modules\Patients\Services\PatientService::register">register</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Controllers/PatientSearchController.php.html#22"><abbr title="App\Modules\Patients\Controllers\PatientSearchController::__invoke">__invoke</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Dto/PatientDto.php.html#68"><abbr title="App\Modules\Patients\Dto\PatientDto::toModelAttributes">toModelAttributes</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Models/Patient.php.html#195"><abbr title="App\Modules\Patients\Models\Patient::isMerged">isMerged</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Repositories/Eloquent/EloquentPatientRepository.php.html#41"><abbr title="App\Modules\Patients\Repositories\Eloquent\EloquentPatientRepository::search">search</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Resources/PatientInsuranceResource.php.html#16"><abbr title="App\Modules\Patients\Resources\PatientInsuranceResource::toArray">toArray</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Resources/PatientResource.php.html#22"><abbr title="App\Modules\Patients\Resources\PatientResource::toArray">toArray</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/AllergyService.php.html#59"><abbr title="App\Modules\Patients\Services\AllergyService::requirePatient">requirePatient</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/NextOfKinService.php.html#25"><abbr title="App\Modules\Patients\Services\NextOfKinService::create">create</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/NextOfKinService.php.html#65"><abbr title="App\Modules\Patients\Services\NextOfKinService::requirePatient">requirePatient</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/PatientInsuranceService.php.html#26"><abbr title="App\Modules\Patients\Services\PatientInsuranceService::create">create</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/PatientInsuranceService.php.html#91"><abbr title="App\Modules\Patients\Services\PatientInsuranceService::requirePatient">requirePatient</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/PatientService.php.html#143"><abbr title="App\Modules\Patients\Services\PatientService::findByPublicId">findByPublicId</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/PatientService.php.html#154"><abbr title="App\Modules\Patients\Services\PatientService::findByPatientNumber">findByPatientNumber</abbr></a></td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 11.0.12</a> using <a href="https://www.php.net/" target="_top">PHP 8.3.28</a> and <a href="https://phpunit.de/">PHPUnit 11.5.50</a> at Sun Aug 23 7:49:36 EAT 2026.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="../../_js/jquery.min.js?v=11.0.12" type="text/javascript"></script>
+  <script src="../../_js/d3.min.js?v=11.0.12" type="text/javascript"></script>
+  <script src="../../_js/nv.d3.min.js?v=11.0.12" type="text/javascript"></script>
+  <script type="text/javascript">
+$(document).ready(function() {
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#classCoverageDistribution svg')
+      .datum(getCoverageDistributionData([41,0,0,0,0,0,0,0,0,0,0,2], "Class Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#methodCoverageDistribution svg')
+      .datum(getCoverageDistributionData([160,0,0,0,0,0,0,0,0,0,0,3], "Method Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getCoverageDistributionData(data, label) {
+    var labels = [
+      '0%',
+      '0-10%',
+      '10-20%',
+      '20-30%',
+      '30-40%',
+      '40-50%',
+      '50-60%',
+      '60-70%',
+      '70-80%',
+      '80-90%',
+      '90-100%',
+      '100%'
+    ];
+    var values = [];
+    $.each(labels, function(key) {
+      values.push({x: labels[key], y: data[key]});
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Cyclomatic Complexity');
+
+    d3.select('#classComplexity svg')
+      .datum(getComplexityData([[0,4,"<a href=\"Controllers\/AllergyController.php.html#15\">App\\Modules\\Patients\\Controllers\\AllergyController<\/a>"],[0,4,"<a href=\"Controllers\/DataCorrectionRequestController.php.html#19\">App\\Modules\\Patients\\Controllers\\DataCorrectionRequestController<\/a>"],[0,5,"<a href=\"Controllers\/NextOfKinController.php.html#16\">App\\Modules\\Patients\\Controllers\\NextOfKinController<\/a>"],[0,7,"<a href=\"Controllers\/PatientController.php.html#20\">App\\Modules\\Patients\\Controllers\\PatientController<\/a>"],[0,5,"<a href=\"Controllers\/PatientInsuranceController.php.html#16\">App\\Modules\\Patients\\Controllers\\PatientInsuranceController<\/a>"],[0,3,"<a href=\"Controllers\/PatientSearchController.php.html#18\">App\\Modules\\Patients\\Controllers\\PatientSearchController<\/a>"],[0,7,"<a href=\"Dto\/PatientDto.php.html#14\">App\\Modules\\Patients\\Dto\\PatientDto<\/a>"],[0,4,"<a href=\"Models\/Allergy.php.html#32\">App\\Modules\\Patients\\Models\\Allergy<\/a>"],[0,5,"<a href=\"Models\/DataCorrectionRequest.php.html#15\">App\\Modules\\Patients\\Models\\DataCorrectionRequest<\/a>"],[0,16,"<a href=\"Models\/Patient.php.html#63\">App\\Modules\\Patients\\Models\\Patient<\/a>"],[0,9,"<a href=\"Models\/PatientInsurance.php.html#35\">App\\Modules\\Patients\\Models\\PatientInsurance<\/a>"],[0,3,"<a href=\"Models\/PatientNextOfKin.php.html#33\">App\\Modules\\Patients\\Models\\PatientNextOfKin<\/a>"],[0,2,"<a href=\"Models\/PatientRelationship.php.html#25\">App\\Modules\\Patients\\Models\\PatientRelationship<\/a>"],[100,2,"<a href=\"Module.php.html#29\">App\\Modules\\Patients\\Module<\/a>"],[0,16,"<a href=\"Policies\/PatientPolicy.php.html#12\">App\\Modules\\Patients\\Policies\\PatientPolicy<\/a>"],[100,1,"<a href=\"Providers\/PatientsServiceProvider.php.html#13\">App\\Modules\\Patients\\Providers\\PatientsServiceProvider<\/a>"],[0,6,"<a href=\"Repositories\/Eloquent\/EloquentAllergyRepository.php.html#16\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentAllergyRepository<\/a>"],[0,6,"<a href=\"Repositories\/Eloquent\/EloquentNextOfKinRepository.php.html#16\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentNextOfKinRepository<\/a>"],[0,6,"<a href=\"Repositories\/Eloquent\/EloquentPatientInsuranceRepository.php.html#16\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentPatientInsuranceRepository<\/a>"],[0,32,"<a href=\"Repositories\/Eloquent\/EloquentPatientRepository.php.html#19\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentPatientRepository<\/a>"],[0,2,"<a href=\"Requests\/MergePatientRequest.php.html#9\">App\\Modules\\Patients\\Requests\\MergePatientRequest<\/a>"],[0,2,"<a href=\"Requests\/ReviewDataCorrectionRequest.php.html#10\">App\\Modules\\Patients\\Requests\\ReviewDataCorrectionRequest<\/a>"],[0,2,"<a href=\"Requests\/StoreAllergyRequest.php.html#9\">App\\Modules\\Patients\\Requests\\StoreAllergyRequest<\/a>"],[0,2,"<a href=\"Requests\/StoreDataCorrectionRequest.php.html#9\">App\\Modules\\Patients\\Requests\\StoreDataCorrectionRequest<\/a>"],[0,2,"<a href=\"Requests\/StoreNextOfKinRequest.php.html#9\">App\\Modules\\Patients\\Requests\\StoreNextOfKinRequest<\/a>"],[0,2,"<a href=\"Requests\/StorePatientInsuranceRequest.php.html#9\">App\\Modules\\Patients\\Requests\\StorePatientInsuranceRequest<\/a>"],[0,2,"<a href=\"Requests\/StorePatientRequest.php.html#9\">App\\Modules\\Patients\\Requests\\StorePatientRequest<\/a>"],[0,2,"<a href=\"Requests\/UpdateNextOfKinRequest.php.html#9\">App\\Modules\\Patients\\Requests\\UpdateNextOfKinRequest<\/a>"],[0,2,"<a href=\"Requests\/UpdatePatientInsuranceRequest.php.html#9\">App\\Modules\\Patients\\Requests\\UpdatePatientInsuranceRequest<\/a>"],[0,2,"<a href=\"Requests\/UpdatePatientRequest.php.html#9\">App\\Modules\\Patients\\Requests\\UpdatePatientRequest<\/a>"],[0,1,"<a href=\"Resources\/AllergyResource.php.html#13\">App\\Modules\\Patients\\Resources\\AllergyResource<\/a>"],[0,1,"<a href=\"Resources\/DataCorrectionRequestResource.php.html#10\">App\\Modules\\Patients\\Resources\\DataCorrectionRequestResource<\/a>"],[0,1,"<a href=\"Resources\/NextOfKinResource.php.html#13\">App\\Modules\\Patients\\Resources\\NextOfKinResource<\/a>"],[0,2,"<a href=\"Resources\/PatientInsuranceResource.php.html#13\">App\\Modules\\Patients\\Resources\\PatientInsuranceResource<\/a>"],[0,2,"<a href=\"Resources\/PatientResource.php.html#19\">App\\Modules\\Patients\\Resources\\PatientResource<\/a>"],[0,4,"<a href=\"Scopes\/OwnPatientDataScope.php.html#16\">App\\Modules\\Patients\\Scopes\\OwnPatientDataScope<\/a>"],[0,11,"<a href=\"Services\/AllergyService.php.html#14\">App\\Modules\\Patients\\Services\\AllergyService<\/a>"],[0,9,"<a href=\"Services\/DataCorrectionRequestService.php.html#17\">App\\Modules\\Patients\\Services\\DataCorrectionRequestService<\/a>"],[0,26,"<a href=\"Services\/DedupeMatcher.php.html#22\">App\\Modules\\Patients\\Services\\DedupeMatcher<\/a>"],[0,14,"<a href=\"Services\/NextOfKinService.php.html#13\">App\\Modules\\Patients\\Services\\NextOfKinService<\/a>"],[0,20,"<a href=\"Services\/PatientInsuranceService.php.html#14\">App\\Modules\\Patients\\Services\\PatientInsuranceService<\/a>"],[0,28,"<a href=\"Services\/PatientService.php.html#27\">App\\Modules\\Patients\\Services\\PatientService<\/a>"],[0,1,"<a href=\"Traits\/HasOwnPatientDataScope.php.html#9\">App\\Modules\\Patients\\Traits\\HasOwnPatientDataScope<\/a>"]], 'Class Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Method Complexity');
+
+    d3.select('#methodComplexity svg')
+      .datum(getComplexityData([[0,1,"<a href=\"Controllers\/AllergyController.php.html#17\">App\\Modules\\Patients\\Controllers\\AllergyController::__construct<\/a>"],[0,1,"<a href=\"Controllers\/AllergyController.php.html#19\">App\\Modules\\Patients\\Controllers\\AllergyController::index<\/a>"],[0,1,"<a href=\"Controllers\/AllergyController.php.html#27\">App\\Modules\\Patients\\Controllers\\AllergyController::store<\/a>"],[0,1,"<a href=\"Controllers\/AllergyController.php.html#37\">App\\Modules\\Patients\\Controllers\\AllergyController::destroy<\/a>"],[0,1,"<a href=\"Controllers\/DataCorrectionRequestController.php.html#21\">App\\Modules\\Patients\\Controllers\\DataCorrectionRequestController::__construct<\/a>"],[0,1,"<a href=\"Controllers\/DataCorrectionRequestController.php.html#23\">App\\Modules\\Patients\\Controllers\\DataCorrectionRequestController::index<\/a>"],[0,1,"<a href=\"Controllers\/DataCorrectionRequestController.php.html#45\">App\\Modules\\Patients\\Controllers\\DataCorrectionRequestController::store<\/a>"],[0,1,"<a href=\"Controllers\/DataCorrectionRequestController.php.html#61\">App\\Modules\\Patients\\Controllers\\DataCorrectionRequestController::review<\/a>"],[0,1,"<a href=\"Controllers\/NextOfKinController.php.html#18\">App\\Modules\\Patients\\Controllers\\NextOfKinController::__construct<\/a>"],[0,1,"<a href=\"Controllers\/NextOfKinController.php.html#20\">App\\Modules\\Patients\\Controllers\\NextOfKinController::index<\/a>"],[0,1,"<a href=\"Controllers\/NextOfKinController.php.html#28\">App\\Modules\\Patients\\Controllers\\NextOfKinController::store<\/a>"],[0,1,"<a href=\"Controllers\/NextOfKinController.php.html#38\">App\\Modules\\Patients\\Controllers\\NextOfKinController::update<\/a>"],[0,1,"<a href=\"Controllers\/NextOfKinController.php.html#48\">App\\Modules\\Patients\\Controllers\\NextOfKinController::destroy<\/a>"],[0,1,"<a href=\"Controllers\/PatientController.php.html#22\">App\\Modules\\Patients\\Controllers\\PatientController::__construct<\/a>"],[0,1,"<a href=\"Controllers\/PatientController.php.html#24\">App\\Modules\\Patients\\Controllers\\PatientController::index<\/a>"],[0,1,"<a href=\"Controllers\/PatientController.php.html#46\">App\\Modules\\Patients\\Controllers\\PatientController::store<\/a>"],[0,1,"<a href=\"Controllers\/PatientController.php.html#56\">App\\Modules\\Patients\\Controllers\\PatientController::show<\/a>"],[0,1,"<a href=\"Controllers\/PatientController.php.html#63\">App\\Modules\\Patients\\Controllers\\PatientController::update<\/a>"],[0,1,"<a href=\"Controllers\/PatientController.php.html#71\">App\\Modules\\Patients\\Controllers\\PatientController::destroy<\/a>"],[0,1,"<a href=\"Controllers\/PatientController.php.html#81\">App\\Modules\\Patients\\Controllers\\PatientController::merge<\/a>"],[0,1,"<a href=\"Controllers\/PatientInsuranceController.php.html#18\">App\\Modules\\Patients\\Controllers\\PatientInsuranceController::__construct<\/a>"],[0,1,"<a href=\"Controllers\/PatientInsuranceController.php.html#20\">App\\Modules\\Patients\\Controllers\\PatientInsuranceController::index<\/a>"],[0,1,"<a href=\"Controllers\/PatientInsuranceController.php.html#28\">App\\Modules\\Patients\\Controllers\\PatientInsuranceController::store<\/a>"],[0,1,"<a href=\"Controllers\/PatientInsuranceController.php.html#38\">App\\Modules\\Patients\\Controllers\\PatientInsuranceController::update<\/a>"],[0,1,"<a href=\"Controllers\/PatientInsuranceController.php.html#48\">App\\Modules\\Patients\\Controllers\\PatientInsuranceController::destroy<\/a>"],[0,1,"<a href=\"Controllers\/PatientSearchController.php.html#20\">App\\Modules\\Patients\\Controllers\\PatientSearchController::__construct<\/a>"],[0,2,"<a href=\"Controllers\/PatientSearchController.php.html#22\">App\\Modules\\Patients\\Controllers\\PatientSearchController::__invoke<\/a>"],[0,1,"<a href=\"Dto\/PatientDto.php.html#16\">App\\Modules\\Patients\\Dto\\PatientDto::__construct<\/a>"],[0,4,"<a href=\"Dto\/PatientDto.php.html#40\">App\\Modules\\Patients\\Dto\\PatientDto::fromArray<\/a>"],[0,2,"<a href=\"Dto\/PatientDto.php.html#68\">App\\Modules\\Patients\\Dto\\PatientDto::toModelAttributes<\/a>"],[0,1,"<a href=\"Models\/Allergy.php.html#60\">App\\Modules\\Patients\\Models\\Allergy::booted<\/a>"],[0,1,"<a href=\"Models\/Allergy.php.html#65\">App\\Modules\\Patients\\Models\\Allergy::patient<\/a>"],[0,1,"<a href=\"Models\/Allergy.php.html#70\">App\\Modules\\Patients\\Models\\Allergy::branch<\/a>"],[0,1,"<a href=\"Models\/Allergy.php.html#75\">App\\Modules\\Patients\\Models\\Allergy::recordedBy<\/a>"],[0,1,"<a href=\"Models\/DataCorrectionRequest.php.html#46\">App\\Modules\\Patients\\Models\\DataCorrectionRequest::booted<\/a>"],[0,1,"<a href=\"Models\/DataCorrectionRequest.php.html#51\">App\\Modules\\Patients\\Models\\DataCorrectionRequest::branch<\/a>"],[0,1,"<a href=\"Models\/DataCorrectionRequest.php.html#56\">App\\Modules\\Patients\\Models\\DataCorrectionRequest::patient<\/a>"],[0,1,"<a href=\"Models\/DataCorrectionRequest.php.html#61\">App\\Modules\\Patients\\Models\\DataCorrectionRequest::requester<\/a>"],[0,1,"<a href=\"Models\/DataCorrectionRequest.php.html#66\">App\\Modules\\Patients\\Models\\DataCorrectionRequest::reviewer<\/a>"],[0,1,"<a href=\"Models\/Patient.php.html#122\">App\\Modules\\Patients\\Models\\Patient::booted<\/a>"],[0,1,"<a href=\"Models\/Patient.php.html#127\">App\\Modules\\Patients\\Models\\Patient::getActivitylogOptions<\/a>"],[0,1,"<a href=\"Models\/Patient.php.html#140\">App\\Modules\\Patients\\Models\\Patient::branch<\/a>"],[0,1,"<a href=\"Models\/Patient.php.html#145\">App\\Modules\\Patients\\Models\\Patient::registeredBy<\/a>"],[0,1,"<a href=\"Models\/Patient.php.html#150\">App\\Modules\\Patients\\Models\\Patient::nextOfKin<\/a>"],[0,1,"<a href=\"Models\/Patient.php.html#155\">App\\Modules\\Patients\\Models\\Patient::primaryNextOfKin<\/a>"],[0,1,"<a href=\"Models\/Patient.php.html#160\">App\\Modules\\Patients\\Models\\Patient::insurance<\/a>"],[0,1,"<a href=\"Models\/Patient.php.html#165\">App\\Modules\\Patients\\Models\\Patient::primaryInsurance<\/a>"],[0,1,"<a href=\"Models\/Patient.php.html#170\">App\\Modules\\Patients\\Models\\Patient::allergies<\/a>"],[0,1,"<a href=\"Models\/Patient.php.html#175\">App\\Modules\\Patients\\Models\\Patient::activeAllergies<\/a>"],[0,1,"<a href=\"Models\/Patient.php.html#180\">App\\Modules\\Patients\\Models\\Patient::relationships<\/a>"],[0,1,"<a href=\"Models\/Patient.php.html#185\">App\\Modules\\Patients\\Models\\Patient::fullName<\/a>"],[0,1,"<a href=\"Models\/Patient.php.html#190\">App\\Modules\\Patients\\Models\\Patient::ageYears<\/a>"],[0,2,"<a href=\"Models\/Patient.php.html#195\">App\\Modules\\Patients\\Models\\Patient::isMerged<\/a>"],[0,1,"<a href=\"Models\/Patient.php.html#200\">App\\Modules\\Patients\\Models\\Patient::getNoShowCountAttribute<\/a>"],[0,1,"<a href=\"Models\/PatientInsurance.php.html#70\">App\\Modules\\Patients\\Models\\PatientInsurance::booted<\/a>"],[0,1,"<a href=\"Models\/PatientInsurance.php.html#75\">App\\Modules\\Patients\\Models\\PatientInsurance::patient<\/a>"],[0,1,"<a href=\"Models\/PatientInsurance.php.html#80\">App\\Modules\\Patients\\Models\\PatientInsurance::branch<\/a>"],[0,6,"<a href=\"Models\/PatientInsurance.php.html#85\">App\\Modules\\Patients\\Models\\PatientInsurance::isCurrentlyValid<\/a>"],[0,1,"<a href=\"Models\/PatientNextOfKin.php.html#62\">App\\Modules\\Patients\\Models\\PatientNextOfKin::booted<\/a>"],[0,1,"<a href=\"Models\/PatientNextOfKin.php.html#67\">App\\Modules\\Patients\\Models\\PatientNextOfKin::patient<\/a>"],[0,1,"<a href=\"Models\/PatientNextOfKin.php.html#72\">App\\Modules\\Patients\\Models\\PatientNextOfKin::branch<\/a>"],[0,1,"<a href=\"Models\/PatientRelationship.php.html#46\">App\\Modules\\Patients\\Models\\PatientRelationship::patient<\/a>"],[0,1,"<a href=\"Models\/PatientRelationship.php.html#51\">App\\Modules\\Patients\\Models\\PatientRelationship::relatedPatient<\/a>"],[100,1,"<a href=\"Module.php.html#31\">App\\Modules\\Patients\\Module::register<\/a>"],[100,1,"<a href=\"Module.php.html#54\">App\\Modules\\Patients\\Module::boot<\/a>"],[0,3,"<a href=\"Policies\/PatientPolicy.php.html#28\">App\\Modules\\Patients\\Policies\\PatientPolicy::view<\/a>"],[0,5,"<a href=\"Policies\/PatientPolicy.php.html#37\">App\\Modules\\Patients\\Policies\\PatientPolicy::update<\/a>"],[0,3,"<a href=\"Policies\/PatientPolicy.php.html#58\">App\\Modules\\Patients\\Policies\\PatientPolicy::merge<\/a>"],[0,1,"<a href=\"Policies\/PatientPolicy.php.html#67\">App\\Modules\\Patients\\Policies\\PatientPolicy::create<\/a>"],[0,4,"<a href=\"Policies\/PatientPolicy.php.html#72\">App\\Modules\\Patients\\Policies\\PatientPolicy::delete<\/a>"],[100,1,"<a href=\"Providers\/PatientsServiceProvider.php.html#15\">App\\Modules\\Patients\\Providers\\PatientsServiceProvider::boot<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentAllergyRepository.php.html#20\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentAllergyRepository::listForPatient<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentAllergyRepository.php.html#30\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentAllergyRepository::find<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentAllergyRepository.php.html#36\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentAllergyRepository::create<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentAllergyRepository.php.html#42\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentAllergyRepository::update<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentAllergyRepository.php.html#50\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentAllergyRepository::delete<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentAllergyRepository.php.html#55\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentAllergyRepository::activeDrugAllergiesFor<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentNextOfKinRepository.php.html#20\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentNextOfKinRepository::listForPatient<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentNextOfKinRepository.php.html#30\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentNextOfKinRepository::find<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentNextOfKinRepository.php.html#36\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentNextOfKinRepository::create<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentNextOfKinRepository.php.html#42\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentNextOfKinRepository::update<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentNextOfKinRepository.php.html#50\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentNextOfKinRepository::delete<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentNextOfKinRepository.php.html#55\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentNextOfKinRepository::setPrimary<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentPatientInsuranceRepository.php.html#20\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentPatientInsuranceRepository::listForPatient<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentPatientInsuranceRepository.php.html#30\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentPatientInsuranceRepository::find<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentPatientInsuranceRepository.php.html#36\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentPatientInsuranceRepository::create<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentPatientInsuranceRepository.php.html#42\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentPatientInsuranceRepository::update<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentPatientInsuranceRepository.php.html#50\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentPatientInsuranceRepository::delete<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentPatientInsuranceRepository.php.html#55\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentPatientInsuranceRepository::setPrimary<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentPatientRepository.php.html#23\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentPatientRepository::findById<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentPatientRepository.php.html#29\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentPatientRepository::findByPublicId<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentPatientRepository.php.html#35\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentPatientRepository::findByPatientNumber<\/a>"],[0,2,"<a href=\"Repositories\/Eloquent\/EloquentPatientRepository.php.html#41\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentPatientRepository::search<\/a>"],[0,17,"<a href=\"Repositories\/Eloquent\/EloquentPatientRepository.php.html#66\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentPatientRepository::paginate<\/a>"],[0,6,"<a href=\"Repositories\/Eloquent\/EloquentPatientRepository.php.html#111\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentPatientRepository::findPotentialDuplicates<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentPatientRepository.php.html#139\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentPatientRepository::create<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentPatientRepository.php.html#145\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentPatientRepository::update<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentPatientRepository.php.html#152\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentPatientRepository::softMerge<\/a>"],[0,1,"<a href=\"Repositories\/Eloquent\/EloquentPatientRepository.php.html#162\">App\\Modules\\Patients\\Repositories\\Eloquent\\EloquentPatientRepository::normalizeName<\/a>"],[0,1,"<a href=\"Requests\/MergePatientRequest.php.html#11\">App\\Modules\\Patients\\Requests\\MergePatientRequest::authorize<\/a>"],[0,1,"<a href=\"Requests\/MergePatientRequest.php.html#17\">App\\Modules\\Patients\\Requests\\MergePatientRequest::rules<\/a>"],[0,1,"<a href=\"Requests\/ReviewDataCorrectionRequest.php.html#12\">App\\Modules\\Patients\\Requests\\ReviewDataCorrectionRequest::authorize<\/a>"],[0,1,"<a href=\"Requests\/ReviewDataCorrectionRequest.php.html#18\">App\\Modules\\Patients\\Requests\\ReviewDataCorrectionRequest::rules<\/a>"],[0,1,"<a href=\"Requests\/StoreAllergyRequest.php.html#11\">App\\Modules\\Patients\\Requests\\StoreAllergyRequest::authorize<\/a>"],[0,1,"<a href=\"Requests\/StoreAllergyRequest.php.html#17\">App\\Modules\\Patients\\Requests\\StoreAllergyRequest::rules<\/a>"],[0,1,"<a href=\"Requests\/StoreDataCorrectionRequest.php.html#11\">App\\Modules\\Patients\\Requests\\StoreDataCorrectionRequest::authorize<\/a>"],[0,1,"<a href=\"Requests\/StoreDataCorrectionRequest.php.html#17\">App\\Modules\\Patients\\Requests\\StoreDataCorrectionRequest::rules<\/a>"],[0,1,"<a href=\"Requests\/StoreNextOfKinRequest.php.html#11\">App\\Modules\\Patients\\Requests\\StoreNextOfKinRequest::authorize<\/a>"],[0,1,"<a href=\"Requests\/StoreNextOfKinRequest.php.html#17\">App\\Modules\\Patients\\Requests\\StoreNextOfKinRequest::rules<\/a>"],[0,1,"<a href=\"Requests\/StorePatientInsuranceRequest.php.html#11\">App\\Modules\\Patients\\Requests\\StorePatientInsuranceRequest::authorize<\/a>"],[0,1,"<a href=\"Requests\/StorePatientInsuranceRequest.php.html#17\">App\\Modules\\Patients\\Requests\\StorePatientInsuranceRequest::rules<\/a>"],[0,1,"<a href=\"Requests\/StorePatientRequest.php.html#11\">App\\Modules\\Patients\\Requests\\StorePatientRequest::authorize<\/a>"],[0,1,"<a href=\"Requests\/StorePatientRequest.php.html#17\">App\\Modules\\Patients\\Requests\\StorePatientRequest::rules<\/a>"],[0,1,"<a href=\"Requests\/UpdateNextOfKinRequest.php.html#11\">App\\Modules\\Patients\\Requests\\UpdateNextOfKinRequest::authorize<\/a>"],[0,1,"<a href=\"Requests\/UpdateNextOfKinRequest.php.html#17\">App\\Modules\\Patients\\Requests\\UpdateNextOfKinRequest::rules<\/a>"],[0,1,"<a href=\"Requests\/UpdatePatientInsuranceRequest.php.html#11\">App\\Modules\\Patients\\Requests\\UpdatePatientInsuranceRequest::authorize<\/a>"],[0,1,"<a href=\"Requests\/UpdatePatientInsuranceRequest.php.html#17\">App\\Modules\\Patients\\Requests\\UpdatePatientInsuranceRequest::rules<\/a>"],[0,1,"<a href=\"Requests\/UpdatePatientRequest.php.html#11\">App\\Modules\\Patients\\Requests\\UpdatePatientRequest::authorize<\/a>"],[0,1,"<a href=\"Requests\/UpdatePatientRequest.php.html#17\">App\\Modules\\Patients\\Requests\\UpdatePatientRequest::rules<\/a>"],[0,1,"<a href=\"Resources\/AllergyResource.php.html#16\">App\\Modules\\Patients\\Resources\\AllergyResource::toArray<\/a>"],[0,1,"<a href=\"Resources\/DataCorrectionRequestResource.php.html#13\">App\\Modules\\Patients\\Resources\\DataCorrectionRequestResource::toArray<\/a>"],[0,1,"<a href=\"Resources\/NextOfKinResource.php.html#16\">App\\Modules\\Patients\\Resources\\NextOfKinResource::toArray<\/a>"],[0,2,"<a href=\"Resources\/PatientInsuranceResource.php.html#16\">App\\Modules\\Patients\\Resources\\PatientInsuranceResource::toArray<\/a>"],[0,2,"<a href=\"Resources\/PatientResource.php.html#22\">App\\Modules\\Patients\\Resources\\PatientResource::toArray<\/a>"],[0,4,"<a href=\"Scopes\/OwnPatientDataScope.php.html#18\">App\\Modules\\Patients\\Scopes\\OwnPatientDataScope::apply<\/a>"],[0,1,"<a href=\"Services\/AllergyService.php.html#16\">App\\Modules\\Patients\\Services\\AllergyService::__construct<\/a>"],[0,1,"<a href=\"Services\/AllergyService.php.html#21\">App\\Modules\\Patients\\Services\\AllergyService::listForPatient<\/a>"],[0,1,"<a href=\"Services\/AllergyService.php.html#26\">App\\Modules\\Patients\\Services\\AllergyService::create<\/a>"],[0,3,"<a href=\"Services\/AllergyService.php.html#37\">App\\Modules\\Patients\\Services\\AllergyService::update<\/a>"],[0,3,"<a href=\"Services\/AllergyService.php.html#48\">App\\Modules\\Patients\\Services\\AllergyService::delete<\/a>"],[0,2,"<a href=\"Services\/AllergyService.php.html#59\">App\\Modules\\Patients\\Services\\AllergyService::requirePatient<\/a>"],[0,1,"<a href=\"Services\/DataCorrectionRequestService.php.html#19\">App\\Modules\\Patients\\Services\\DataCorrectionRequestService::__construct<\/a>"],[0,5,"<a href=\"Services\/DataCorrectionRequestService.php.html#22\">App\\Modules\\Patients\\Services\\DataCorrectionRequestService::createForPatient<\/a>"],[0,3,"<a href=\"Services\/DataCorrectionRequestService.php.html#63\">App\\Modules\\Patients\\Services\\DataCorrectionRequestService::review<\/a>"],[0,1,"<a href=\"Services\/DedupeMatcher.php.html#24\">App\\Modules\\Patients\\Services\\DedupeMatcher::__construct<\/a>"],[0,11,"<a href=\"Services\/DedupeMatcher.php.html#29\">App\\Modules\\Patients\\Services\\DedupeMatcher::candidatesFor<\/a>"],[0,4,"<a href=\"Services\/DedupeMatcher.php.html#78\">App\\Modules\\Patients\\Services\\DedupeMatcher::bothPresent<\/a>"],[0,3,"<a href=\"Services\/DedupeMatcher.php.html#83\">App\\Modules\\Patients\\Services\\DedupeMatcher::normalizePhone<\/a>"],[0,7,"<a href=\"Services\/DedupeMatcher.php.html#96\">App\\Modules\\Patients\\Services\\DedupeMatcher::nameMatches<\/a>"],[0,1,"<a href=\"Services\/NextOfKinService.php.html#15\">App\\Modules\\Patients\\Services\\NextOfKinService::__construct<\/a>"],[0,1,"<a href=\"Services\/NextOfKinService.php.html#20\">App\\Modules\\Patients\\Services\\NextOfKinService::listForPatient<\/a>"],[0,2,"<a href=\"Services\/NextOfKinService.php.html#25\">App\\Modules\\Patients\\Services\\NextOfKinService::create<\/a>"],[0,5,"<a href=\"Services\/NextOfKinService.php.html#39\">App\\Modules\\Patients\\Services\\NextOfKinService::update<\/a>"],[0,3,"<a href=\"Services\/NextOfKinService.php.html#54\">App\\Modules\\Patients\\Services\\NextOfKinService::delete<\/a>"],[0,2,"<a href=\"Services\/NextOfKinService.php.html#65\">App\\Modules\\Patients\\Services\\NextOfKinService::requirePatient<\/a>"],[0,1,"<a href=\"Services\/PatientInsuranceService.php.html#16\">App\\Modules\\Patients\\Services\\PatientInsuranceService::__construct<\/a>"],[0,1,"<a href=\"Services\/PatientInsuranceService.php.html#21\">App\\Modules\\Patients\\Services\\PatientInsuranceService::listForPatient<\/a>"],[0,2,"<a href=\"Services\/PatientInsuranceService.php.html#26\">App\\Modules\\Patients\\Services\\PatientInsuranceService::create<\/a>"],[0,5,"<a href=\"Services\/PatientInsuranceService.php.html#42\">App\\Modules\\Patients\\Services\\PatientInsuranceService::update<\/a>"],[0,3,"<a href=\"Services\/PatientInsuranceService.php.html#59\">App\\Modules\\Patients\\Services\\PatientInsuranceService::delete<\/a>"],[0,6,"<a href=\"Services\/PatientInsuranceService.php.html#73\">App\\Modules\\Patients\\Services\\PatientInsuranceService::assertSchemeRules<\/a>"],[0,2,"<a href=\"Services\/PatientInsuranceService.php.html#91\">App\\Modules\\Patients\\Services\\PatientInsuranceService::requirePatient<\/a>"],[0,1,"<a href=\"Services\/PatientService.php.html#29\">App\\Modules\\Patients\\Services\\PatientService::__construct<\/a>"],[0,3,"<a href=\"Services\/PatientService.php.html#42\">App\\Modules\\Patients\\Services\\PatientService::register<\/a>"],[0,8,"<a href=\"Services\/PatientService.php.html#89\">App\\Modules\\Patients\\Services\\PatientService::update<\/a>"],[0,1,"<a href=\"Services\/PatientService.php.html#138\">App\\Modules\\Patients\\Services\\PatientService::softDelete<\/a>"],[0,2,"<a href=\"Services\/PatientService.php.html#143\">App\\Modules\\Patients\\Services\\PatientService::findByPublicId<\/a>"],[0,2,"<a href=\"Services\/PatientService.php.html#154\">App\\Modules\\Patients\\Services\\PatientService::findByPatientNumber<\/a>"],[0,1,"<a href=\"Services\/PatientService.php.html#168\">App\\Modules\\Patients\\Services\\PatientService::search<\/a>"],[0,1,"<a href=\"Services\/PatientService.php.html#176\">App\\Modules\\Patients\\Services\\PatientService::paginate<\/a>"],[0,4,"<a href=\"Services\/PatientService.php.html#185\">App\\Modules\\Patients\\Services\\PatientService::merge<\/a>"],[0,5,"<a href=\"Services\/PatientService.php.html#200\">App\\Modules\\Patients\\Services\\PatientService::resolveBranchId<\/a>"],[0,1,"<a href=\"Traits\/HasOwnPatientDataScope.php.html#14\">App\\Modules\\Patients\\Traits\\HasOwnPatientDataScope::bootHasOwnPatientDataScope<\/a>"]], 'Method Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getComplexityData(data, label) {
+    var values = [];
+    $.each(data, function(key) {
+      var value = Math.round(data[key][0]*100) / 100;
+      values.push({
+        x: value,
+        y: data[key][1],
+        class: data[key][2],
+        size: 0.05,
+        shape: 'diamond'
+      });
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+});
+  </script>
+ </body>
+</html>

@@ -845,11 +845,13 @@ final class ReportingController extends Controller
 
         $appointments = $query->get();
         $totalBooked = $appointments->count();
-        $attended = $appointments->filter(fn($a) => in_array($a->status->value ?? $a->status, ['completed', 'checked_in']))->count();
+        $attended = $appointments->filter(fn($a) => in_array($a->status->value ?? $a->status, ['completed', 'checked_in', 'in_progress']))->count();
         $missed = $appointments->filter(fn($a) => ($a->status->value ?? $a->status) === 'no_show')->count();
         $cancelled = $appointments->filter(fn($a) => ($a->status->value ?? $a->status) === 'cancelled')->count();
         
-        $attendanceRate = $totalBooked > 0 ? round(($attended / $totalBooked) * 100, 1) . '%' : '0%';
+        $eligible = max(0, $totalBooked - $cancelled);
+        $attendanceRate = $eligible > 0 ? round(($attended / $eligible) * 100, 1) . '%' : '0%';
+        $noShowRate = $eligible > 0 ? round(($missed / $eligible) * 100, 1) . '%' : '0%';
         $cancellationRate = $totalBooked > 0 ? round(($cancelled / $totalBooked) * 100, 1) . '%' : '0%';
 
         // Wait Time Calculation (Check-in vs Consultation Start)
@@ -864,7 +866,7 @@ final class ReportingController extends Controller
                 return [
                     'date' => $date,
                     'booked' => $group->count(),
-                    'attended' => $group->filter(fn($a) => in_array($a->status->value ?? $a->status, ['completed', 'checked_in']))->count(),
+                    'attended' => $group->filter(fn($a) => in_array($a->status->value ?? $a->status, ['completed', 'checked_in', 'in_progress']))->count(),
                     'missed' => $group->filter(fn($a) => ($a->status->value ?? $a->status) === 'no_show')->count(),
                 ];
             })->sortBy('date')->values()->toArray();
@@ -872,7 +874,7 @@ final class ReportingController extends Controller
         $tableData = $appointments->groupBy(fn($a) => $a->appointment_date->format('Y-m-d'))
             ->map(function ($group, $date) {
                 $booked = $group->count();
-                $att = $group->filter(fn($a) => in_array($a->status->value ?? $a->status, ['completed', 'checked_in']))->count();
+                $att = $group->filter(fn($a) => in_array($a->status->value ?? $a->status, ['completed', 'checked_in', 'in_progress']))->count();
                 $miss = $group->filter(fn($a) => ($a->status->value ?? $a->status) === 'no_show')->count();
                 return [
                     'date' => $date,
@@ -898,13 +900,41 @@ final class ReportingController extends Controller
                 'count' => $group->count()
             ])->sortBy('hour')->values()->toArray();
 
-        // Doctor Utilization (simple booked count for now)
-        $doctorUtilization = $appointments->filter(fn($a) => $a->doctor)
-            ->groupBy(fn($a) => $a->doctor->name)
-            ->map(fn($group, $doctor) => [
-                'doctor' => 'Dr. ' . $doctor,
-                'appointments' => $group->count()
-            ])->sortByDesc('appointments')->values()->toArray();
+        // Doctor utilization = booked capacity divided by scheduled slot capacity.
+        $periodFrom = $from ? Carbon::parse($from)->startOfDay() : ($appointments->min('appointment_date') ?: today());
+        $periodTo = $to ? Carbon::parse($to)->startOfDay() : ($appointments->max('appointment_date') ?: today());
+        $periodTo = $periodTo->copy()->min($periodFrom->copy()->addDays(92));
+        $doctorUtilization = [];
+        $doctors = $appointments->filter(fn($a) => $a->doctor)->groupBy('doctor_id');
+
+        foreach ($doctors as $doctorId => $doctorAppointments) {
+            $doctor = $doctorAppointments->first()->doctor;
+            $capacity = 0;
+            foreach (\Carbon\CarbonPeriod::create($periodFrom, $periodTo) as $date) {
+                $schedules = \App\Modules\Appointments\Models\DoctorSchedule::withoutGlobalScopes()
+                    ->where('doctor_id', $doctorId)
+                    ->where('branch_id', $doctorAppointments->first()->branch_id)
+                    ->where('is_active', true)
+                    ->whereDate('valid_from', '<=', $date)
+                    ->where(fn ($q) => $q->whereNull('valid_until')->orWhereDate('valid_until', '>=', $date))
+                    ->get();
+
+                foreach ($schedules as $schedule) {
+                    $slots = app(\App\Modules\Appointments\Services\SlotGeneratorService::class)
+                        ->getAvailableSlots((int) $doctorId, $date, (int) $schedule->branch_id, (string) $schedule->id);
+                    $capacity += count($slots) * max(1, (int) $schedule->max_concurrent);
+                }
+            }
+
+            $booked = $doctorAppointments->filter(fn($a) => !in_array($a->status->value ?? $a->status, ['cancelled', 'rescheduled']))->count();
+            $doctorUtilization[] = [
+                'doctor' => 'Dr. '.$doctor->name,
+                'appointments' => $booked,
+                'available_slots' => $capacity,
+                'utilization_rate' => $capacity > 0 ? round(($booked / $capacity) * 100, 1).'%' : '0%',
+            ];
+        }
+        usort($doctorUtilization, fn ($a, $b) => $b['appointments'] <=> $a['appointments']);
 
         return response()->json([
             'kpis' => [
@@ -912,6 +942,7 @@ final class ReportingController extends Controller
                 'attended' => $attended,
                 'missed' => $missed,
                 'attendance_rate' => $attendanceRate,
+                'no_show_rate' => $noShowRate,
                 'cancellation_rate' => $cancellationRate,
                 'average_wait_time' => $averageWaitTime,
             ],

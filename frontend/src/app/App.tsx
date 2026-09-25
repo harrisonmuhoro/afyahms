@@ -163,6 +163,9 @@ const ScheduleManagerPage = lazy(() =>
 const AppointmentBookingPage = lazy(() =>
   import('@/features/appointments').then((m) => ({ default: m.AppointmentBookingPage })),
 );
+const AppointmentReschedulePage = lazy(() =>
+  import('@/features/appointments').then((m) => ({ default: m.AppointmentReschedulePage })),
+);
 const AppointmentDetailPage = lazy(() =>
   import('@/features/appointments').then((m) => ({ default: m.AppointmentDetailPage })),
 );
@@ -410,6 +413,14 @@ export function App(): JSX.Element {
             element={
               <ProtectedRoute permission="appointments.read">
                 <AppointmentDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="appointments/:id/reschedule"
+            element={
+              <ProtectedRoute permission="appointments.update">
+                <AppointmentReschedulePage />
               </ProtectedRoute>
             }
           />

@@ -13,6 +13,7 @@ interface AppointmentStatisticsResponse {
     attended: number;
     missed: number;
     attendance_rate: string;
+    no_show_rate: string;
     cancellation_rate: string;
     average_wait_time: number;
   };
@@ -115,7 +116,7 @@ export function AppointmentStatisticsReport(): JSX.Element {
 
       {data && (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4">
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-5 shadow-sm">
               <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wide">Total Booked</h3>
               <p className="mt-2 text-2xl font-black text-blue-600">{data.kpis.total_booked.toLocaleString()}</p>
@@ -135,6 +136,10 @@ export function AppointmentStatisticsReport(): JSX.Element {
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-5 shadow-sm">
               <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wide">Cancellation</h3>
               <p className="mt-2 text-2xl font-black text-orange-600">{data.kpis.cancellation_rate}</p>
+            </div>
+            <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-5 shadow-sm">
+              <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wide">No-show</h3>
+              <p className="mt-2 text-2xl font-black text-rose-600">{data.kpis.no_show_rate}</p>
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-5 shadow-sm">
               <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wide">Avg Wait</h3>

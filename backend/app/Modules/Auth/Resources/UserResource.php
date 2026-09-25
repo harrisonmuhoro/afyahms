@@ -36,7 +36,7 @@ final class UserResource extends JsonResource
             'employment_type'  => $user->employment_type,
             'employment_start_date' => $user->employment_start_date?->toDateString(),
             'locale'          => $user->locale ?? config('hospital.locale', 'en'),
-            'theme'           => $user->theme ?? 'light',
+            'theme'           => $user->theme ?? 'system',
             'is_active'       => ! $user->isDeactivated(),
             'deactivated_at'  => $user->deactivated_at?->toIso8601String(),
             'deactivated_reason' => $user->deactivated_reason,

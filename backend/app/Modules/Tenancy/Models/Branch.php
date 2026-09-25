@@ -29,11 +29,13 @@ class Branch extends Model
         'code', 'name', 'address', 'phone', 'email',
         'timezone', 'currency', 'is_active',
         'mpesa_shortcode', 'sha_facility_code',
+        'appointment_cancellation_window_hours',
     ];
 
     /** @var array<string, string> */
     protected $casts = [
         'is_active' => 'boolean',
+        'appointment_cancellation_window_hours' => 'integer',
     ];
 
     public function getActivitylogOptions(): LogOptions

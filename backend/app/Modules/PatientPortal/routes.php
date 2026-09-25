@@ -48,6 +48,7 @@ Route::prefix('api/v1/portal')
         // ── Billing ───────────────────────────────────────────────────────────
         Route::get('/invoices', [PortalInvoiceController::class, 'index']);
         Route::post('/invoices/{publicId}/pay', [PortalInvoiceController::class, 'pay']);
+        Route::get('/invoices/{publicId}/pay/status', [PortalInvoiceController::class, 'paymentStatus']);
 
         // ── Results (Lab + Radiology) ─────────────────────────────────────────
         Route::get('/results', [PortalResultsController::class, 'index']);

@@ -34,21 +34,21 @@ export function PortalHome(): JSX.Element {
     <>
       {/* Welcome Section */}
       <div className="mb-xl">
-        <h2 className="font-headline-lg text-headline-lg text-on-surface">Welcome back, {firstName}.</h2>
-        <p className="text-body-md text-on-surface-variant mt-1">Here is a summary of your recent health activity.</p>
+        <h2 className="font-headline-lg text-headline-lg text-on-surface dark:text-stone-100">Welcome back, {firstName}.</h2>
+        <p className="text-body-md text-on-surface-variant dark:text-stone-400 mt-1">Here is a summary of your recent health activity.</p>
       </div>
 
       {/* Bento Grid Dashboard */}
       <div className="grid grid-cols-12 gap-gutter">
         {/* Upcoming Appointment: Priority Card */}
-        <div className="col-span-12 lg:col-span-8 p-lg flex flex-col md:flex-row gap-lg items-center justify-center bg-white border border-outline-variant shadow-sm hover:shadow-md transition-all duration-200 rounded-[14px]">
+        <div className="col-span-12 lg:col-span-8 p-lg flex flex-col md:flex-row gap-lg items-center justify-center bg-white dark:bg-stone-900 border border-outline-variant dark:border-stone-800 shadow-sm hover:shadow-md transition-all duration-200 rounded-[14px]">
           {nextAppt ? (
             <div className="flex flex-col items-center justify-center text-center py-6 w-full">
               <div className="w-14 h-14 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center mb-3">
                 <Icon name="calendar" size={28} />
               </div>
-              <h3 className="font-headline-md text-headline-md mb-1 text-on-surface">Next Appointment</h3>
-              <p className="text-body-md text-on-surface-variant mb-4">
+              <h3 className="font-headline-md text-headline-md mb-1 text-on-surface dark:text-stone-100">Next Appointment</h3>
+              <p className="text-body-md text-on-surface-variant dark:text-stone-400 mb-4">
                 {new Date(nextAppt.appointment_date).toLocaleDateString('en-GB')} at {nextAppt.start_time}
               </p>
               <Link to="/portal/appointments" className="bg-primary text-on-primary px-lg py-2.5 rounded-lg text-body-sm font-semibold hover:opacity-90 transition-opacity">
@@ -57,11 +57,11 @@ export function PortalHome(): JSX.Element {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center text-center py-8">
-              <div className="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center mb-4">
-                <Icon name="calendar" size={32} className="text-on-surface-variant" />
+              <div className="w-16 h-16 bg-surface-container dark:bg-stone-800 rounded-full flex items-center justify-center mb-4">
+                <Icon name="calendar" size={32} className="text-on-surface-variant dark:text-stone-400" />
               </div>
-              <h3 className="font-headline-md text-headline-md mb-2 text-on-surface">No Upcoming Appointments</h3>
-              <p className="text-body-md text-on-surface-variant mb-6">You don't have any appointments scheduled.</p>
+              <h3 className="font-headline-md text-headline-md mb-2 text-on-surface dark:text-stone-100">No Upcoming Appointments</h3>
+              <p className="text-body-md text-on-surface-variant dark:text-stone-400 mb-6">You don't have any appointments scheduled.</p>
               <Link to="/portal/appointments" className="bg-primary text-on-primary px-lg py-3 rounded-lg text-body-sm font-semibold hover:opacity-90 transition-opacity">
                 Book an Appointment
               </Link>
@@ -73,12 +73,12 @@ export function PortalHome(): JSX.Element {
         <div className="col-span-12 lg:col-span-4 p-lg flex flex-col justify-between border-2 border-primary/20 bg-primary-container/5 hover:shadow-md transition-all duration-200 rounded-[14px]">
           <div>
             <div className="flex justify-between items-start mb-md">
-              <h3 className="font-headline-md text-headline-md text-on-surface">Outstanding Bills</h3>
+              <h3 className="font-headline-md text-headline-md text-on-surface dark:text-stone-100">Outstanding Bills</h3>
               <Icon name="wallet" size={32} className="text-primary" />
             </div>
             <div className="mb-lg">
-              <p className="text-[32px] font-bold text-on-surface">KES {outstandingBillsTotal.toLocaleString()}</p>
-              <p className="text-body-sm text-on-surface-variant">
+              <p className="text-[32px] font-bold text-on-surface dark:text-stone-100">KES {outstandingBillsTotal.toLocaleString()}</p>
+              <p className="text-body-sm text-on-surface-variant dark:text-stone-400">
                 {outstandingBillsTotal > 0 ? 'Pending payments' : 'All paid up!'}
               </p>
             </div>
@@ -90,9 +90,9 @@ export function PortalHome(): JSX.Element {
         </div>
 
         {/* Lab Results: Content Card */}
-        <div className="col-span-12 md:col-span-6 flex flex-col bg-white border border-outline-variant shadow-sm hover:shadow-md transition-all duration-200 rounded-[14px]">
-          <div className="px-lg py-md border-b border-outline-variant flex justify-between items-center">
-            <h3 className="font-headline-md text-headline-md text-on-surface">My Lab Results</h3>
+        <div className="col-span-12 md:col-span-6 flex flex-col bg-white dark:bg-stone-900 border border-outline-variant dark:border-stone-800 shadow-sm hover:shadow-md transition-all duration-200 rounded-[14px]">
+          <div className="px-lg py-md border-b border-outline-variant dark:border-stone-800 flex justify-between items-center">
+            <h3 className="font-headline-md text-headline-md text-on-surface dark:text-stone-100">My Lab Results</h3>
             <Link to="/portal/results" className="text-primary font-semibold text-body-sm hover:underline">View All</Link>
           </div>
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
@@ -101,22 +101,22 @@ export function PortalHome(): JSX.Element {
                  <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-3">
                    <Icon name="laboratory" size={24} />
                  </div>
-                 <p className="font-bold text-on-surface">{recentLabResults.length} Lab Results</p>
-                 <p className="text-body-sm text-on-surface-variant">Available for viewing</p>
+                 <p className="font-bold text-on-surface dark:text-stone-100">{recentLabResults.length} Lab Results</p>
+                 <p className="text-body-sm text-on-surface-variant dark:text-stone-400">Available for viewing</p>
                </>
             ) : (
               <>
-                <Icon name="laboratory" size={32} className="text-on-surface-variant mb-3" />
-                <p className="text-body-md text-on-surface-variant">No recent lab results</p>
+                <Icon name="laboratory" size={32} className="text-on-surface-variant dark:text-stone-400 mb-3" />
+                <p className="text-body-md text-on-surface-variant dark:text-stone-400">No recent lab results</p>
               </>
             )}
           </div>
         </div>
 
         {/* Prescription Refills */}
-        <div className="col-span-12 md:col-span-6 flex flex-col bg-white border border-outline-variant shadow-sm hover:shadow-md transition-all duration-200 rounded-[14px]">
-          <div className="px-lg py-md border-b border-outline-variant flex justify-between items-center">
-            <h3 className="font-headline-md text-headline-md text-on-surface">Prescription Refills</h3>
+        <div className="col-span-12 md:col-span-6 flex flex-col bg-white dark:bg-stone-900 border border-outline-variant dark:border-stone-800 shadow-sm hover:shadow-md transition-all duration-200 rounded-[14px]">
+          <div className="px-lg py-md border-b border-outline-variant dark:border-stone-800 flex justify-between items-center">
+            <h3 className="font-headline-md text-headline-md text-on-surface dark:text-stone-100">Prescription Refills</h3>
             <Link to="/portal/records" className="text-primary font-semibold text-body-sm hover:underline">Manage All</Link>
           </div>
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
@@ -125,12 +125,12 @@ export function PortalHome(): JSX.Element {
                  <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-3">
                    <Icon name="pharmacy" size={24} />
                  </div>
-                 <p className="font-bold text-on-surface">{prescriptionRefills.length} Active Prescriptions</p>
+                 <p className="font-bold text-on-surface dark:text-stone-100">{prescriptionRefills.length} Active Prescriptions</p>
                </>
             ) : (
               <>
-                <Icon name="pharmacy" size={32} className="text-on-surface-variant mb-3" />
-                <p className="text-body-md text-on-surface-variant">No active prescriptions</p>
+                <Icon name="pharmacy" size={32} className="text-on-surface-variant dark:text-stone-400 mb-3" />
+                <p className="text-body-md text-on-surface-variant dark:text-stone-400">No active prescriptions</p>
               </>
             )}
           </div>
@@ -151,9 +151,9 @@ export function PortalHome(): JSX.Element {
         </div>
 
         {/* Visit History */}
-        <div className="col-span-12 lg:col-span-7 flex flex-col bg-white border border-outline-variant shadow-sm hover:shadow-md transition-all duration-200 rounded-[14px]">
-          <div className="px-lg py-md border-b border-outline-variant flex justify-between items-center">
-            <h3 className="font-headline-md text-headline-md text-on-surface">Visit History</h3>
+        <div className="col-span-12 lg:col-span-7 flex flex-col bg-white dark:bg-stone-900 border border-outline-variant dark:border-stone-800 shadow-sm hover:shadow-md transition-all duration-200 rounded-[14px]">
+          <div className="px-lg py-md border-b border-outline-variant dark:border-stone-800 flex justify-between items-center">
+            <h3 className="font-headline-md text-headline-md text-on-surface dark:text-stone-100">Visit History</h3>
             <Link to="/portal/records" className="text-primary font-semibold text-body-sm hover:underline">Download Records</Link>
           </div>
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
@@ -162,12 +162,12 @@ export function PortalHome(): JSX.Element {
                  <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-3">
                    <Icon name="clinical" size={24} />
                  </div>
-                 <p className="font-bold text-on-surface">{visitHistory.length} Past Visits</p>
+                 <p className="font-bold text-on-surface dark:text-stone-100">{visitHistory.length} Past Visits</p>
                </>
             ) : (
               <>
-                <Icon name="fileText" size={32} className="text-on-surface-variant mb-3" />
-                <p className="text-body-md text-on-surface-variant">No past visits found</p>
+                <Icon name="fileText" size={32} className="text-on-surface-variant dark:text-stone-400 mb-3" />
+                <p className="text-body-md text-on-surface-variant dark:text-stone-400">No past visits found</p>
               </>
             )}
           </div>

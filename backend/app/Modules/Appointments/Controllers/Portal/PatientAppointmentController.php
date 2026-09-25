@@ -29,7 +29,7 @@ class PatientAppointmentController extends Controller
     {
         $patientId = $this->patientId($request);
 
-        $appointments = Appointment::with(['doctor', 'branch'])
+        $appointments = Appointment::with(['patient', 'doctor', 'branch'])
             ->where('patient_id', $patientId)
             ->orderBy('appointment_date', 'desc')
             ->orderBy('start_time', 'desc')
@@ -101,7 +101,7 @@ class PatientAppointmentController extends Controller
             $appointment = $this->appointmentService->book($data);
             return response()->json([
                 'message' => 'Appointment booked successfully.',
-                'appointment' => new AppointmentResource($appointment->load(['doctor', 'branch'])),
+                'appointment' => new AppointmentResource($appointment->load(['patient', 'doctor', 'branch'])),
             ], 201);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 422);
@@ -116,10 +116,12 @@ class PatientAppointmentController extends Controller
 
         $request->validate(['reason' => 'nullable|string|max:255']);
 
-        // Check if within 24 hours
+        // Patient cancellation is blocked inside the configurable branch policy window.
         $startsAt = $appointment->appointment_date->setTimeFromTimeString($appointment->start_time);
-        if (now()->diffInHours($startsAt, false) < 24) {
-            return response()->json(['message' => 'Cannot cancel within 24 hours of appointment. Please call the clinic.'], 422);
+        $windowHours = (int) ($appointment->branch?->appointment_cancellation_window_hours
+            ?? config('appointments.patient_cancellation_window_hours', 2));
+        if (now()->diffInHours($startsAt, false) < $windowHours) {
+            return response()->json(["message" => "Cannot cancel within {$windowHours} hours of appointment. Please call the clinic."], 422);
         }
 
         $this->appointmentService->cancel($appointment, $request->reason);

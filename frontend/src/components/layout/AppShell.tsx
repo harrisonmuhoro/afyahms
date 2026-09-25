@@ -98,7 +98,11 @@ export function AppShell(): JSX.Element {
         <div className="px-sm pb-lg mt-2 space-y-1">
           <button
             type="button"
-            className="flex w-full items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors rounded-lg text-body-md font-body-md"
+            onClick={() => {
+              navigate('/messages');
+              setSidebarOpen(false);
+            }}
+            className="flex w-full items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-stone-300 hover:bg-surface-container dark:hover:bg-stone-800 hover:text-primary transition-colors rounded-lg text-body-md font-body-md"
           >
             <span className="material-symbols-outlined">help</span>
             Support

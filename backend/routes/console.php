@@ -25,4 +25,4 @@ app(Schedule::class)
 app(Schedule::class)
     ->command('staff:purge-expired-contact-changes')->hourly();
 app(Schedule::class)
-    ->job(new MarkNoShowAppointments)->everyFifteenMinutes();
+    ->job(new MarkNoShowAppointments)->everyThirtyMinutes();

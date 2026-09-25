@@ -28,7 +28,7 @@ final class UpdatePreferencesRequest extends FormRequest
                 'sometimes',
                 'required',
                 'string',
-                Rule::in(['light', 'dark']),
+                Rule::in(['light', 'dark', 'system']),
             ],
         ];
     }

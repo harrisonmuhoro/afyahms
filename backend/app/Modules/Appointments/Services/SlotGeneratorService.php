@@ -6,6 +6,7 @@ namespace App\Modules\Appointments\Services;
 
 use App\Modules\Appointments\Models\Appointment;
 use App\Modules\Appointments\Models\DoctorSchedule;
+use App\Modules\Appointments\Models\BranchPublicHoliday;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -19,6 +20,14 @@ class SlotGeneratorService
      */
     public function getAvailableSlots(int $doctorId, Carbon $date, int $branchId, ?string $scheduleId = null): array
     {
+        if (BranchPublicHoliday::withoutGlobalScopes()
+            ->where('branch_id', $branchId)
+            ->whereDate('holiday_date', $date->toDateString())
+            ->where('is_active', true)
+            ->exists()) {
+            return [];
+        }
+
         // 1. Fetch active schedule
         $schedule = DoctorSchedule::with(['timeBlocks', 'overrides' => function ($q) use ($date) {
             $q->where('override_date', $date->toDateString());

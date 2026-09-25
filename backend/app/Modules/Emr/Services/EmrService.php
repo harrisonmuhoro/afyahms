@@ -13,6 +13,7 @@ use App\Modules\Emr\Models\SoapNote;
 use App\Modules\Emr\Repositories\Contracts\DiagnosisCatalogRepository;
 use App\Modules\Emr\Repositories\Contracts\EncounterRepository;
 use App\Modules\Queue\Repositories\Contracts\QueueRepository;
+use App\Modules\Appointments\Services\AppointmentService;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -29,6 +30,7 @@ final class EmrService
         private readonly EncounterRepository $encounters,
         private readonly DiagnosisCatalogRepository $catalog,
         private readonly QueueRepository $queue,
+        private readonly AppointmentService $appointments,
     ) {}
 
     /**
@@ -70,6 +72,10 @@ final class EmrService
 
             // Link the visit chain to this encounter.
             $visit->update(['encounter_id' => $encounter->id]);
+
+            if ($encounter->appointment_id !== null) {
+                $this->appointments->markInProgress((int) $encounter->appointment_id, (int) $encounter->id);
+            }
 
             return $encounter;
         });
@@ -275,11 +281,17 @@ final class EmrService
             }
 
             /** @var Encounter */
-            return $this->encounters->updateEncounter($encounter, [
+            $completed = $this->encounters->updateEncounter($encounter, [
                 'status'      => 'completed',
                 'disposition' => $disposition ?? $encounter->disposition,
                 'closed_at'   => now(),
             ]);
+
+            if ($completed->appointment_id !== null) {
+                $this->appointments->markCompleted((int) $completed->appointment_id, (int) $completed->id);
+            }
+
+            return $completed;
         });
     }
 

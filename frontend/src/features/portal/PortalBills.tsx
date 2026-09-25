@@ -33,7 +33,7 @@ export function PortalBills(): JSX.Element {
       await payMutation.mutateAsync({ publicId: payModal.publicId, phone });
       setPayModal(null);
       setPhone('');
-      showToast('Payment recorded successfully. Your bill has been marked as paid.', 'info');
+      showToast('M-Pesa prompt sent. Enter your PIN on your phone to complete the payment.', 'info');
     } catch {
       showToast('Payment failed. Please try again.', 'info');
     }
@@ -94,6 +94,9 @@ export function PortalBills(): JSX.Element {
             const cfg = STATUS_CONFIG[inv.status] ?? STATUS_CONFIG.pending;
             const outstanding = Math.max(0, inv.total_amount - inv.paid_amount);
             const dateStr = new Date(inv.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            const statusConfig = inv.mpesa_status === 'pending'
+              ? { label: 'Payment pending', classes: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' }
+              : cfg;
             return (
               <div key={inv.id} className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm dark:border-stone-800 dark:bg-stone-900">
                 <div className="mb-4 flex items-start justify-between gap-3">
@@ -101,7 +104,7 @@ export function PortalBills(): JSX.Element {
                     <p className="font-mono text-xs font-bold text-stone-400 dark:text-stone-500">{inv.public_id}</p>
                     <p className="mt-0.5 font-bold text-stone-900 dark:text-stone-100">{dateStr}</p>
                   </div>
-                  <span className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${cfg.classes}`}>{cfg.label}</span>
+                  <span className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusConfig.classes}`}>{statusConfig.label}</span>
                 </div>
                 {inv.items.length > 0 && (
                   <ul className="mb-4 space-y-1">

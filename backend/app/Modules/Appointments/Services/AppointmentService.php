@@ -7,6 +7,9 @@ namespace App\Modules\Appointments\Services;
 use App\Modules\Appointments\Enums\AppointmentStatus;
 use App\Modules\Appointments\Models\Appointment;
 use App\Modules\Appointments\Models\DoctorSchedule;
+use App\Modules\Queue\Models\Visit;
+use App\Modules\Queue\Services\QueueService;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class AppointmentService
@@ -14,6 +17,7 @@ class AppointmentService
     public function __construct(
         private readonly AppointmentNumberService $numberService,
         private readonly SlotGeneratorService $slotService,
+        private readonly QueueService $queueService,
     ) {}
 
     public function book(array $data): Appointment
@@ -67,6 +71,15 @@ class AppointmentService
         });
     }
 
+    public function update(Appointment $appointment, array $data): Appointment
+    {
+        $appointment->update(array_intersect_key($data, array_flip([
+            'type', 'reason', 'chief_complaint', 'notes',
+        ])));
+
+        return $appointment->refresh();
+    }
+
     public function cancel(Appointment $appointment, string $reason = null): bool
     {
         return $appointment->update([
@@ -85,18 +98,55 @@ class AppointmentService
         ]);
     }
 
-    public function checkIn(Appointment $appointment): bool
+    public function checkIn(Appointment $appointment, ?User $actor = null): bool
     {
+        if ($actor !== null && ! Visit::query()->where('appointment_id', $appointment->id)->exists()) {
+            $this->queueService->openVisit([
+                'patient_id' => $appointment->patient_id,
+                'appointment_id' => $appointment->id,
+                'visit_type' => 'appointment',
+            ], $actor);
+        }
+
         return $appointment->update([
             'status' => AppointmentStatus::CheckedIn,
             'checked_in_at' => now(),
         ]);
     }
 
-    public function markNoShow(Appointment $appointment): bool
+    public function markNoShow(Appointment $appointment, ?string $reason = null): bool
     {
         return $appointment->update([
             'status' => AppointmentStatus::NoShow,
+            'notes' => $reason !== null ? trim(($appointment->notes ? $appointment->notes."\n" : '').'No-show: '.$reason) : $appointment->notes,
+        ]);
+    }
+
+    public function markInProgress(int $appointmentId, int $encounterId): void
+    {
+        $appointment = Appointment::query()->find($appointmentId);
+        if ($appointment === null || $appointment->status?->isTerminal()) {
+            return;
+        }
+
+        $appointment->update([
+            'status' => AppointmentStatus::InProgress,
+            'consultation_start_time' => now(),
+            'encounter_id' => $encounterId,
+        ]);
+    }
+
+    public function markCompleted(int $appointmentId, int $encounterId): void
+    {
+        $appointment = Appointment::query()->find($appointmentId);
+        if ($appointment === null || $appointment->status?->isTerminal()) {
+            return;
+        }
+
+        $appointment->update([
+            'status' => AppointmentStatus::Completed,
+            'completed_at' => now(),
+            'encounter_id' => $encounterId,
         ]);
     }
 
@@ -105,14 +155,8 @@ class AppointmentService
         $conflictCount = Appointment::where('doctor_id', $doctorId)
             ->where('appointment_date', $date)
             ->whereNotIn('status', ['cancelled', 'rescheduled', 'no_show'])
-            ->where(function ($q) use ($startTime, $endTime) {
-                $q->whereBetween('start_time', [$startTime, $endTime])
-                  ->orWhereBetween('end_time', [$startTime, $endTime])
-                  ->orWhere(function ($q) use ($startTime, $endTime) {
-                      $q->where('start_time', '<=', $startTime)
-                        ->where('end_time', '>=', $endTime);
-                  });
-            })
+            ->where('start_time', '<', $endTime)
+            ->where('end_time', '>', $startTime)
             ->count();
 
         if ($conflictCount >= $schedule->max_concurrent) {

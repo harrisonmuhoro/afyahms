@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Appointments\Models;
 
 use App\Modules\Tenancy\Models\Branch;
+use App\Modules\Tenancy\Scopes\BranchScope;
 use App\Modules\Patients\Models\Patient;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -45,6 +46,9 @@ class Appointment extends Model
         'consultation_start_time',
         'rescheduled_from',
         'encounter_id',
+        'schedule_conflict',
+        'schedule_conflict_reason',
+        'schedule_conflict_at',
     ];
 
     protected $casts = [
@@ -57,6 +61,8 @@ class Appointment extends Model
         'consultation_start_time' => 'datetime',
         'completed_at' => 'datetime',
         'cancelled_at' => 'datetime',
+        'schedule_conflict' => 'boolean',
+        'schedule_conflict_at' => 'datetime',
     ];
 
     public function uniqueIds(): array
@@ -73,6 +79,11 @@ class Appointment extends Model
                 $model->public_id = (string) Str::uuid();
             }
         });
+    }
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new BranchScope());
     }
 
     public function patient(): BelongsTo

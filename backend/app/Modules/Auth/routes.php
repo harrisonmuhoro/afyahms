@@ -31,6 +31,7 @@ Route::prefix('google')->name('google.')->group(function () {
 // Protected
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/me',          [AuthController::class, 'me'])->name('me');
+    Route::get('/preferences', [AuthController::class, 'preferences'])->name('preferences.show');
     Route::post('/logout',     [AuthController::class, 'logout'])->name('logout');
     Route::post('/password',   [AuthController::class, 'changePassword'])->name('password');
     Route::patch('/preferences', [AuthController::class, 'updatePreferences'])->name('preferences');

@@ -49,6 +49,7 @@ final class PatientResource extends JsonResource
             'deceased'            => (bool) $patient->deceased,
             'deceased_at'         => $patient->deceased_at?->toDateString(),
             'branch_id'           => (int) $patient->branch_id,
+            'no_show_count'       => $patient->no_show_count,
             'is_active'           => (bool) $patient->is_active,
             'merged_into'         => $patient->merged_into_public_id,
             'merged_at'           => $patient->merged_at?->toIso8601String(),

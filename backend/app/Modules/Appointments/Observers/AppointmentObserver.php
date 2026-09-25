@@ -39,11 +39,11 @@ class AppointmentObserver
             $newStatus = $appointment->status;
 
             if ($newStatus === AppointmentStatus::Cancelled && $oldStatus !== AppointmentStatus::Cancelled) {
-                // Cancelled - send cancellation notification
-                \App\Modules\Appointments\Jobs\SendAppointmentReminder::dispatch($appointment, 'cancellation')->onQueue('notifications');
+                $this->reminderService->cancelPending($appointment);
+                $this->reminderService->dispatchImmediate($appointment, 'cancellation');
             } elseif ($newStatus === AppointmentStatus::Rescheduled && $oldStatus !== AppointmentStatus::Rescheduled) {
-                // Rescheduled - send reschedule notification
-                \App\Modules\Appointments\Jobs\SendAppointmentReminder::dispatch($appointment, 'reschedule')->onQueue('notifications');
+                $this->reminderService->cancelPending($appointment);
+                $this->reminderService->dispatchImmediate($appointment, 'reschedule');
             }
         }
     }

@@ -33,9 +33,12 @@ class AppointmentResource extends JsonResource
             'schedule' => new DoctorScheduleResource($this->whenLoaded('schedule')),
             'booked_by' => new UserResource($this->whenLoaded('bookedBy')),
             'cancelled_by' => new UserResource($this->whenLoaded('cancelledBy')),
-            'cancellation_reason' => $this->cancellation_reason,
+            'cancellation_reason' => $request->user()?->hasRole('patient') ? null : $this->cancellation_reason,
             'rescheduled_from' => $this->rescheduled_from,
             'encounter_id' => $this->encounter_id,
+            'schedule_conflict' => (bool) $this->schedule_conflict,
+            'schedule_conflict_reason' => $this->schedule_conflict_reason,
+            'schedule_conflict_at' => $this->schedule_conflict_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -11,42 +11,71 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class SendAppointmentReminder implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public int $tries = 3;
+
     public function __construct(
         public Appointment $appointment,
-        public string $type
+        public string $type,
+        public string $channel = 'email',
     ) {}
 
     public function handle(): void
     {
-        // Spec §7.3 specifies we just log for now unless configured
         $patient = $this->appointment->patient;
-        
-        $message = match($this->type) {
-            'confirmation' => "Appointment confirmed for {$this->appointment->appointment_date->format('M d')} at {$this->appointment->start_time}.",
-            '24h' => "Reminder: You have an appointment tomorrow at {$this->appointment->start_time}.",
-            '2h' => "Reminder: Your appointment is in 2 hours.",
-            'cancellation' => "Your appointment on {$this->appointment->appointment_date->format('M d')} has been cancelled.",
-            'reschedule' => "Your appointment has been rescheduled to {$this->appointment->appointment_date->format('M d')} at {$this->appointment->start_time}.",
-            default => "Appointment update.",
-        };
 
-        // Create the reminder record
-        $reminder = AppointmentReminder::create([
+        if (! $patient) {
+            throw new \RuntimeException('Appointment patient could not be loaded.');
+        }
+
+        if (in_array($this->appointment->status?->value, ['cancelled', 'rescheduled'], true)
+            && in_array($this->type, ['24h', '2h'], true)) {
+            return;
+        }
+
+        $reminder = AppointmentReminder::query()->firstOrNew([
             'appointment_id' => $this->appointment->id,
-            'channel' => 'sms', // Defaulting to SMS
+            'channel' => $this->channel,
             'type' => $this->type,
-            'scheduled_at' => now(),
+        ]);
+        $reminder->scheduled_at ??= now();
+        $reminder->status = 'pending';
+        $reminder->error_message = null;
+        $reminder->save();
+
+        $patient->notify(new \App\Notifications\AppointmentReminderNotification(
+            $this->appointment,
+            $this->type,
+            $this->channel,
+        ));
+
+        $reminder->update([
             'sent_at' => now(),
             'status' => 'sent',
         ]);
+    }
 
-        // Simulating sending SMS by logging it
-        Log::channel('sms_reminders')->info("SMS to {$patient->phone}: {$message}");
+    public function backoff(): array
+    {
+        return [30, 60, 120];
+    }
+
+    public function failed(Throwable $exception): void
+    {
+        AppointmentReminder::query()
+            ->where('appointment_id', $this->appointment->id)
+            ->where('channel', $this->channel)
+            ->where('type', $this->type)
+            ->latest('id')
+            ->first()
+            ?->update([
+                'status' => 'failed',
+                'error_message' => $exception->getMessage(),
+            ]);
     }
 }

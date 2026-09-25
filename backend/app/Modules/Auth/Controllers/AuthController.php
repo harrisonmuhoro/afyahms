@@ -66,6 +66,13 @@ final class AuthController extends Controller
         ]);
     }
 
+    public function preferences(Request $request): JsonResponse
+    {
+        return response()->json([
+            'user' => (new UserResource($request->user()->load(self::USER_RESOURCE_RELATIONS)))->toArray($request),
+        ]);
+    }
+
     public function logout(Request $request): JsonResponse
     {
         $this->auth->logout($request->user());

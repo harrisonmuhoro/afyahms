@@ -62,6 +62,9 @@ export default defineConfig(({ mode }) => {
     server: {
       host: true,
       port: 5173,
+      // Allow Cloudflare Quick Tunnel hostnames while keeping Vite's
+      // host-header protection enabled for unrelated domains.
+      allowedHosts: ['.trycloudflare.com'],
       proxy: {
         '/api': { target: backendOrigin, changeOrigin: true },
         '/broadcasting': { target: backendOrigin, changeOrigin: true, ws: true },

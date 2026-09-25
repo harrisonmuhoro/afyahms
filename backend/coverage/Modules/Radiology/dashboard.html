@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for D:\wamp64\www\hospital\backend\app\Modules\Radiology</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../../_css/bootstrap.min.css?v=11.0.12" rel="stylesheet" type="text/css">
+  <link href="../../_css/nv.d3.min.css?v=11.0.12" rel="stylesheet" type="text/css">
+  <link href="../../_css/style.css?v=11.0.12" rel="stylesheet" type="text/css">
+  <link href="../../_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="../../index.html">D:\wamp64\www\hospital\backend\app</a></li>
+         <li class="breadcrumb-item"><a href="../index.html">Modules</a></li>
+         <li class="breadcrumb-item"><a href="index.html">Radiology</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Controllers/RadiologyController.php.html#31">App\Modules\Radiology\Controllers\RadiologyController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/ImagingOrder.php.html#36">App\Modules\Radiology\Models\ImagingOrder</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/ImagingReport.php.html#28">App\Modules\Radiology\Models\ImagingReport</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/ImagingStudy.php.html#27">App\Modules\Radiology\Models\ImagingStudy</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#25">App\Modules\Radiology\Services\RadiologyService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Providers/RadiologyServiceProvider.php.html#11">App\Modules\Radiology\Providers\RadiologyServiceProvider</a></td><td class="text-right">87%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Controllers/RadiologyController.php.html#31">App\Modules\Radiology\Controllers\RadiologyController</a></td><td class="text-right">600</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#25">App\Modules\Radiology\Services\RadiologyService</a></td><td class="text-right">342</td></tr>
+       <tr><td><a href="Models/ImagingOrder.php.html#36">App\Modules\Radiology\Models\ImagingOrder</a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Providers/RadiologyServiceProvider.php.html#11">App\Modules\Radiology\Providers\RadiologyServiceProvider</a></td><td class="text-right">4</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Controllers/RadiologyController.php.html#33"><abbr title="App\Modules\Radiology\Controllers\RadiologyController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/RadiologyController.php.html#38"><abbr title="App\Modules\Radiology\Controllers\RadiologyController::catalog">catalog</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/RadiologyController.php.html#56"><abbr title="App\Modules\Radiology\Controllers\RadiologyController::worklist">worklist</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/RadiologyController.php.html#70"><abbr title="App\Modules\Radiology\Controllers\RadiologyController::index">index</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/RadiologyController.php.html#84"><abbr title="App\Modules\Radiology\Controllers\RadiologyController::store">store</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/RadiologyController.php.html#108"><abbr title="App\Modules\Radiology\Controllers\RadiologyController::schedule">schedule</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/RadiologyController.php.html#121"><abbr title="App\Modules\Radiology\Controllers\RadiologyController::acquire">acquire</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/RadiologyController.php.html#130"><abbr title="App\Modules\Radiology\Controllers\RadiologyController::cancel">cancel</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/RadiologyController.php.html#145"><abbr title="App\Modules\Radiology\Controllers\RadiologyController::saveReport">saveReport</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/RadiologyController.php.html#163"><abbr title="App\Modules\Radiology\Controllers\RadiologyController::finalize">finalize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/RadiologyController.php.html#172"><abbr title="App\Modules\Radiology\Controllers\RadiologyController::amend">amend</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/RadiologyController.php.html#189"><abbr title="App\Modules\Radiology\Controllers\RadiologyController::verify">verify</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/RadiologyController.php.html#200"><abbr title="App\Modules\Radiology\Controllers\RadiologyController::orderData">orderData</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/RadiologyController.php.html#241"><abbr title="App\Modules\Radiology\Controllers\RadiologyController::reportData">reportData</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/ImagingOrder.php.html#58"><abbr title="App\Modules\Radiology\Models\ImagingOrder::booted">booted</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/ImagingOrder.php.html#69"><abbr title="App\Modules\Radiology\Models\ImagingOrder::getRouteKeyName">getRouteKeyName</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/ImagingOrder.php.html#74"><abbr title="App\Modules\Radiology\Models\ImagingOrder::study">study</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/ImagingOrder.php.html#79"><abbr title="App\Modules\Radiology\Models\ImagingOrder::report">report</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/ImagingOrder.php.html#84"><abbr title="App\Modules\Radiology\Models\ImagingOrder::visit">visit</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/ImagingOrder.php.html#89"><abbr title="App\Modules\Radiology\Models\ImagingOrder::patient">patient</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/ImagingOrder.php.html#94"><abbr title="App\Modules\Radiology\Models\ImagingOrder::orderedBy">orderedBy</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/ImagingReport.php.html#48"><abbr title="App\Modules\Radiology\Models\ImagingReport::order">order</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/ImagingReport.php.html#53"><abbr title="App\Modules\Radiology\Models\ImagingReport::reportedBy">reportedBy</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/ImagingReport.php.html#58"><abbr title="App\Modules\Radiology\Models\ImagingReport::verifiedBy">verifiedBy</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Models/ImagingStudy.php.html#48"><abbr title="App\Modules\Radiology\Models\ImagingStudy::orders">orders</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#36"><abbr title="App\Modules\Radiology\Services\RadiologyService::searchCatalog">searchCatalog</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#60"><abbr title="App\Modules\Radiology\Services\RadiologyService::ordersForVisit">ordersForVisit</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#75"><abbr title="App\Modules\Radiology\Services\RadiologyService::worklist">worklist</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#95"><abbr title="App\Modules\Radiology\Services\RadiologyService::placeOrder">placeOrder</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#129"><abbr title="App\Modules\Radiology\Services\RadiologyService::schedule">schedule</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#144"><abbr title="App\Modules\Radiology\Services\RadiologyService::markAcquired">markAcquired</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#159"><abbr title="App\Modules\Radiology\Services\RadiologyService::cancel">cancel</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#180"><abbr title="App\Modules\Radiology\Services\RadiologyService::saveReport">saveReport</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#206"><abbr title="App\Modules\Radiology\Services\RadiologyService::finalizeReport">finalizeReport</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#237"><abbr title="App\Modules\Radiology\Services\RadiologyService::amendReport">amendReport</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#264"><abbr title="App\Modules\Radiology\Services\RadiologyService::verifyReport">verifyReport</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#287"><abbr title="App\Modules\Radiology\Services\RadiologyService::assertStatus">assertStatus</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Providers/RadiologyServiceProvider.php.html#23"><abbr title="App\Modules\Radiology\Providers\RadiologyServiceProvider::bootRoutes">bootRoutes</abbr></a></td><td class="text-right">83%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Controllers/RadiologyController.php.html#200"><abbr title="App\Modules\Radiology\Controllers\RadiologyController::orderData">orderData</abbr></a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="Controllers/RadiologyController.php.html#241"><abbr title="App\Modules\Radiology\Controllers\RadiologyController::reportData">reportData</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Models/ImagingOrder.php.html#58"><abbr title="App\Modules\Radiology\Models\ImagingOrder::booted">booted</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#95"><abbr title="App\Modules\Radiology\Services\RadiologyService::placeOrder">placeOrder</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#159"><abbr title="App\Modules\Radiology\Services\RadiologyService::cancel">cancel</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#206"><abbr title="App\Modules\Radiology\Services\RadiologyService::finalizeReport">finalizeReport</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#237"><abbr title="App\Modules\Radiology\Services\RadiologyService::amendReport">amendReport</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#264"><abbr title="App\Modules\Radiology\Services\RadiologyService::verifyReport">verifyReport</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/RadiologyService.php.html#287"><abbr title="App\Modules\Radiology\Services\RadiologyService::assertStatus">assertStatus</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Providers/RadiologyServiceProvider.php.html#23"><abbr title="App\Modules\Radiology\Providers\RadiologyServiceProvider::bootRoutes">bootRoutes</abbr></a></td><td class="text-right">2</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 11.0.12</a> using <a href="https://www.php.net/" target="_top">PHP 8.3.28</a> and <a href="https://phpunit.de/">PHPUnit 11.5.50</a> at Sun Aug 23 7:49:36 EAT 2026.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="../../_js/jquery.min.js?v=11.0.12" type="text/javascript"></script>
+  <script src="../../_js/d3.min.js?v=11.0.12" type="text/javascript"></script>
+  <script src="../../_js/nv.d3.min.js?v=11.0.12" type="text/javascript"></script>
+  <script type="text/javascript">
+$(document).ready(function() {
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#classCoverageDistribution svg')
+      .datum(getCoverageDistributionData([5,0,0,0,0,0,0,0,0,1,0,1], "Class Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#methodCoverageDistribution svg')
+      .datum(getCoverageDistributionData([37,0,0,0,0,0,0,0,0,1,0,4], "Method Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getCoverageDistributionData(data, label) {
+    var labels = [
+      '0%',
+      '0-10%',
+      '10-20%',
+      '20-30%',
+      '30-40%',
+      '40-50%',
+      '50-60%',
+      '60-70%',
+      '70-80%',
+      '80-90%',
+      '90-100%',
+      '100%'
+    ];
+    var values = [];
+    $.each(labels, function(key) {
+      values.push({x: labels[key], y: data[key]});
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Cyclomatic Complexity');
+
+    d3.select('#classComplexity svg')
+      .datum(getComplexityData([[0,24,"<a href=\"Controllers\/RadiologyController.php.html#31\">App\\Modules\\Radiology\\Controllers\\RadiologyController<\/a>"],[0,8,"<a href=\"Models\/ImagingOrder.php.html#36\">App\\Modules\\Radiology\\Models\\ImagingOrder<\/a>"],[0,3,"<a href=\"Models\/ImagingReport.php.html#28\">App\\Modules\\Radiology\\Models\\ImagingReport<\/a>"],[0,1,"<a href=\"Models\/ImagingStudy.php.html#27\">App\\Modules\\Radiology\\Models\\ImagingStudy<\/a>"],[100,2,"<a href=\"Module.php.html#7\">App\\Modules\\Radiology\\Module<\/a>"],[87.5,4,"<a href=\"Providers\/RadiologyServiceProvider.php.html#11\">App\\Modules\\Radiology\\Providers\\RadiologyServiceProvider<\/a>"],[0,18,"<a href=\"Services\/RadiologyService.php.html#25\">App\\Modules\\Radiology\\Services\\RadiologyService<\/a>"]], 'Class Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Method Complexity');
+
+    d3.select('#methodComplexity svg')
+      .datum(getComplexityData([[0,1,"<a href=\"Controllers\/RadiologyController.php.html#33\">App\\Modules\\Radiology\\Controllers\\RadiologyController::__construct<\/a>"],[0,1,"<a href=\"Controllers\/RadiologyController.php.html#38\">App\\Modules\\Radiology\\Controllers\\RadiologyController::catalog<\/a>"],[0,1,"<a href=\"Controllers\/RadiologyController.php.html#56\">App\\Modules\\Radiology\\Controllers\\RadiologyController::worklist<\/a>"],[0,1,"<a href=\"Controllers\/RadiologyController.php.html#70\">App\\Modules\\Radiology\\Controllers\\RadiologyController::index<\/a>"],[0,1,"<a href=\"Controllers\/RadiologyController.php.html#84\">App\\Modules\\Radiology\\Controllers\\RadiologyController::store<\/a>"],[0,1,"<a href=\"Controllers\/RadiologyController.php.html#108\">App\\Modules\\Radiology\\Controllers\\RadiologyController::schedule<\/a>"],[0,1,"<a href=\"Controllers\/RadiologyController.php.html#121\">App\\Modules\\Radiology\\Controllers\\RadiologyController::acquire<\/a>"],[0,1,"<a href=\"Controllers\/RadiologyController.php.html#130\">App\\Modules\\Radiology\\Controllers\\RadiologyController::cancel<\/a>"],[0,1,"<a href=\"Controllers\/RadiologyController.php.html#145\">App\\Modules\\Radiology\\Controllers\\RadiologyController::saveReport<\/a>"],[0,1,"<a href=\"Controllers\/RadiologyController.php.html#163\">App\\Modules\\Radiology\\Controllers\\RadiologyController::finalize<\/a>"],[0,1,"<a href=\"Controllers\/RadiologyController.php.html#172\">App\\Modules\\Radiology\\Controllers\\RadiologyController::amend<\/a>"],[0,1,"<a href=\"Controllers\/RadiologyController.php.html#189\">App\\Modules\\Radiology\\Controllers\\RadiologyController::verify<\/a>"],[0,7,"<a href=\"Controllers\/RadiologyController.php.html#200\">App\\Modules\\Radiology\\Controllers\\RadiologyController::orderData<\/a>"],[0,5,"<a href=\"Controllers\/RadiologyController.php.html#241\">App\\Modules\\Radiology\\Controllers\\RadiologyController::reportData<\/a>"],[0,2,"<a href=\"Models\/ImagingOrder.php.html#58\">App\\Modules\\Radiology\\Models\\ImagingOrder::booted<\/a>"],[0,1,"<a href=\"Models\/ImagingOrder.php.html#69\">App\\Modules\\Radiology\\Models\\ImagingOrder::getRouteKeyName<\/a>"],[0,1,"<a href=\"Models\/ImagingOrder.php.html#74\">App\\Modules\\Radiology\\Models\\ImagingOrder::study<\/a>"],[0,1,"<a href=\"Models\/ImagingOrder.php.html#79\">App\\Modules\\Radiology\\Models\\ImagingOrder::report<\/a>"],[0,1,"<a href=\"Models\/ImagingOrder.php.html#84\">App\\Modules\\Radiology\\Models\\ImagingOrder::visit<\/a>"],[0,1,"<a href=\"Models\/ImagingOrder.php.html#89\">App\\Modules\\Radiology\\Models\\ImagingOrder::patient<\/a>"],[0,1,"<a href=\"Models\/ImagingOrder.php.html#94\">App\\Modules\\Radiology\\Models\\ImagingOrder::orderedBy<\/a>"],[0,1,"<a href=\"Models\/ImagingReport.php.html#48\">App\\Modules\\Radiology\\Models\\ImagingReport::order<\/a>"],[0,1,"<a href=\"Models\/ImagingReport.php.html#53\">App\\Modules\\Radiology\\Models\\ImagingReport::reportedBy<\/a>"],[0,1,"<a href=\"Models\/ImagingReport.php.html#58\">App\\Modules\\Radiology\\Models\\ImagingReport::verifiedBy<\/a>"],[0,1,"<a href=\"Models\/ImagingStudy.php.html#48\">App\\Modules\\Radiology\\Models\\ImagingStudy::orders<\/a>"],[100,1,"<a href=\"Module.php.html#9\">App\\Modules\\Radiology\\Module::register<\/a>"],[100,1,"<a href=\"Module.php.html#11\">App\\Modules\\Radiology\\Module::boot<\/a>"],[100,1,"<a href=\"Providers\/RadiologyServiceProvider.php.html#13\">App\\Modules\\Radiology\\Providers\\RadiologyServiceProvider::register<\/a>"],[100,1,"<a href=\"Providers\/RadiologyServiceProvider.php.html#18\">App\\Modules\\Radiology\\Providers\\RadiologyServiceProvider::boot<\/a>"],[83.33333333333334,2,"<a href=\"Providers\/RadiologyServiceProvider.php.html#23\">App\\Modules\\Radiology\\Providers\\RadiologyServiceProvider::bootRoutes<\/a>"],[0,1,"<a href=\"Services\/RadiologyService.php.html#36\">App\\Modules\\Radiology\\Services\\RadiologyService::searchCatalog<\/a>"],[0,1,"<a href=\"Services\/RadiologyService.php.html#60\">App\\Modules\\Radiology\\Services\\RadiologyService::ordersForVisit<\/a>"],[0,1,"<a href=\"Services\/RadiologyService.php.html#75\">App\\Modules\\Radiology\\Services\\RadiologyService::worklist<\/a>"],[0,2,"<a href=\"Services\/RadiologyService.php.html#95\">App\\Modules\\Radiology\\Services\\RadiologyService::placeOrder<\/a>"],[0,1,"<a href=\"Services\/RadiologyService.php.html#129\">App\\Modules\\Radiology\\Services\\RadiologyService::schedule<\/a>"],[0,1,"<a href=\"Services\/RadiologyService.php.html#144\">App\\Modules\\Radiology\\Services\\RadiologyService::markAcquired<\/a>"],[0,2,"<a href=\"Services\/RadiologyService.php.html#159\">App\\Modules\\Radiology\\Services\\RadiologyService::cancel<\/a>"],[0,1,"<a href=\"Services\/RadiologyService.php.html#180\">App\\Modules\\Radiology\\Services\\RadiologyService::saveReport<\/a>"],[0,2,"<a href=\"Services\/RadiologyService.php.html#206\">App\\Modules\\Radiology\\Services\\RadiologyService::finalizeReport<\/a>"],[0,2,"<a href=\"Services\/RadiologyService.php.html#237\">App\\Modules\\Radiology\\Services\\RadiologyService::amendReport<\/a>"],[0,2,"<a href=\"Services\/RadiologyService.php.html#264\">App\\Modules\\Radiology\\Services\\RadiologyService::verifyReport<\/a>"],[0,2,"<a href=\"Services\/RadiologyService.php.html#287\">App\\Modules\\Radiology\\Services\\RadiologyService::assertStatus<\/a>"]], 'Method Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getComplexityData(data, label) {
+    var values = [];
+    $.each(data, function(key) {
+      var value = Math.round(data[key][0]*100) / 100;
+      values.push({
+        x: value,
+        y: data[key][1],
+        class: data[key][2],
+        size: 0.05,
+        shape: 'diamond'
+      });
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+});
+  </script>
+ </body>
+</html>

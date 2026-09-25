@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useSchedules } from '../api';
 import { ScheduleModal } from '../components/ScheduleModal';
+import { ScheduleExceptionsPanel } from '../components/ScheduleExceptionsPanel';
 import type { DoctorSchedule } from '../types';
 
 export function ScheduleManagerPage(): JSX.Element {
@@ -121,6 +122,10 @@ export function ScheduleManagerPage(): JSX.Element {
           </tbody>
         </table>
       </div>
+
+      {branchId !== null && (
+        <ScheduleExceptionsPanel branchId={Number(branchId)} schedules={schedules} />
+      )}
 
       {branchId !== null && <ScheduleModal 
         isOpen={modalOpen} 

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for D:\wamp64\www\hospital\backend\app\Modules\Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../../_css/bootstrap.min.css?v=11.0.12" rel="stylesheet" type="text/css">
+  <link href="../../_css/nv.d3.min.css?v=11.0.12" rel="stylesheet" type="text/css">
+  <link href="../../_css/style.css?v=11.0.12" rel="stylesheet" type="text/css">
+  <link href="../../_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="../../index.html">D:\wamp64\www\hospital\backend\app</a></li>
+         <li class="breadcrumb-item"><a href="../index.html">Modules</a></li>
+         <li class="breadcrumb-item"><a href="index.html">Admin</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Controllers/BranchController.php.html#9">App\Modules\Admin\Controllers\BranchController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/RolesController.php.html#13">App\Modules\Admin\Controllers\RolesController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/SettingsController.php.html#8">App\Modules\Admin\Controllers\SettingsController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#24">App\Modules\Admin\Controllers\StaffAdminController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/UsersController.php.html#18">App\Modules\Admin\Controllers\UsersController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Rbac.php.html#19">App\Modules\Admin\Rbac</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RolePermissionService.php.html#19">App\Modules\Admin\Services\RolePermissionService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/UserAccountService.php.html#15">App\Modules\Admin\Services\UserAccountService</a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#24">App\Modules\Admin\Controllers\StaffAdminController</a></td><td class="text-right">1640</td></tr>
+       <tr><td><a href="Services/UserAccountService.php.html#15">App\Modules\Admin\Services\UserAccountService</a></td><td class="text-right">702</td></tr>
+       <tr><td><a href="Controllers/UsersController.php.html#18">App\Modules\Admin\Controllers\UsersController</a></td><td class="text-right">210</td></tr>
+       <tr><td><a href="Services/RolePermissionService.php.html#19">App\Modules\Admin\Services\RolePermissionService</a></td><td class="text-right">132</td></tr>
+       <tr><td><a href="Rbac.php.html#19">App\Modules\Admin\Rbac</a></td><td class="text-right">72</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Controllers/BranchController.php.html#11"><abbr title="App\Modules\Admin\Controllers\BranchController::index">index</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/RolesController.php.html#15"><abbr title="App\Modules\Admin\Controllers\RolesController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/RolesController.php.html#17"><abbr title="App\Modules\Admin\Controllers\RolesController::index">index</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/RolesController.php.html#22"><abbr title="App\Modules\Admin\Controllers\RolesController::permissions">permissions</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/RolesController.php.html#27"><abbr title="App\Modules\Admin\Controllers\RolesController::syncPermissions">syncPermissions</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/SettingsController.php.html#10"><abbr title="App\Modules\Admin\Controllers\SettingsController::index">index</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/SettingsController.php.html#23"><abbr title="App\Modules\Admin\Controllers\SettingsController::update">update</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#47"><abbr title="App\Modules\Admin\Controllers\StaffAdminController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#53"><abbr title="App\Modules\Admin\Controllers\StaffAdminController::index">index</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#89"><abbr title="App\Modules\Admin\Controllers\StaffAdminController::store">store</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#146"><abbr title="App\Modules\Admin\Controllers\StaffAdminController::show">show</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#155"><abbr title="App\Modules\Admin\Controllers\StaffAdminController::updateEmployment">updateEmployment</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#226"><abbr title="App\Modules\Admin\Controllers\StaffAdminController::updateRole">updateRole</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#264"><abbr title="App\Modules\Admin\Controllers\StaffAdminController::triggerPasswordReset">triggerPasswordReset</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#300"><abbr title="App\Modules\Admin\Controllers\StaffAdminController::assertCanManageStaff">assertCanManageStaff</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#329"><abbr title="App\Modules\Admin\Controllers\StaffAdminController::maskSensitive">maskSensitive</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#339"><abbr title="App\Modules\Admin\Controllers\StaffAdminController::updateBranches">updateBranches</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#385"><abbr title="App\Modules\Admin\Controllers\StaffAdminController::syncRoleProfiles">syncRoleProfiles</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/UsersController.php.html#20"><abbr title="App\Modules\Admin\Controllers\UsersController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/UsersController.php.html#27"><abbr title="App\Modules\Admin\Controllers\UsersController::index">index</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/UsersController.php.html#54"><abbr title="App\Modules\Admin\Controllers\UsersController::show">show</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/UsersController.php.html#61"><abbr title="App\Modules\Admin\Controllers\UsersController::store">store</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/UsersController.php.html#116"><abbr title="App\Modules\Admin\Controllers\UsersController::update">update</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/UsersController.php.html#166"><abbr title="App\Modules\Admin\Controllers\UsersController::destroy">destroy</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/UsersController.php.html#173"><abbr title="App\Modules\Admin\Controllers\UsersController::deactivate">deactivate</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/UsersController.php.html#187"><abbr title="App\Modules\Admin\Controllers\UsersController::reactivate">reactivate</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Rbac.php.html#444"><abbr title="App\Modules\Admin\Rbac::seed">seed</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Rbac.php.html#479"><abbr title="App\Modules\Admin\Rbac::expandWildcards">expandWildcards</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RolePermissionService.php.html#21"><abbr title="App\Modules\Admin\Services\RolePermissionService::listRoles">listRoles</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RolePermissionService.php.html#26"><abbr title="App\Modules\Admin\Services\RolePermissionService::listPermissions">listPermissions</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RolePermissionService.php.html#31"><abbr title="App\Modules\Admin\Services\RolePermissionService::assignRole">assignRole</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RolePermissionService.php.html#38"><abbr title="App\Modules\Admin\Services\RolePermissionService::revokeRole">revokeRole</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RolePermissionService.php.html#45"><abbr title="App\Modules\Admin\Services\RolePermissionService::syncPermissions">syncPermissions</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RolePermissionService.php.html#54"><abbr title="App\Modules\Admin\Services\RolePermissionService::syncUserRoles">syncUserRoles</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/RolePermissionService.php.html#63"><abbr title="App\Modules\Admin\Services\RolePermissionService::assertRoleCanBeManaged">assertRoleCanBeManaged</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/UserAccountService.php.html#17"><abbr title="App\Modules\Admin\Services\UserAccountService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/UserAccountService.php.html#19"><abbr title="App\Modules\Admin\Services\UserAccountService::assertCanView">assertCanView</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/UserAccountService.php.html#26"><abbr title="App\Modules\Admin\Services\UserAccountService::assertCanManage">assertCanManage</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/UserAccountService.php.html#37"><abbr title="App\Modules\Admin\Services\UserAccountService::assertAssignableRoles">assertAssignableRoles</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/UserAccountService.php.html#48"><abbr title="App\Modules\Admin\Services\UserAccountService::assertCanChangeRoles">assertCanChangeRoles</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/UserAccountService.php.html#62"><abbr title="App\Modules\Admin\Services\UserAccountService::deactivate">deactivate</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/UserAccountService.php.html#109"><abbr title="App\Modules\Admin\Services\UserAccountService::reactivate">reactivate</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/UserAccountService.php.html#152"><abbr title="App\Modules\Admin\Services\UserAccountService::activeSuperadminCount">activeSuperadminCount</abbr></a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#300"><abbr title="App\Modules\Admin\Controllers\StaffAdminController::assertCanManageStaff">assertCanManageStaff</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#155"><abbr title="App\Modules\Admin\Controllers\StaffAdminController::updateEmployment">updateEmployment</abbr></a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#89"><abbr title="App\Modules\Admin\Controllers\StaffAdminController::store">store</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#339"><abbr title="App\Modules\Admin\Controllers\StaffAdminController::updateBranches">updateBranches</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#385"><abbr title="App\Modules\Admin\Controllers\StaffAdminController::syncRoleProfiles">syncRoleProfiles</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Rbac.php.html#479"><abbr title="App\Modules\Admin\Rbac::expandWildcards">expandWildcards</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Services/UserAccountService.php.html#26"><abbr title="App\Modules\Admin\Services\UserAccountService::assertCanManage">assertCanManage</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Services/UserAccountService.php.html#37"><abbr title="App\Modules\Admin\Services\UserAccountService::assertAssignableRoles">assertAssignableRoles</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Services/UserAccountService.php.html#62"><abbr title="App\Modules\Admin\Services\UserAccountService::deactivate">deactivate</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#264"><abbr title="App\Modules\Admin\Controllers\StaffAdminController::triggerPasswordReset">triggerPasswordReset</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Controllers/UsersController.php.html#61"><abbr title="App\Modules\Admin\Controllers\UsersController::store">store</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Controllers/UsersController.php.html#116"><abbr title="App\Modules\Admin\Controllers\UsersController::update">update</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Services/UserAccountService.php.html#48"><abbr title="App\Modules\Admin\Services\UserAccountService::assertCanChangeRoles">assertCanChangeRoles</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="Rbac.php.html#444"><abbr title="App\Modules\Admin\Rbac::seed">seed</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Services/RolePermissionService.php.html#63"><abbr title="App\Modules\Admin\Services\RolePermissionService::assertRoleCanBeManaged">assertRoleCanBeManaged</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Services/UserAccountService.php.html#19"><abbr title="App\Modules\Admin\Services\UserAccountService::assertCanView">assertCanView</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="Controllers/StaffAdminController.php.html#329"><abbr title="App\Modules\Admin\Controllers\StaffAdminController::maskSensitive">maskSensitive</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/RolePermissionService.php.html#45"><abbr title="App\Modules\Admin\Services\RolePermissionService::syncPermissions">syncPermissions</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/RolePermissionService.php.html#54"><abbr title="App\Modules\Admin\Services\RolePermissionService::syncUserRoles">syncUserRoles</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/UserAccountService.php.html#109"><abbr title="App\Modules\Admin\Services\UserAccountService::reactivate">reactivate</abbr></a></td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 11.0.12</a> using <a href="https://www.php.net/" target="_top">PHP 8.3.28</a> and <a href="https://phpunit.de/">PHPUnit 11.5.50</a> at Sun Aug 23 7:49:36 EAT 2026.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="../../_js/jquery.min.js?v=11.0.12" type="text/javascript"></script>
+  <script src="../../_js/d3.min.js?v=11.0.12" type="text/javascript"></script>
+  <script src="../../_js/nv.d3.min.js?v=11.0.12" type="text/javascript"></script>
+  <script type="text/javascript">
+$(document).ready(function() {
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#classCoverageDistribution svg')
+      .datum(getCoverageDistributionData([8,0,0,0,0,0,0,0,0,0,0,2], "Class Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#methodCoverageDistribution svg')
+      .datum(getCoverageDistributionData([43,0,0,0,0,0,0,0,0,0,0,3], "Method Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getCoverageDistributionData(data, label) {
+    var labels = [
+      '0%',
+      '0-10%',
+      '10-20%',
+      '20-30%',
+      '30-40%',
+      '40-50%',
+      '50-60%',
+      '60-70%',
+      '70-80%',
+      '80-90%',
+      '90-100%',
+      '100%'
+    ];
+    var values = [];
+    $.each(labels, function(key) {
+      values.push({x: labels[key], y: data[key]});
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Cyclomatic Complexity');
+
+    d3.select('#classComplexity svg')
+      .datum(getComplexityData([[0,1,"<a href=\"Controllers\/BranchController.php.html#9\">App\\Modules\\Admin\\Controllers\\BranchController<\/a>"],[0,4,"<a href=\"Controllers\/RolesController.php.html#13\">App\\Modules\\Admin\\Controllers\\RolesController<\/a>"],[0,2,"<a href=\"Controllers\/SettingsController.php.html#8\">App\\Modules\\Admin\\Controllers\\SettingsController<\/a>"],[0,40,"<a href=\"Controllers\/StaffAdminController.php.html#24\">App\\Modules\\Admin\\Controllers\\StaffAdminController<\/a>"],[0,14,"<a href=\"Controllers\/UsersController.php.html#18\">App\\Modules\\Admin\\Controllers\\UsersController<\/a>"],[100,2,"<a href=\"Module.php.html#7\">App\\Modules\\Admin\\Module<\/a>"],[100,1,"<a href=\"Providers\/AdminServiceProvider.php.html#10\">App\\Modules\\Admin\\Providers\\AdminServiceProvider<\/a>"],[0,8,"<a href=\"Rbac.php.html#19\">App\\Modules\\Admin\\Rbac<\/a>"],[0,11,"<a href=\"Services\/RolePermissionService.php.html#19\">App\\Modules\\Admin\\Services\\RolePermissionService<\/a>"],[0,26,"<a href=\"Services\/UserAccountService.php.html#15\">App\\Modules\\Admin\\Services\\UserAccountService<\/a>"]], 'Class Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Method Complexity');
+
+    d3.select('#methodComplexity svg')
+      .datum(getComplexityData([[0,1,"<a href=\"Controllers\/BranchController.php.html#11\">App\\Modules\\Admin\\Controllers\\BranchController::index<\/a>"],[0,1,"<a href=\"Controllers\/RolesController.php.html#15\">App\\Modules\\Admin\\Controllers\\RolesController::__construct<\/a>"],[0,1,"<a href=\"Controllers\/RolesController.php.html#17\">App\\Modules\\Admin\\Controllers\\RolesController::index<\/a>"],[0,1,"<a href=\"Controllers\/RolesController.php.html#22\">App\\Modules\\Admin\\Controllers\\RolesController::permissions<\/a>"],[0,1,"<a href=\"Controllers\/RolesController.php.html#27\">App\\Modules\\Admin\\Controllers\\RolesController::syncPermissions<\/a>"],[0,1,"<a href=\"Controllers\/SettingsController.php.html#10\">App\\Modules\\Admin\\Controllers\\SettingsController::index<\/a>"],[0,1,"<a href=\"Controllers\/SettingsController.php.html#23\">App\\Modules\\Admin\\Controllers\\SettingsController::update<\/a>"],[0,1,"<a href=\"Controllers\/StaffAdminController.php.html#47\">App\\Modules\\Admin\\Controllers\\StaffAdminController::__construct<\/a>"],[0,1,"<a href=\"Controllers\/StaffAdminController.php.html#53\">App\\Modules\\Admin\\Controllers\\StaffAdminController::index<\/a>"],[0,5,"<a href=\"Controllers\/StaffAdminController.php.html#89\">App\\Modules\\Admin\\Controllers\\StaffAdminController::store<\/a>"],[0,1,"<a href=\"Controllers\/StaffAdminController.php.html#146\">App\\Modules\\Admin\\Controllers\\StaffAdminController::show<\/a>"],[0,7,"<a href=\"Controllers\/StaffAdminController.php.html#155\">App\\Modules\\Admin\\Controllers\\StaffAdminController::updateEmployment<\/a>"],[0,1,"<a href=\"Controllers\/StaffAdminController.php.html#226\">App\\Modules\\Admin\\Controllers\\StaffAdminController::updateRole<\/a>"],[0,4,"<a href=\"Controllers\/StaffAdminController.php.html#264\">App\\Modules\\Admin\\Controllers\\StaffAdminController::triggerPasswordReset<\/a>"],[0,8,"<a href=\"Controllers\/StaffAdminController.php.html#300\">App\\Modules\\Admin\\Controllers\\StaffAdminController::assertCanManageStaff<\/a>"],[0,2,"<a href=\"Controllers\/StaffAdminController.php.html#329\">App\\Modules\\Admin\\Controllers\\StaffAdminController::maskSensitive<\/a>"],[0,5,"<a href=\"Controllers\/StaffAdminController.php.html#339\">App\\Modules\\Admin\\Controllers\\StaffAdminController::updateBranches<\/a>"],[0,5,"<a href=\"Controllers\/StaffAdminController.php.html#385\">App\\Modules\\Admin\\Controllers\\StaffAdminController::syncRoleProfiles<\/a>"],[0,1,"<a href=\"Controllers\/UsersController.php.html#20\">App\\Modules\\Admin\\Controllers\\UsersController::__construct<\/a>"],[0,1,"<a href=\"Controllers\/UsersController.php.html#27\">App\\Modules\\Admin\\Controllers\\UsersController::index<\/a>"],[0,1,"<a href=\"Controllers\/UsersController.php.html#54\">App\\Modules\\Admin\\Controllers\\UsersController::show<\/a>"],[0,4,"<a href=\"Controllers\/UsersController.php.html#61\">App\\Modules\\Admin\\Controllers\\UsersController::store<\/a>"],[0,4,"<a href=\"Controllers\/UsersController.php.html#116\">App\\Modules\\Admin\\Controllers\\UsersController::update<\/a>"],[0,1,"<a href=\"Controllers\/UsersController.php.html#166\">App\\Modules\\Admin\\Controllers\\UsersController::destroy<\/a>"],[0,1,"<a href=\"Controllers\/UsersController.php.html#173\">App\\Modules\\Admin\\Controllers\\UsersController::deactivate<\/a>"],[0,1,"<a href=\"Controllers\/UsersController.php.html#187\">App\\Modules\\Admin\\Controllers\\UsersController::reactivate<\/a>"],[100,1,"<a href=\"Module.php.html#9\">App\\Modules\\Admin\\Module::register<\/a>"],[100,1,"<a href=\"Module.php.html#14\">App\\Modules\\Admin\\Module::boot<\/a>"],[100,1,"<a href=\"Providers\/AdminServiceProvider.php.html#12\">App\\Modules\\Admin\\Providers\\AdminServiceProvider::boot<\/a>"],[0,3,"<a href=\"Rbac.php.html#444\">App\\Modules\\Admin\\Rbac::seed<\/a>"],[0,5,"<a href=\"Rbac.php.html#479\">App\\Modules\\Admin\\Rbac::expandWildcards<\/a>"],[0,1,"<a href=\"Services\/RolePermissionService.php.html#21\">App\\Modules\\Admin\\Services\\RolePermissionService::listRoles<\/a>"],[0,1,"<a href=\"Services\/RolePermissionService.php.html#26\">App\\Modules\\Admin\\Services\\RolePermissionService::listPermissions<\/a>"],[0,1,"<a href=\"Services\/RolePermissionService.php.html#31\">App\\Modules\\Admin\\Services\\RolePermissionService::assignRole<\/a>"],[0,1,"<a href=\"Services\/RolePermissionService.php.html#38\">App\\Modules\\Admin\\Services\\RolePermissionService::revokeRole<\/a>"],[0,2,"<a href=\"Services\/RolePermissionService.php.html#45\">App\\Modules\\Admin\\Services\\RolePermissionService::syncPermissions<\/a>"],[0,2,"<a href=\"Services\/RolePermissionService.php.html#54\">App\\Modules\\Admin\\Services\\RolePermissionService::syncUserRoles<\/a>"],[0,3,"<a href=\"Services\/RolePermissionService.php.html#63\">App\\Modules\\Admin\\Services\\RolePermissionService::assertRoleCanBeManaged<\/a>"],[0,1,"<a href=\"Services\/UserAccountService.php.html#17\">App\\Modules\\Admin\\Services\\UserAccountService::__construct<\/a>"],[0,3,"<a href=\"Services\/UserAccountService.php.html#19\">App\\Modules\\Admin\\Services\\UserAccountService::assertCanView<\/a>"],[0,5,"<a href=\"Services\/UserAccountService.php.html#26\">App\\Modules\\Admin\\Services\\UserAccountService::assertCanManage<\/a>"],[0,5,"<a href=\"Services\/UserAccountService.php.html#37\">App\\Modules\\Admin\\Services\\UserAccountService::assertAssignableRoles<\/a>"],[0,4,"<a href=\"Services\/UserAccountService.php.html#48\">App\\Modules\\Admin\\Services\\UserAccountService::assertCanChangeRoles<\/a>"],[0,5,"<a href=\"Services\/UserAccountService.php.html#62\">App\\Modules\\Admin\\Services\\UserAccountService::deactivate<\/a>"],[0,2,"<a href=\"Services\/UserAccountService.php.html#109\">App\\Modules\\Admin\\Services\\UserAccountService::reactivate<\/a>"],[0,1,"<a href=\"Services\/UserAccountService.php.html#152\">App\\Modules\\Admin\\Services\\UserAccountService::activeSuperadminCount<\/a>"]], 'Method Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getComplexityData(data, label) {
+    var values = [];
+    $.each(data, function(key) {
+      var value = Math.round(data[key][0]*100) / 100;
+      values.push({
+        x: value,
+        y: data[key][1],
+        class: data[key][2],
+        size: 0.05,
+        shape: 'diamond'
+      });
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+});
+  </script>
+ </body>
+</html>

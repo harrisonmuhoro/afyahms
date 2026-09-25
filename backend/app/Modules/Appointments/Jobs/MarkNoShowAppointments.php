@@ -22,22 +22,21 @@ class MarkNoShowAppointments implements ShouldQueue
      */
     public function handle(): void
     {
-        // Find appointments that are scheduled/confirmed, 
-        // past their end_time for today, and not checked-in.
+        // Find appointments that are scheduled/confirmed and at least 30 minutes
+        // past their end time. The grace period prevents premature no-shows.
         $now = now();
-        $date = $now->toDateString();
-        $time = $now->toTimeString();
+        $cutoff = $now->copy()->subMinutes(30);
 
-        $appointments = Appointment::whereIn('status', [
+        $appointments = Appointment::withoutGlobalScopes()->whereIn('status', [
             AppointmentStatus::Scheduled->value,
             AppointmentStatus::Confirmed->value,
         ])
-        ->where('appointment_date', '<=', $date)
-        ->where(function ($query) use ($date, $time) {
-            $query->where('appointment_date', '<', $date)
-                  ->orWhere(function ($q) use ($time) {
-                      $q->where('end_time', '<', $time);
-                  });
+        ->where(function ($query) use ($cutoff) {
+            $query->whereDate('appointment_date', '<', $cutoff->toDateString())
+                ->orWhere(function ($sameDay) use ($cutoff) {
+                    $sameDay->whereDate('appointment_date', $cutoff->toDateString())
+                        ->where('end_time', '<=', $cutoff->toTimeString());
+                });
         })
         ->get();
 

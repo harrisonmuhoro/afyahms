@@ -6,7 +6,7 @@ import { useCancelAppointment } from '../hooks/useCancelAppointment';
 import { AppointmentStatusBadge } from '../components/AppointmentStatusBadge';
 import { AppointmentActionsMenu } from '../components/AppointmentActionsMenu';
 import { NoShowAlertBanner } from '../components/NoShowAlertBanner';
-import { useConfirmAppointment, useCheckInPatient } from '../api';
+import { useConfirmAppointment, useCheckInPatient, useMarkNoShowAppointment } from '../api';
 
 
 function formatTime(t: string): string {
@@ -43,6 +43,7 @@ export function AppointmentDetailPage(): JSX.Element {
   const { mutateAsync: cancelAppt, isPending: cancelling } = useCancelAppointment();
   const { mutateAsync: confirmAppt } = useConfirmAppointment();
   const { mutateAsync: checkIn } = useCheckInPatient();
+  const { mutateAsync: markNoShow } = useMarkNoShowAppointment();
 
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
@@ -50,13 +51,19 @@ export function AppointmentDetailPage(): JSX.Element {
   // ── Handlers ──────────────────────────────────────────────────────────
   const handleConfirm = async () => {
     if (!id) return;
-    await confirmAppt(Number(id));
+    await confirmAppt(id);
     refetch();
   };
 
   const handleCheckIn = async () => {
     if (!id) return;
-    await checkIn(Number(id));
+    await checkIn(id);
+    refetch();
+  };
+
+  const handleNoShow = async () => {
+    if (!id) return;
+    await markNoShow({ id });
     refetch();
   };
 
@@ -123,6 +130,7 @@ export function AppointmentDetailPage(): JSX.Element {
           onCheckIn={() => void handleCheckIn()}
           onCancel={() => setShowCancelDialog(true)}
           onReschedule={() => navigate(`/appointments/${appointment.id}/reschedule`)}
+          onNoShow={() => void handleNoShow()}
         />
       </div>
 

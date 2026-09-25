@@ -14,15 +14,16 @@ class DoctorSchedulePolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->hasRole('superadmin') 
-            || $user->hasRole('hospital-admin') 
-            || $user->hasRole('doctor') 
-            || $user->hasRole('receptionist');
+        return $user->hasPermissionTo('appointments.list');
     }
 
     public function view(User $user, DoctorSchedule $schedule): bool
     {
-        if ($user->hasRole('superadmin') || $user->hasRole('hospital-admin') || $user->hasRole('receptionist')) {
+        if (! $this->branchAllowed($user, $schedule->branch_id)) {
+            return false;
+        }
+
+        if ($user->hasRole('superadmin') || $user->hasRole('hospital-admin') || $user->hasRole('receptionist') || $user->hasRole('cashier')) {
             return true;
         }
         
@@ -31,14 +32,16 @@ class DoctorSchedulePolicy
 
     public function create(User $user): bool
     {
-        return $user->hasRole('superadmin') 
-            || $user->hasRole('hospital-admin') 
-            || $user->hasRole('doctor');
+        return $user->hasPermissionTo('appointments.create');
     }
 
     public function update(User $user, DoctorSchedule $schedule): bool
     {
-        if ($user->hasRole('superadmin') || $user->hasRole('hospital-admin')) {
+        if (! $this->branchAllowed($user, $schedule->branch_id)) {
+            return false;
+        }
+
+        if ($user->hasRole('superadmin') || $user->hasRole('hospital-admin') || $user->hasRole('receptionist')) {
             return true;
         }
         
@@ -51,6 +54,16 @@ class DoctorSchedulePolicy
 
     public function delete(User $user, DoctorSchedule $schedule): bool
     {
-        return $user->hasRole('superadmin') || $user->hasRole('hospital-admin');
+        return ($user->hasRole('superadmin') || $user->hasRole('hospital-admin'))
+            && $this->branchAllowed($user, $schedule->branch_id);
+    }
+
+    private function branchAllowed(User $user, int|string $branchId): bool
+    {
+        if ($user->hasRole('superadmin') || $user->can('branch.view-all')) {
+            return true;
+        }
+
+        return in_array((int) $branchId, array_map('intval', $user->accessibleBranchIds()), true);
     }
 }

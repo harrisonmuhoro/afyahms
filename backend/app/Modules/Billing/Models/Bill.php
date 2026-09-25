@@ -35,6 +35,9 @@ final class Bill extends Model
         'public_id', 'branch_id', 'visit_id', 'patient_id',
         'total_amount', 'paid_amount', 'status',
         'payment_method', 'notes', 'cleared_by', 'cleared_at',
+        'mpesa_merchant_request_id', 'mpesa_checkout_request_id', 'mpesa_receipt',
+        'mpesa_phone', 'mpesa_amount', 'mpesa_status', 'mpesa_result_code',
+        'mpesa_result_description', 'mpesa_transaction_at',
     ];
 
     /** @var array<string, string> */
@@ -42,6 +45,9 @@ final class Bill extends Model
         'total_amount' => 'float',
         'paid_amount'  => 'float',
         'cleared_at'   => 'datetime',
+        'mpesa_amount' => 'float',
+        'mpesa_result_code' => 'integer',
+        'mpesa_transaction_at' => 'datetime',
     ];
 
     protected static function booted(): void

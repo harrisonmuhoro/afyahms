@@ -19,7 +19,15 @@ class AppointmentPolicy
 
     public function view(User $user, Appointment $appointment): bool
     {
-        return $user->hasPermissionTo('appointments.read');
+        if ($user->hasRole('patient')) {
+            return (int) $user->patient?->id === (int) $appointment->patient_id;
+        }
+
+        if (! $user->hasPermissionTo('appointments.read') || ! $this->branchAllowed($user, $appointment->branch_id)) {
+            return false;
+        }
+
+        return ! $user->hasRole('doctor') || (int) $user->id === (int) $appointment->doctor_id;
     }
 
     public function create(User $user): bool
@@ -29,11 +37,25 @@ class AppointmentPolicy
 
     public function update(User $user, Appointment $appointment): bool
     {
-        return $user->hasPermissionTo('appointments.update');
+        if (! $user->hasPermissionTo('appointments.update') || ! $this->branchAllowed($user, $appointment->branch_id)) {
+            return false;
+        }
+
+        return ! $user->hasRole('doctor') || (int) $user->id === (int) $appointment->doctor_id;
     }
 
     public function delete(User $user, Appointment $appointment): bool
     {
-        return $user->hasPermissionTo('appointments.delete');
+        return $user->hasPermissionTo('appointments.delete')
+            && $this->branchAllowed($user, $appointment->branch_id);
+    }
+
+    private function branchAllowed(User $user, int|string $branchId): bool
+    {
+        if ($user->hasRole('superadmin') || $user->can('branch.view-all')) {
+            return true;
+        }
+
+        return in_array((int) $branchId, array_map('intval', $user->accessibleBranchIds()), true);
     }
 }

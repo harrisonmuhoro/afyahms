@@ -29,3 +29,4 @@ export * from './pages/AppointmentsCalendarPage';
 export * from './pages/AppointmentBookingPage';
 export * from './pages/AppointmentDetailPage';
 export * from './pages/ScheduleManagerPage';
+export * from './pages/AppointmentReschedulePage';

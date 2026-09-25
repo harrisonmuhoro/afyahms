@@ -19,8 +19,26 @@ export interface DoctorSchedule {
   valid_until: string | null;
   is_active: boolean;
   time_blocks?: TimeBlock[];
+  overrides?: ScheduleOverride[];
   doctor?: { id: string; name: string };
   branch?: { id: string; name: string };
+}
+
+export interface ScheduleOverride {
+  id: string;
+  override_date: string;
+  type: 'unavailable' | 'extra';
+  start_time: string | null;
+  end_time: string | null;
+  reason: string | null;
+}
+
+export interface BranchPublicHoliday {
+  id: number | string;
+  branch_id: number | string;
+  holiday_date: string;
+  name: string;
+  is_active: boolean;
 }
 
 export interface TimeBlock {

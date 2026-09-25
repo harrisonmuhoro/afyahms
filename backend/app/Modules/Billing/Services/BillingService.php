@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Modules\Billing\Models\Bill;
 use App\Modules\Billing\Models\BillItem;
 use App\Modules\Queue\Models\Visit;
+use App\Modules\Appointments\Models\Appointment;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -30,7 +31,7 @@ final class BillingService
      */
     public function createForVisit(Visit $visit): Bill
     {
-        return Bill::create([
+        $bill = Bill::create([
             'branch_id'    => $visit->branch_id,
             'visit_id'     => $visit->id,
             'patient_id'   => $visit->patient_id,
@@ -38,6 +39,24 @@ final class BillingService
             'paid_amount'  => 0,
             'status'       => 'pending',
         ]);
+
+        $appointment = $visit->appointment_id === null
+            ? null
+            : Appointment::withoutGlobalScopes()->find($visit->appointment_id);
+        $fee = $appointment === null
+            ? 0.0
+            : (float) (config('appointments.consultation_fees.'.($appointment->type ?: 'follow_up'), 0));
+
+        if ($fee > 0) {
+            $this->addItem($bill, [
+                'description' => ucfirst(str_replace('_', ' ', (string) ($appointment->type ?: 'consultation'))).' consultation',
+                'category' => 'consultation',
+                'unit_price' => $fee,
+                'quantity' => 1,
+            ]);
+        }
+
+        return $bill->refresh();
     }
 
     /**
@@ -92,9 +111,18 @@ final class BillingService
 
             $bill->save();
 
-            // Send receipt if newly cleared and patient has an email
+            // Send receipt if newly cleared and patient has an email.
+            // Wrapped in rescue() so a mail-delivery failure (e.g. Resend sandbox
+            // restrictions in local dev) never rolls back the payment transaction.
             if ($wasNotCleared && $bill->status === 'cleared' && !empty($bill->patient->email)) {
-                $bill->patient->notify(new \App\Notifications\PaymentReceiptNotification($bill));
+                rescue(
+                    fn () => $bill->patient->notify(new \App\Notifications\PaymentReceiptNotification($bill)),
+                    fn (\Throwable $e) => logger()->warning('Payment receipt notification failed', [
+                        'bill_id' => $bill->id,
+                        'error'   => $e->getMessage(),
+                    ]),
+                    report: false,
+                );
             }
 
             return $bill->refresh();
