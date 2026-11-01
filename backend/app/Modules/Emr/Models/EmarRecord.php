@@ -6,8 +6,8 @@ namespace App\Modules\Emr\Models;
 
 use App\Models\User;
 use App\Modules\Patients\Models\Patient;
-use App\Modules\Pharmacy\Models\Medication;
-use App\Modules\Pharmacy\Models\Prescription;
+use App\Models\Medication;
+use App\Models\Prescription;
 use App\Modules\Queue\Models\Visit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
