@@ -53,7 +53,7 @@ class PortalInvoiceController extends Controller
         ]);
 
         try {
-            $amount = max(0, (float) $bill->total_amount - (float) $bill->paid_amount);
+            $amount = (float) ceil(max(0, (float) $bill->total_amount - (float) $bill->paid_amount));
             $result = $mpesa->initiateStkPush($bill, $request->string('phone')->toString(), $amount);
         } catch (RuntimeException $exception) {
             return response()->json(['message' => $exception->getMessage()], 422);

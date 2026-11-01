@@ -1,11 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
 import { httpClient } from '@/lib/http';
 import { resolveHomeRoute } from '@/config/navigation';
 
 export function AuthCallbackPage(): JSX.Element {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { refreshUser } = useAuth();
   const initialized = useRef(false);
@@ -14,17 +13,18 @@ export function AuthCallbackPage(): JSX.Element {
     if (initialized.current) return;
     initialized.current = true;
 
-    const token = searchParams.get('token');
-    if (!token) {
+    const code = new URLSearchParams(window.location.hash.slice(1)).get('code');
+    if (!code) {
       navigate('/login', { replace: true });
       return;
     }
 
-    // Set token globally
-    httpClient.setToken(token);
+    window.history.replaceState({}, '', window.location.pathname);
 
-    // Fetch user and navigate
-    refreshUser().then((user) => {
+    httpClient.post<{ token: string }>('/auth/google/exchange', { code }).then(({ token }) => {
+      httpClient.setToken(token);
+      return refreshUser();
+    }).then((user) => {
       if (!user) {
         navigate('/login', { replace: true });
         return;
@@ -34,7 +34,7 @@ export function AuthCallbackPage(): JSX.Element {
     }).catch(() => {
       navigate('/login', { replace: true });
     });
-  }, [navigate, searchParams, refreshUser]);
+  }, [navigate, refreshUser]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-stone-50 dark:bg-stone-950">

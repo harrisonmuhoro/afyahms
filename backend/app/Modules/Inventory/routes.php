@@ -37,40 +37,40 @@ Route::middleware(['auth:sanctum'])->group(function (): void {
         ->name('inventory.batches.expiring');
 
     Route::post('/inventory/items/{item}/receive', [InventoryController::class, 'receiveBatch'])
-        ->middleware('permission:inventory.receive')
+        ->middleware('permission:inventory.receive-grn')
         ->name('inventory.items.receive');
 
     Route::post('/inventory/items/{item}/adjust', [InventoryController::class, 'adjustStock'])
-        ->middleware('permission:inventory.adjust')
+        ->middleware('permission:inventory.adjust-stock')
         ->name('inventory.items.adjust');
 
     // ── Suppliers ──────────────────────────────────────────────────────────
     Route::get('/inventory/suppliers', [InventoryController::class, 'getSuppliers'])
-        ->middleware('permission:suppliers.read')
+        ->middleware('permission:inventory.read')
         ->name('inventory.suppliers.index');
 
     Route::post('/inventory/suppliers', [InventoryController::class, 'createSupplier'])
-        ->middleware('permission:suppliers.manage')
+        ->middleware('permission:inventory.manage')
         ->name('inventory.suppliers.store');
 
     // ── Purchase Orders ────────────────────────────────────────────────────
     Route::get('/inventory/purchase-orders', [InventoryController::class, 'getPurchaseOrders'])
-        ->middleware('permission:purchase_orders.read')
+        ->middleware('permission:purchase-orders.read')
         ->name('inventory.purchase_orders.index');
 
     Route::post('/inventory/purchase-orders', [InventoryController::class, 'createPurchaseOrder'])
-        ->middleware('permission:purchase_orders.create')
+        ->middleware('permission:purchase-orders.create')
         ->name('inventory.purchase_orders.store');
 
     Route::post('/inventory/purchase-orders/{po}/submit', [InventoryController::class, 'submitPurchaseOrder'])
-        ->middleware('permission:purchase_orders.submit')
+        ->middleware('permission:purchase-orders.submit')
         ->name('inventory.purchase_orders.submit');
 
     Route::post('/inventory/purchase-orders/{po}/receive', [InventoryController::class, 'receivePurchaseOrder'])
-        ->middleware('permission:purchase_orders.receive')
+        ->middleware('permission:purchase-orders.receive')
         ->name('inventory.purchase_orders.receive');
 
     Route::post('/inventory/purchase-orders/{po}/cancel', [InventoryController::class, 'cancelPurchaseOrder'])
-        ->middleware('permission:purchase_orders.cancel')
+        ->middleware('permission:purchase-orders.cancel')
         ->name('inventory.purchase_orders.cancel');
 });

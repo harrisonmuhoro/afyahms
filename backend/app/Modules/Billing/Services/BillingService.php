@@ -9,8 +9,11 @@ use App\Exceptions\Domain\NotFoundException;
 use App\Models\User;
 use App\Modules\Billing\Models\Bill;
 use App\Modules\Billing\Models\BillItem;
+use App\Modules\Billing\Models\BillPayment;
 use App\Modules\Queue\Models\Visit;
 use App\Modules\Appointments\Models\Appointment;
+use App\Modules\Tenancy\Scopes\BranchScope;
+use App\Exceptions\Domain\ConflictException;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -92,40 +95,101 @@ final class BillingService
      *
      * @param array<string, mixed> $paymentData
      */
-    public function recordPayment(Bill $bill, float $amount, string $method = 'cash', ?User $actor = null): Bill
+    public function recordPayment(
+        Bill $bill,
+        float $amount,
+        string $method = 'cash',
+        ?User $actor = null,
+        ?string $reference = null,
+        ?string $idempotencyKey = null,
+        array $metadata = [],
+    ): Bill
     {
-        return DB::transaction(function () use ($bill, $amount, $method, $actor): Bill {
-            $newPaid = min($bill->paid_amount + $amount, $bill->total_amount);
-            $bill->paid_amount     = $newPaid;
-            $bill->payment_method  = $method;
+        if ($amount <= 0) {
+            throw new \InvalidArgumentException('Payment amount must be greater than zero.');
+        }
 
-            $wasNotCleared = !$bill->isCleared();
+        return DB::transaction(function () use ($bill, $amount, $method, $actor, $reference, $idempotencyKey, $metadata): Bill {
+            /** @var Bill $lockedBill */
+            $lockedBill = Bill::withoutGlobalScope(BranchScope::class)
+                ->whereKey($bill->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
 
-            if ($newPaid >= $bill->total_amount) {
-                $bill->status     = 'cleared';
-                $bill->cleared_by = $actor?->id;
-                $bill->cleared_at = now();
-            } elseif ($newPaid > 0) {
-                $bill->status = 'partial';
+            $existingPayment = ($reference !== null || $idempotencyKey !== null)
+                ? BillPayment::query()
+                    ->where(function ($query) use ($reference, $idempotencyKey): void {
+                        if ($reference !== null) {
+                            $query->where('reference', $reference);
+                        }
+                        if ($idempotencyKey !== null) {
+                            $method = $reference === null ? 'where' : 'orWhere';
+                            $query->{$method}('idempotency_key', $idempotencyKey);
+                        }
+                    })
+                    ->first()
+                : null;
+
+            if ($existingPayment !== null) {
+                if ((int) $existingPayment->bill_id !== (int) $lockedBill->id) {
+                    throw new ConflictException('Payment reference has already been used.', 409);
+                }
+
+                return $lockedBill->refresh();
             }
 
-            $bill->save();
+            if ($lockedBill->isCleared()) {
+                throw new ConflictException('Bill is already cleared and cannot accept further payments.', 409);
+            }
+
+            $balance = max(0, (float) $lockedBill->total_amount - (float) $lockedBill->paid_amount);
+            $appliedAmount = min($amount, $balance);
+            if ($appliedAmount <= 0) {
+                throw new ConflictException('Bill has no outstanding balance.', 409);
+            }
+
+            BillPayment::create([
+                'bill_id' => $lockedBill->id,
+                'amount' => round($amount, 2),
+                'applied_amount' => round($appliedAmount, 2),
+                'method' => $method,
+                'reference' => $reference,
+                'idempotency_key' => $idempotencyKey,
+                'received_by' => $actor?->id,
+                'metadata' => $metadata ?: null,
+            ]);
+
+            $newPaid = min((float) $lockedBill->paid_amount + $appliedAmount, (float) $lockedBill->total_amount);
+            $lockedBill->paid_amount = $newPaid;
+            $lockedBill->payment_method = $method;
+
+            $wasNotCleared = ! $lockedBill->isCleared();
+
+            if ($newPaid >= $lockedBill->total_amount) {
+                $lockedBill->status     = 'cleared';
+                $lockedBill->cleared_by = $actor?->id;
+                $lockedBill->cleared_at = now();
+            } elseif ($newPaid > 0) {
+                $lockedBill->status = 'partial';
+            }
+
+            $lockedBill->save();
 
             // Send receipt if newly cleared and patient has an email.
             // Wrapped in rescue() so a mail-delivery failure (e.g. Resend sandbox
             // restrictions in local dev) never rolls back the payment transaction.
-            if ($wasNotCleared && $bill->status === 'cleared' && !empty($bill->patient->email)) {
+            if ($wasNotCleared && $lockedBill->status === 'cleared' && ! empty($lockedBill->patient->email)) {
                 rescue(
-                    fn () => $bill->patient->notify(new \App\Notifications\PaymentReceiptNotification($bill)),
+                    fn () => $lockedBill->patient->notify(new \App\Notifications\PaymentReceiptNotification($lockedBill)),
                     fn (\Throwable $e) => logger()->warning('Payment receipt notification failed', [
-                        'bill_id' => $bill->id,
+                        'bill_id' => $lockedBill->id,
                         'error'   => $e->getMessage(),
                     ]),
                     report: false,
                 );
             }
 
-            return $bill->refresh();
+            return $lockedBill->refresh();
         });
     }
 

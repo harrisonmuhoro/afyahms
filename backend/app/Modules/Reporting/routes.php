@@ -14,14 +14,14 @@ Route::middleware(['api', 'auth:sanctum'])
         ->middleware('permission:reporting.read');
 
     Route::post('pdf/{type}', [ReportPdfController::class, 'generate'])
-        ->middleware('permission:reports.view')
+        ->middleware('permission:reporting.read')
         ->name('pdf.generate');
 
     Route::get('pdf/job/{jobId}/status', [ReportPdfController::class, 'status'])
-        ->middleware('permission:reports.view')
+        ->middleware('permission:reporting.read')
         ->name('reports.pdf.status');
 
     Route::get('pdf/job/{jobId}/download', [ReportPdfController::class, 'download'])
-        ->middleware('permission:reports.view')
+        ->middleware('permission:reporting.read')
         ->name('reports.pdf.download');
 });

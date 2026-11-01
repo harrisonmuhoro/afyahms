@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 return [
+    'password' => [
+        'min_length' => (int) env('AUTH_PASSWORD_MIN_LENGTH', 12),
+    ],
     'defaults' => [
         'guard'     => env('AUTH_GUARD', 'web'),
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),

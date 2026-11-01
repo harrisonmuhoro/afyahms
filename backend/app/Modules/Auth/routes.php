@@ -23,6 +23,9 @@ Route::prefix('google')->name('google.')->group(function () {
     Route::get('/callback', [\App\Modules\Auth\Controllers\GoogleAuthController::class, 'callback'])
         ->middleware('throttle:60,1')
         ->name('callback');
+    Route::post('/exchange', [\App\Modules\Auth\Controllers\GoogleAuthController::class, 'exchange'])
+        ->middleware('throttle:auth')
+        ->name('exchange');
     Route::post('/complete-profile', [\App\Modules\Auth\Controllers\GoogleAuthController::class, 'completeProfile'])
         ->middleware(['auth:sanctum', 'throttle:5,1'])
         ->name('complete-profile');

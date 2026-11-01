@@ -38,11 +38,11 @@ Route::middleware(['auth:sanctum', \App\Http\Middleware\SetActiveBranch::class])
         ->name('lab.orders.store');
 
     Route::post('/lab/orders/{order}/collect', [LaboratoryController::class, 'collect'])
-        ->middleware('permission:lab.collect')
+        ->middleware('permission:lab.accession')
         ->name('lab.orders.collect');
 
     Route::post('/lab/orders/{order}/process', [LaboratoryController::class, 'process'])
-        ->middleware('permission:lab.process')
+        ->middleware('permission:lab.update')
         ->name('lab.orders.process');
 
     Route::post('/lab/orders/{order}/cancel', [LaboratoryController::class, 'cancel'])
@@ -51,10 +51,10 @@ Route::middleware(['auth:sanctum', \App\Http\Middleware\SetActiveBranch::class])
 
     // ── Results ───────────────────────────────────────────────────────────────
     Route::post('/lab/orders/{order}/result', [LaboratoryController::class, 'recordResult'])
-        ->middleware('permission:lab.result')
+        ->middleware('permission:lab.enter-result')
         ->name('lab.results.store');
 
     Route::post('/lab/results/{result}/verify', [LaboratoryController::class, 'verify'])
-        ->middleware('permission:lab.verify')
+        ->middleware('permission:lab.approve-result')
         ->name('lab.results.verify');
 });

@@ -45,7 +45,7 @@ final class Rbac
     /**
      * Roles that MUST enroll in MFA (foundation §11).
      */
-    public const MFA_REQUIRED = [];
+    public const MFA_REQUIRED = ['superadmin', 'hospital-admin', 'doctor', 'pharmacist'];
 
     /**
      * Permission catalogue. Mirrors `docs/08-rbac-matrix.md`.
@@ -111,12 +111,12 @@ final class Rbac
 
         // Radiology
         'radiology.create', 'radiology.read', 'radiology.update', 'radiology.delete', 'radiology.list',
-        'radiology.order', 'radiology.upload-image', 'radiology.report', 'radiology.sign-report',
+        'radiology.order', 'radiology.schedule', 'radiology.upload-image', 'radiology.report', 'radiology.sign-report',
         'radiology.manage-catalog',
 
         // Billing
         'invoices.create', 'invoices.read', 'invoices.update', 'invoices.delete', 'invoices.list',
-        'payments.create', 'payments.read', 'payments.list',
+        'payments.create', 'payments.read', 'payments.list', 'billing.clear',
         'billing.refund', 'billing.void-invoice', 'billing.apply-discount', 'billing.reconcile',
 
         // SHA
@@ -131,9 +131,11 @@ final class Rbac
         'mar.read', 'mar.administer',
 
         // Inventory
-        'inventory.create', 'inventory.read', 'inventory.update', 'inventory.delete', 'inventory.list',
+        'inventory.create', 'inventory.read', 'inventory.update', 'inventory.delete', 'inventory.list', 'inventory.manage',
         'inventory.adjust-stock', 'inventory.receive-grn',
+        'inventory.expiry-check.run',
         'purchase-orders.create', 'purchase-orders.read', 'purchase-orders.update', 'purchase-orders.list',
+        'purchase-orders.submit', 'purchase-orders.receive', 'purchase-orders.cancel',
         'purchase-orders.approve',
 
         // Reporting
@@ -224,18 +226,19 @@ final class Rbac
             'prescriptions.read', 'prescriptions.list',
             'pharmacy.read', 'pharmacy.list', 'pharmacy.view-stock', 'pharmacy.manage-stock', 'pharmacy.manage-catalog',
             'lab.read', 'lab.delete', 'lab.list', 'lab.manage-catalog',
-            'radiology.read', 'radiology.delete', 'radiology.list', 'radiology.manage-catalog',
+            'radiology.read', 'radiology.delete', 'radiology.list', 'radiology.manage-catalog', 'radiology.schedule',
             'invoices.create', 'invoices.read', 'invoices.update', 'invoices.delete', 'invoices.list',
-            'payments.create', 'payments.read', 'payments.list',
+            'payments.create', 'payments.read', 'payments.list', 'billing.clear',
             'billing.refund', 'billing.void-invoice', 'billing.apply-discount', 'billing.reconcile',
             'sha.read', 'sha.list', 'sha.verify-eligibility', 'sha.create-claim',
             'sha.submit-claim', 'sha.appeal-claim', 'sha.pre-auth', 'sha.track-claim', 'sha.reconcile',
             'inpatient.read', 'inpatient.list', 'wards.read', 'wards.list', 'wards.manage',
             'inpatient.view-chart', 'mar.read',
-            'inventory.create', 'inventory.read', 'inventory.update', 'inventory.delete', 'inventory.list',
+            'inventory.create', 'inventory.read', 'inventory.update', 'inventory.delete', 'inventory.list', 'inventory.manage',
             'inventory.adjust-stock', 'inventory.receive-grn',
+            'inventory.expiry-check.run',
             'purchase-orders.create', 'purchase-orders.read', 'purchase-orders.update',
-            'purchase-orders.list', 'purchase-orders.approve',
+            'purchase-orders.list', 'purchase-orders.approve', 'purchase-orders.submit', 'purchase-orders.receive', 'purchase-orders.cancel',
             'reporting.read', 'reporting.list', 'reporting.clinical', 'reporting.financial',
             'reporting.operational', 'reporting.export',
             'communication.read', 'communication.list', 'communication.send', 'communication.manage-templates',
@@ -264,17 +267,18 @@ final class Rbac
             'alerts.read', 'alerts.list', 'alerts.configure',
             'pharmacy.read', 'pharmacy.list', 'pharmacy.view-stock', 'pharmacy.manage-stock', 'pharmacy.manage-catalog',
             'lab.manage-catalog',
-            'radiology.manage-catalog',
+            'radiology.manage-catalog', 'radiology.schedule',
             'invoices.create', 'invoices.read', 'invoices.update', 'invoices.delete', 'invoices.list',
-            'payments.create', 'payments.read', 'payments.list',
+            'payments.create', 'payments.read', 'payments.list', 'billing.clear',
             'billing.refund', 'billing.void-invoice', 'billing.apply-discount', 'billing.reconcile',
             'sha.read', 'sha.list', 'sha.verify-eligibility', 'sha.create-claim',
             'sha.submit-claim', 'sha.appeal-claim', 'sha.pre-auth', 'sha.track-claim', 'sha.reconcile',
             'inpatient.read', 'inpatient.list', 'wards.read', 'wards.list', 'wards.manage',
-            'inventory.create', 'inventory.read', 'inventory.update', 'inventory.delete', 'inventory.list',
+            'inventory.create', 'inventory.read', 'inventory.update', 'inventory.delete', 'inventory.list', 'inventory.manage',
             'inventory.adjust-stock', 'inventory.receive-grn',
+            'inventory.expiry-check.run',
             'purchase-orders.create', 'purchase-orders.read', 'purchase-orders.update',
-            'purchase-orders.list', 'purchase-orders.approve',
+            'purchase-orders.list', 'purchase-orders.approve', 'purchase-orders.submit', 'purchase-orders.receive', 'purchase-orders.cancel',
             'reporting.read', 'reporting.list', 'reporting.clinical', 'reporting.financial',
             'reporting.operational', 'reporting.export',
             'communication.read', 'communication.list', 'communication.send', 'communication.manage-templates',
@@ -373,9 +377,10 @@ final class Rbac
             'pharmacy.read', 'pharmacy.list', 'pharmacy.view-stock',
             'pharmacy.manage-stock', 'pharmacy.manage-catalog',
             'inpatient.read', 'inpatient.list', 'inpatient.view-chart', 'mar.read',
-            'inventory.create', 'inventory.read', 'inventory.update', 'inventory.list',
+            'inventory.create', 'inventory.read', 'inventory.update', 'inventory.list', 'inventory.manage',
             'inventory.adjust-stock', 'inventory.receive-grn',
             'purchase-orders.create', 'purchase-orders.read', 'purchase-orders.update', 'purchase-orders.list',
+            'purchase-orders.submit', 'purchase-orders.receive', 'purchase-orders.cancel',
             'reporting.read', 'reporting.list', 'reporting.operational',
             'communication.read', 'communication.list',
             'documents.read', 'documents.list', 'documents.download',
@@ -402,7 +407,7 @@ final class Rbac
             'emr.read',
             'radiology.create', 'radiology.read', 'radiology.update', 'radiology.list',
             'radiology.upload-image', 'radiology.report', 'radiology.sign-report',
-            'radiology.manage-catalog',
+            'radiology.manage-catalog', 'radiology.schedule',
             'inventory.read', 'inventory.list',
             'reporting.read', 'reporting.list', 'reporting.operational',
             'communication.read', 'communication.list',
@@ -415,7 +420,7 @@ final class Rbac
             'appointments.read', 'appointments.list',
             'queue.read', 'queue.list', 'queue.call-next', 'queue.advance',
             'invoices.create', 'invoices.read', 'invoices.update', 'invoices.list',
-            'payments.create', 'payments.read', 'payments.list',
+            'payments.create', 'payments.read', 'payments.list', 'billing.clear',
             'billing.refund', 'billing.void-invoice', 'billing.apply-discount', 'billing.reconcile',
             'sha.read', 'sha.list', 'sha.verify-eligibility', 'sha.create-claim',
             'sha.submit-claim', 'sha.appeal-claim', 'sha.pre-auth', 'sha.track-claim', 'sha.reconcile',

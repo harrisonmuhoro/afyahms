@@ -39,7 +39,7 @@ Route::middleware(['auth:sanctum', \App\Http\Middleware\SetActiveBranch::class])
         ->name('radiology.orders.schedule');
 
     Route::post('/radiology/orders/{order}/acquire', [RadiologyController::class, 'acquire'])
-        ->middleware('permission:radiology.acquire')
+        ->middleware('permission:radiology.upload-image')
         ->name('radiology.orders.acquire');
 
     Route::post('/radiology/orders/{order}/cancel', [RadiologyController::class, 'cancel'])
@@ -60,6 +60,6 @@ Route::middleware(['auth:sanctum', \App\Http\Middleware\SetActiveBranch::class])
         ->name('radiology.reports.amend');
 
     Route::post('/radiology/reports/{report}/verify', [RadiologyController::class, 'verify'])
-        ->middleware('permission:radiology.verify')
+        ->middleware('permission:radiology.sign-report')
         ->name('radiology.reports.verify');
 });

@@ -24,8 +24,8 @@ Route::prefix('v1')->name('api.')->group(function () {
         ->middleware(['auth:sanctum'])
         ->group(function () {
             Route::get('/', [NotificationController::class, 'index']);
-            Route::post('/test', [NotificationController::class, 'generateTestNotifications']);
-            Route::post('/trigger-expiring-check', [NotificationController::class, 'triggerExpiringCheck']);
+            Route::post('/trigger-expiring-check', [NotificationController::class, 'triggerExpiringCheck'])
+                ->middleware('permission:inventory.expiry-check.run');
             Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead']);
             Route::post('/{id}/read', [NotificationController::class, 'markAsRead']);
         });

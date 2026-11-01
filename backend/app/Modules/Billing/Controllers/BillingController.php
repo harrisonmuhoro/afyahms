@@ -68,9 +68,11 @@ final class BillingController extends Controller
     /** POST /api/v1/billing/visits/{visit}/bill/pay */
     public function recordPayment(Request $request, Visit $visit): JsonResponse
     {
+        $request->merge(['idempotency_key' => $request->header('Idempotency-Key')]);
         $validated = $request->validate([
             'amount' => ['required', 'numeric', 'min:0.01'],
             'method' => ['nullable', 'string', 'max:40'],
+            'idempotency_key' => ['nullable', 'string', 'max:100'],
         ]);
 
         $bill = $this->billing->billForVisit($visit);
@@ -96,6 +98,7 @@ final class BillingController extends Controller
             (float) $validated['amount'],
             (string) ($validated['method'] ?? 'cash'),
             $request->user(),
+            idempotencyKey: $validated['idempotency_key'] ?? null,
         );
         
         // High Value Payment Alert — dispatch as background job to avoid blocking the HTTP response

@@ -209,6 +209,7 @@ export function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     await httpClient.post('/auth/mfa/enroll/verify', { code });
     const fresh = await refetch();
     setRequiresMfaEnrollment(false);
+    setRequiresMfa(false);
 
     return fresh.data ?? null;
   }, [refetch]);

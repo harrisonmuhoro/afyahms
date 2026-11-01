@@ -57,6 +57,34 @@ final class MpesaDarajaService
         ];
     }
 
+    /** @return array<string, mixed> */
+    public function queryStkPush(string $checkoutRequestId): array
+    {
+        $gateway = config('mpesa.gateways.mpesa_daraja');
+        $shortcode = (string) ($gateway['lipa_na_mpesa_online_shortcode'] ?: $gateway['shortcode']);
+        $passkey = (string) ($gateway['lipa_na_mpesa_online_passkey'] ?: $gateway['passkey']);
+        if ($checkoutRequestId === '' || $passkey === '') {
+            throw new RuntimeException('M-Pesa STK query is not configured.');
+        }
+
+        $timestamp = now()->format('YmdHis');
+        $response = Http::withToken($this->accessToken($gateway))
+            ->acceptJson()
+            ->timeout((int) $gateway['timeout'])
+            ->post(rtrim((string) $gateway['base_url'], '/').'/mpesa/stkpushquery/v1/query', [
+                'BusinessShortCode' => $shortcode,
+                'Password' => base64_encode($shortcode.$passkey.$timestamp),
+                'Timestamp' => $timestamp,
+                'CheckoutRequestID' => $checkoutRequestId,
+            ]);
+
+        if ($response->failed() || ! is_array($response->json())) {
+            throw new RuntimeException('Unable to verify the M-Pesa STK transaction.');
+        }
+
+        return $response->json();
+    }
+
     /** @param array<string, mixed> $gateway */
     private function accessToken(array $gateway): string
     {

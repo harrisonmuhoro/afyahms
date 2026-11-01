@@ -77,11 +77,15 @@ return Application::configure(basePath: dirname(__DIR__))
                 default => 500,
             };
 
+            $isInternalError = $status >= 500;
+
             return response()->json([
                 'error' => [
-                    'type'    => class_basename($e),
+                    'type'    => $isInternalError ? 'internal_error' : class_basename($e),
                     'status'  => $status,
-                    'message' => $e->getMessage() ?: 'An error occurred.',
+                    'message' => $isInternalError
+                        ? 'An unexpected error occurred. Please try again later.'
+                        : ($e->getMessage() ?: 'An error occurred.'),
                     'details' => $e instanceof \Illuminate\Validation\ValidationException
                         ? $e->errors()
                         : null,

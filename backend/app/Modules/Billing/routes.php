@@ -24,27 +24,27 @@ Route::middleware(['auth:sanctum'])->group(function (): void {
     // Bill for a specific visit
     Route::get('/billing/visits/{visit}/bill',         [BillingController::class, 'show'])
         ->whereNumber('visit')
-        ->middleware('permission:billing.read')
+        ->middleware('permission:invoices.read')
         ->name('billing.visits.bill.show');
 
     Route::get('/billing/visits/{visit}/receipt',      [\App\Modules\Billing\Controllers\ReceiptController::class, 'show'])
         ->whereNumber('visit')
-        ->middleware('permission:billing.read')
+        ->middleware('permission:invoices.read')
         ->name('billing.visits.receipt.show');
 
     Route::get('/billing/visits/{visit}/bill/status',  [BillingController::class, 'status'])
         ->whereNumber('visit')
-        ->middleware('permission:billing.read')
+        ->middleware('permission:invoices.read')
         ->name('billing.visits.bill.status');
 
     Route::post('/billing/visits/{visit}/bill/items',  [BillingController::class, 'addItem'])
         ->whereNumber('visit')
-        ->middleware('permission:billing.write')
+        ->middleware('permission:invoices.update')
         ->name('billing.visits.bill.items.store');
 
     Route::post('/billing/visits/{visit}/bill/pay',    [BillingController::class, 'recordPayment'])
         ->whereNumber('visit')
-        ->middleware('permission:billing.write')
+        ->middleware('permission:payments.create')
         ->name('billing.visits.bill.pay');
 
     Route::post('/billing/visits/{visit}/bill/clear',  [BillingController::class, 'markCleared'])

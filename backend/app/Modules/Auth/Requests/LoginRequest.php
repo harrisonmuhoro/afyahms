@@ -18,7 +18,7 @@ final class LoginRequest extends FormRequest
     {
         return [
             'email'    => ['required', 'email:rfc'],
-            'password' => ['required', 'string', 'min:'.config('auth.password.min_length', 5)],
+            'password' => ['required', 'string'],
             'device'   => ['nullable', 'string', 'max:128'],
         ];
     }

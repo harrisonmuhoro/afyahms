@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Modules\Admin\Rbac;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,16 +25,15 @@ final class EnsureMfaConfirmed
             return $next($request);
         }
 
-        if (! $user->mfa_enabled) {
-            return $next($request);
-        }
-
-        if ($user->hasAnyRole(['superadmin', 'hospital-admin', 'doctor'])) {
+        $required = $user->hasAnyRole(Rbac::MFA_REQUIRED);
+        if (! $required && ! $user->mfa_enabled) {
             return $next($request);
         }
 
         $lastConfirmed = $user->mfa_confirmed_at;
-        $fresh = $lastConfirmed !== null
+        $fresh = $user->mfa_enabled
+            && $user->activeMfa() !== null
+            && $lastConfirmed !== null
             && $lastConfirmed->diffInSeconds(now()) < self::CONFIRM_WINDOW_SECONDS;
 
         if (! $fresh) {

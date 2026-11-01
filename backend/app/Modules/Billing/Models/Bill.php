@@ -71,6 +71,11 @@ final class Bill extends Model
         return $this->hasMany(BillItem::class, 'bill_id');
     }
 
+    public function payments(): HasMany
+    {
+        return $this->hasMany(BillPayment::class, 'bill_id');
+    }
+
     public function visit(): BelongsTo
     {
         return $this->belongsTo(\App\Modules\Queue\Models\Visit::class, 'visit_id');

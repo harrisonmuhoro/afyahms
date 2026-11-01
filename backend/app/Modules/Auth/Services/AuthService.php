@@ -7,6 +7,7 @@ namespace App\Modules\Auth\Services;
 use App\Exceptions\Domain\ForbiddenException;
 use App\Exceptions\Domain\ValidationFailedException;
 use App\Models\User;
+use App\Modules\Admin\Rbac;
 use App\Modules\Auth\Models\LoginHistory;
 use App\Modules\Auth\Services\LoginHistoryService;
 use App\Modules\Tenancy\Models\Branch;
@@ -104,8 +105,11 @@ final class AuthService
 
         $this->history->clearFailures($user);
 
-        $requiresMfaStep = $user->mfa_enabled && ! $this->bypassesLoginMfa($user);
-        $mfaType = $requiresMfaStep ? $user->activeMfa()?->type : null;
+        $activeMfa = $user->activeMfa();
+        $requiresMfaEnrollment = $user->hasAnyRole(Rbac::MFA_REQUIRED)
+            && (! $user->mfa_enabled || $activeMfa === null);
+        $requiresMfaStep = ! $requiresMfaEnrollment && $user->mfa_enabled && $activeMfa !== null;
+        $mfaType = $requiresMfaStep ? $activeMfa->type : null;
 
         if ($requiresMfaStep && $mfaType === 'email') {
             $this->otpService->send($user, $user->email, 'mfa_login');
@@ -122,8 +126,8 @@ final class AuthService
             'user'                    => $user->load(['roles', 'branches']),
             'token'                   => $token->plainTextToken,
             'requires_mfa'            => $requiresMfaStep,
-            'mfa_type'                => $requiresMfaStep ? $user->activeMfa()?->type : null,
-            'requires_mfa_enrollment' => false,
+            'mfa_type'                => $mfaType,
+            'requires_mfa_enrollment' => $requiresMfaEnrollment,
         ];
     }
 

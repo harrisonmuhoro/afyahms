@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Inventory\Services;
 
 use App\Exceptions\Domain\ConflictException;
+use App\Exceptions\Domain\ValidationFailedException;
 use App\Models\User;
 use App\Modules\Inventory\Models\InventoryBatch;
 use App\Modules\Inventory\Models\InventoryItem;
@@ -116,27 +117,33 @@ final class InventoryService
     public function receiveBatch(InventoryItem $item, User $actor, array $data): InventoryBatch
     {
         return DB::transaction(function () use ($item, $actor, $data): InventoryBatch {
+            /** @var InventoryItem $lockedItem */
+            $lockedItem = InventoryItem::query()->whereKey($item->id)->lockForUpdate()->firstOrFail();
             $qty = (int) ($data['quantity_received'] ?? 0);
+            if ($qty < 1) {
+                throw new ValidationFailedException('Received quantity must be greater than zero.');
+            }
 
             $batch = InventoryBatch::create([
-                'branch_id'          => $item->branch_id,
-                'inventory_item_id'  => $item->id,
+                'branch_id'          => $lockedItem->branch_id,
+                'inventory_item_id'  => $lockedItem->id,
                 'batch_number'       => (string) ($data['batch_number'] ?? Str::upper(Str::random(8))),
                 'supplier_id'        => $data['supplier_id']        ?? null,
                 'quantity_received'  => $qty,
                 'quantity_remaining' => $qty,
-                'unit_cost'          => (float) ($data['unit_cost']  ?? $item->unit_cost ?? 0),
+                'unit_cost'          => (float) ($data['unit_cost']  ?? $lockedItem->unit_cost ?? 0),
                 'manufacture_date'   => $data['manufacture_date']    ?? null,
                 'expiry_date'        => $data['expiry_date']         ?? null,
                 'status'             => 'active',
             ]);
 
-            $before = $item->quantity_on_hand;
-            $item->increment('quantity_on_hand', $qty);
+            $before = (int) $lockedItem->quantity_on_hand;
+            $lockedItem->quantity_on_hand = $before + $qty;
+            $lockedItem->save();
 
             StockAdjustment::create([
-                'branch_id'           => $item->branch_id,
-                'inventory_item_id'   => $item->id,
+                'branch_id'           => $lockedItem->branch_id,
+                'inventory_item_id'   => $lockedItem->id,
                 'inventory_batch_id'  => $batch->id,
                 'performed_by'        => $actor->id,
                 'quantity_before'     => $before,
@@ -179,16 +186,59 @@ final class InventoryService
     public function adjust(InventoryItem $item, User $actor, array $data): StockAdjustment
     {
         return DB::transaction(function () use ($item, $actor, $data): StockAdjustment {
+            /** @var InventoryItem $lockedItem */
+            $lockedItem = InventoryItem::query()->whereKey($item->id)->lockForUpdate()->firstOrFail();
             $change = (int) ($data['quantity_change'] ?? 0);
-            $before = $item->quantity_on_hand;
-            $after  = max(0, $before + $change);
+            $before = (int) $lockedItem->quantity_on_hand;
+            $after = $before + $change;
+            if ($after < 0) {
+                throw new ConflictException('Stock adjustment would make on-hand quantity negative.', 409);
+            }
 
-            $item->update(['quantity_on_hand' => $after]);
+            $batchId = isset($data['inventory_batch_id']) ? (int) $data['inventory_batch_id'] : null;
+            if ($batchId !== null) {
+                $batch = InventoryBatch::query()->whereKey($batchId)->lockForUpdate()->firstOrFail();
+                if ((int) $batch->inventory_item_id !== (int) $lockedItem->id || (int) $batch->branch_id !== (int) $lockedItem->branch_id) {
+                    throw new ConflictException('Inventory batch does not belong to this item and branch.', 409);
+                }
+                if ($change < 0 && (int) $batch->quantity_remaining < abs($change)) {
+                    throw new ConflictException('Adjustment exceeds the selected batch quantity.', 409);
+                }
+                $batch->quantity_remaining = (int) $batch->quantity_remaining + $change;
+                if ($change > 0) {
+                    $batch->quantity_received = (int) $batch->quantity_received + $change;
+                }
+                $batch->status = $batch->quantity_remaining === 0 ? 'exhausted' : 'active';
+                $batch->save();
+            } elseif ($change < 0) {
+                $remainingToRemove = abs($change);
+                $batches = InventoryBatch::query()
+                    ->where('inventory_item_id', $lockedItem->id)
+                    ->where('branch_id', $lockedItem->branch_id)
+                    ->where('quantity_remaining', '>', 0)
+                    ->orderBy('expiry_date')
+                    ->orderBy('id')
+                    ->lockForUpdate()
+                    ->get();
+                foreach ($batches as $batch) {
+                    if ($remainingToRemove === 0) {
+                        break;
+                    }
+                    $taken = min($remainingToRemove, (int) $batch->quantity_remaining);
+                    $batch->quantity_remaining -= $taken;
+                    $batch->status = $batch->quantity_remaining === 0 ? 'exhausted' : 'active';
+                    $batch->save();
+                    $remainingToRemove -= $taken;
+                }
+            }
+
+            $lockedItem->quantity_on_hand = $after;
+            $lockedItem->save();
 
             return StockAdjustment::create([
-                'branch_id'          => $item->branch_id,
-                'inventory_item_id'  => $item->id,
-                'inventory_batch_id' => $data['inventory_batch_id'] ?? null,
+                'branch_id'          => $lockedItem->branch_id,
+                'inventory_item_id'  => $lockedItem->id,
+                'inventory_batch_id' => $batchId,
                 'performed_by'       => $actor->id,
                 'quantity_before'    => $before,
                 'quantity_change'    => $change,
@@ -320,43 +370,50 @@ final class InventoryService
      */
     public function receivePurchaseOrder(PurchaseOrder $po, User $actor, array $receivedLines): PurchaseOrder
     {
-        $this->assertPoStatus($po, ['sent', 'acknowledged', 'shipped'], 'receive');
-
         return DB::transaction(function () use ($po, $actor, $receivedLines): PurchaseOrder {
-            foreach ($receivedLines as $line) {
-                $poItem = PurchaseOrderItem::findOrFail((int) $line['po_item_id']);
-                
-                // Security Fix: Prevent IDOR / cross-contamination of PO items
-                if ($poItem->purchase_order_id !== $po->id) {
-                    throw new ConflictException("Item does not belong to this purchase order.", 403);
-                }
-                
-                $qty = (int) ($line['quantity_received'] ?? 0);
+            /** @var PurchaseOrder $lockedPo */
+            $lockedPo = PurchaseOrder::query()->whereKey($po->id)->lockForUpdate()->firstOrFail();
+            $this->assertPoStatus($lockedPo, ['sent', 'acknowledged', 'shipped', 'partially_received'], 'receive');
 
-                if ($qty <= 0) {
+            foreach ($receivedLines as $line) {
+                $poItem = PurchaseOrderItem::query()
+                    ->where('purchase_order_id', $lockedPo->id)
+                    ->whereKey((int) $line['po_item_id'])
+                    ->lockForUpdate()
+                    ->firstOrFail();
+                $newReceived = (int) ($line['quantity_received'] ?? 0);
+                $previouslyReceived = (int) $poItem->quantity_received;
+                if ($newReceived < $previouslyReceived || $newReceived > (int) $poItem->quantity_ordered) {
+                    throw new ConflictException('Received quantity must be between the prior received total and the ordered quantity.', 409);
+                }
+
+                $delta = $newReceived - $previouslyReceived;
+                $poItem->update(['quantity_received' => $newReceived]);
+                if ($delta === 0) {
                     continue;
                 }
 
-                $poItem->update(['quantity_received' => $qty]);
-
-                $inventoryItem = InventoryItem::findOrFail($poItem->inventory_item_id);
+                $inventoryItem = InventoryItem::query()->whereKey($poItem->inventory_item_id)->lockForUpdate()->firstOrFail();
 
                 $this->receiveBatch($inventoryItem, $actor, [
-                    'quantity_received' => $qty,
+                    'quantity_received' => $delta,
                     'batch_number'      => $line['batch_number'] ?? null,
-                    'supplier_id'       => $po->supplier_id,
+                    'supplier_id'       => $lockedPo->supplier_id,
                     'unit_cost'         => $poItem->unit_cost,
                     'expiry_date'       => $line['expiry_date'] ?? null,
-                    'notes'             => "PO: {$po->po_number}",
+                    'notes'             => "PO: {$lockedPo->po_number}",
                 ]);
             }
 
-            $po->update([
-                'status'         => 'received',
-                'delivered_date' => now()->toDateString(),
+            $allReceived = ! $lockedPo->items()
+                ->whereColumn('quantity_received', '<', 'quantity_ordered')
+                ->exists();
+            $lockedPo->update([
+                'status' => $allReceived ? 'received' : 'partially_received',
+                'delivered_date' => $allReceived ? now()->toDateString() : null,
             ]);
 
-            return $po->refresh()->load(['items.item', 'supplier', 'raisedBy']);
+            return $lockedPo->refresh()->load(['items.item', 'supplier', 'raisedBy']);
         });
     }
 

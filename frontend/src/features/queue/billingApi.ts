@@ -87,6 +87,7 @@ export function useRecordPayment(visitId: number): {
       return await httpClient.post<{ data: Bill }>(
         `/billing/visits/${visitId}/bill/pay`,
         data,
+        { headers: { 'Idempotency-Key': crypto.randomUUID() } },
       );
     },
     onSuccess: () => {

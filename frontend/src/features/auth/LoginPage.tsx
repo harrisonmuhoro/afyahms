@@ -6,9 +6,17 @@ import { HttpError } from '@/lib/http';
 import { resolveHomeRoute } from '@/config/navigation';
 import { Icon, type IconName } from '@/components/icons/Icon';
 import { GoogleSignInButton } from './GoogleSignInButton';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface LocationState {
   from?: string;
+}
+
+interface MfaEnrollment {
+  secret: string | null;
+  qr_url: string | null;
+  recovery_codes: string[];
+  message: string;
 }
 
 /* ─── Feature bullet item (brand panel) ─────────────────────────────────────── */
@@ -27,7 +35,7 @@ export function LoginPage(): JSX.Element {
   const { t, i18n } = useTranslation(['auth', 'errors', 'common', 'app', 'settings']);
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, confirmMfa } = useAuth();
+  const { login, confirmMfa, startMfaEnrollment, verifyMfaEnrollment } = useAuth();
 
   const [email, setEmail] = useState('admin@afya.local');
   const [password, setPassword] = useState('ChangeMe!2025');
@@ -37,8 +45,9 @@ export function LoginPage(): JSX.Element {
   const [error, setError] = useState<string | null>(null);
 
   // MFA Flow States
-  const [mfaStep, setMfaStep] = useState<'none' | 'verify'>('none');
+  const [mfaStep, setMfaStep] = useState<'none' | 'verify' | 'enroll'>('none');
   const [mfaCode, setMfaCode] = useState('');
+  const [mfaEnrollment, setMfaEnrollment] = useState<MfaEnrollment | null>(null);
   // We need to keep track of the destination after MFA succeeds
   const [pendingDestination, setPendingDestination] = useState<string | null>(null);
 
@@ -53,7 +62,11 @@ export function LoginPage(): JSX.Element {
       const response = await login(email, password);
       const destination = from ?? resolveHomeRoute(response.user.roles);
 
-      if (response.requires_mfa) {
+      if (response.requires_mfa_enrollment) {
+        setPendingDestination(destination);
+        setMfaEnrollment(await startMfaEnrollment('totp'));
+        setMfaStep('enroll');
+      } else if (response.requires_mfa) {
         setPendingDestination(destination);
         setMfaStep('verify');
       } else {
@@ -69,6 +82,20 @@ export function LoginPage(): JSX.Element {
       } else {
         setError(t('errors:generic'));
       }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleMfaEnrollment = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
+    event.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    try {
+      await verifyMfaEnrollment(mfaCode);
+      navigate(pendingDestination ?? '/', { replace: true });
+    } catch (err) {
+      setError(err instanceof HttpError ? err.message : t('errors:generic'));
     } finally {
       setSubmitting(false);
     }
@@ -284,7 +311,7 @@ export function LoginPage(): JSX.Element {
               {/* Social sign-in */}
               <GoogleSignInButton />
             </form>
-          ) : (
+          ) : mfaStep === 'verify' ? (
             <form onSubmit={handleMfaVerify} noValidate className="animate-fade-in space-y-5">
               <div className="mb-4">
                 <h2 className="text-xl font-semibold tracking-tight text-stone-900 dark:text-stone-50">
@@ -343,17 +370,67 @@ export function LoginPage(): JSX.Element {
                 Cancel and return to login
               </button>
             </form>
+          ) : (
+            <form onSubmit={handleMfaEnrollment} noValidate className="animate-fade-in space-y-5">
+              <div className="mb-4">
+                <h2 className="text-xl font-semibold tracking-tight text-stone-900 dark:text-stone-50">
+                  Set up two-factor verification
+                </h2>
+                <p className="mt-1.5 text-sm text-stone-500 dark:text-stone-400">
+                  Add this account to an authenticator app, then enter the current six-digit code.
+                </p>
+              </div>
+
+              {mfaEnrollment?.qr_url && (
+                <div className="flex justify-center rounded-xl bg-white p-4">
+                  <QRCodeSVG value={mfaEnrollment.qr_url} size={180} />
+                </div>
+              )}
+              {mfaEnrollment?.secret && (
+                <p className="break-all rounded-lg bg-stone-100 p-3 text-center font-mono text-sm dark:bg-stone-900">
+                  Setup key: {mfaEnrollment.secret}
+                </p>
+              )}
+              {mfaEnrollment?.recovery_codes.length ? (
+                <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
+                  Save these recovery codes somewhere private. Each code works once.
+                  <p className="mt-2 break-words font-mono">{mfaEnrollment.recovery_codes.join(' · ')}</p>
+                </div>
+              ) : null}
+
+              <label htmlFor="enrollMfaCode" className="block text-sm font-semibold text-stone-700 dark:text-stone-300">
+                Authentication code
+              </label>
+              <input
+                id="enrollMfaCode"
+                type="text"
+                inputMode="numeric"
+                required
+                autoFocus
+                autoComplete="one-time-code"
+                placeholder="123456"
+                className="input text-center font-mono text-lg tracking-[0.5em]"
+                value={mfaCode}
+                onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              />
+
+              {error !== null && <div role="alert" className="text-sm text-red-700">{error}</div>}
+              <button type="submit" className="btn-login" disabled={submitting || mfaCode.length < 6}>
+                {submitting ? 'Verifying…' : 'Verify & Continue'}
+              </button>
+            </form>
           )}
 
-          {/* Demo hint */}
-          <div className="mt-6 rounded-xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900/50">
-            <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-stone-400 dark:text-stone-500">
-              Demo credentials
-            </p>
-            <p className="text-xs text-stone-500 dark:text-stone-400">
-              {t('auth:login.demo', 'Use any role email from the README · Password: ChangeMe!2025')}
-            </p>
-          </div>
+          {mfaStep === 'none' && (
+            <div className="mt-6 rounded-xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900/50">
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-stone-400 dark:text-stone-500">
+                Demo credentials
+              </p>
+              <p className="text-xs text-stone-500 dark:text-stone-400">
+                {t('auth:login.demo', 'Use any role email from the README · Password: ChangeMe!2025')}
+              </p>
+            </div>
+          )}
 
           {/* Footer: language switcher + tagline */}
           <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-stone-200/70 pt-5 dark:border-stone-800/70 sm:flex-row">

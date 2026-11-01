@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Modules\Admin\Rbac;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Finder\Finder;
@@ -22,6 +23,19 @@ final class AuthServiceProvider extends ServiceProvider
         Gate::before(function ($user, string $ability): ?bool {
             if ($user === null) {
                 return null;
+            }
+
+            if ($user->hasAnyRole(Rbac::MFA_REQUIRED) || $user->mfa_enabled) {
+                $confirmedAt = $user->mfa_confirmed_at;
+                $fresh = $user->mfa_enabled
+                    && $confirmedAt !== null
+                    && $confirmedAt->diffInSeconds(now()) < 600;
+                if ($fresh && ! $user->relationLoaded('_mfa_gate_enabled')) {
+                    $user->setRelation('_mfa_gate_enabled', $user->mfa()->whereNotNull('enabled_at')->exists());
+                }
+                if (! $fresh || $user->getRelation('_mfa_gate_enabled') !== true) {
+                    return false;
+                }
             }
 
             // Only intercept Spatie dot-notation permissions (e.g. queue.advance)

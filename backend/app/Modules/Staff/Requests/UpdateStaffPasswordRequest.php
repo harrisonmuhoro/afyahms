@@ -16,7 +16,7 @@ final class UpdateStaffPasswordRequest extends FormRequest
     /** @return array<string, mixed> */
     public function rules(): array
     {
-        $min = (int) config('auth.password.min_length', 5);
+        $min = (int) config('auth.password.min_length', 12);
 
         return [
             'current_password' => ['required', 'string'],
