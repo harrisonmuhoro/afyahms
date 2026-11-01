@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\EMR\Controllers;
+namespace App\Modules\Emr\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Modules\EMR\Models\EmarRecord;
+use App\Modules\Emr\Models\EmarRecord;
 use App\Modules\Queue\Models\Visit;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

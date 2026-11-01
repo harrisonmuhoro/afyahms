@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\EMR\Models;
+namespace App\Modules\Emr\Models;
 
 use App\Models\User;
 use App\Modules\Patients\Models\Patient;
