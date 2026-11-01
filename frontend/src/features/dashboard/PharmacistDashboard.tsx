@@ -117,7 +117,7 @@ export function PharmacistDashboard(): JSX.Element {
             <span className="text-label-caps text-on-surface-variant">Pending Reviews</span>
             <div className="flex items-end justify-between">
               <span className="text-headline-lg font-bold text-on-surface">
-                {rxLoading ? '…' : String(pending.length).padStart(2, '0')}
+                {rxLoading ? '…' : pending.length}
               </span>
               {pending.length > 0 && (
                 <span className="px-2 py-0.5 bg-error-container/30 text-error text-[11px] font-bold rounded-full">
@@ -134,7 +134,7 @@ export function PharmacistDashboard(): JSX.Element {
             <span className="text-label-caps text-on-surface-variant">Critical Stock Alerts</span>
             <div className="flex items-end justify-between">
               <span className="text-headline-lg font-bold text-on-surface">
-                {medsLoading ? '…' : String(criticalStock.length).padStart(2, '0')}
+                {medsLoading ? '…' : criticalStock.length}
               </span>
               <Glyph name="warning" className={`${criticalStock.length > 0 ? 'text-error' : 'text-on-surface-variant'}`} />
             </div>

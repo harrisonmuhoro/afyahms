@@ -5,6 +5,7 @@ import { usePendingEmarRecords } from '@/features/emr/api';
 import { cn } from '@/lib/cn';
 import type { MtsCategory, QueueTicket } from '@/features/queue/types';
 import { Glyph } from '@/components/icons/Glyph';
+import { ErrorState, SkeletonRows } from '@/components/ui';
 
 const MTS_BAR: Record<MtsCategory, string> = {
   red: 'bg-error',
@@ -33,7 +34,7 @@ export function NurseDashboard(): JSX.Element {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { snapshot, isLoading } = useBoard('TRI');
-  const { data: pendingMeds, isLoading: loadingMeds } = usePendingEmarRecords();
+  const { data: pendingMeds, isLoading: loadingMeds, error: medsError } = usePendingEmarRecords();
 
   const waiting = snapshot?.waiting ?? [];
   const inService = snapshot?.in_service ?? null;
@@ -173,7 +174,11 @@ export function NurseDashboard(): JSX.Element {
           Medication Administration
         </h3>
         {loadingMeds ? (
-          <p className="py-8 text-center text-body-md text-on-surface-variant">Loading pending medications…</p>
+          <SkeletonRows rows={3} />
+        ) : medsError !== null && medsError !== undefined ? (
+          <div className="card">
+            <ErrorState title="Medication schedule unavailable" error={medsError} />
+          </div>
         ) : pendingMeds.length === 0 ? (
           <div className="bg-surface-container-low border border-dashed border-outline-variant rounded-xl py-8 text-center">
             <Glyph name="medication" size={24} className="text-outline-variant" />
