@@ -8,7 +8,7 @@ import {
   MapPin, Mic, Microscope, Package, Paperclip, Pill, Pipette, Play, Plus, Receipt, ReceiptText, RefreshCw,
   ScanLine, Search, Settings, Shield, ShieldCheck, ShieldPlus, UserRoundCheck, ShoppingCart, Siren, Smartphone,
   Stethoscope, Store, Syringe, Ticket, Trash2, TrendingUp, Truck, User, UserCog, UserPlus, Users, UserX, Video,
-  Wallet, X, XCircle, Zap, ArrowRightLeft, Bandage,
+  Wallet, X, XCircle, Zap, ArrowRightLeft, Bandage, Phone, Megaphone, Network, MessageSquare, Star, Sun, Timer,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -45,7 +45,11 @@ const GLYPHS: Record<string, LucideIcon> = {
   stethoscope: Stethoscope, storefront: Store, task_alt: CheckCircle2,
   transfer_within_a_station: ArrowRightLeft, triage: HeartPulse, trending_up: TrendingUp, upload: CloudUpload,
   vaccines: Syringe, verified: BadgeCheck, verified_user: ShieldCheck, videocam: Video, warning: AlertTriangle,
-  power: Bolt,
+  power: Bolt, arrow_forward_ios: ChevronRight, bell: Bell, billing: Receipt, calendar: Calendar, call: Phone,
+  campaign: Megaphone, emergency_home: Siren, emr: ClipboardPen, group: Users, hub: Network,
+  insights: TrendingUp, laboratory: FlaskConical, medication_liquid: Pill, message: MessageSquare,
+  pharmacy: Pill, plus: Plus, reports: BarChart3, security: ShieldCheck, star: Star, sun: Sun, time: Clock,
+  timer: Timer, user: User, users: Users,
 };
 
 interface GlyphProps {

@@ -4,6 +4,8 @@ import { useBill, useRecordPayment, useMarkBillCleared } from '@/features/queue/
 import { httpClient } from '@/lib/http';
 import type { QueueTicket } from '@/features/queue/types';
 import { Glyph } from '@/components/icons/Glyph';
+import { Banknote, CreditCard, DoorOpen, ListChecks } from 'lucide-react';
+import { StatTile } from '@/components/ui';
 
 const PAYMENT_METHODS = [
   { key: 'cash', label: 'Cash', icon: 'payments' },
@@ -128,61 +130,37 @@ export function BillingDashboard(): JSX.Element {
       </div>
 
       {/* Financial Overview KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-lg">
-        <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-card">
-          <div className="flex justify-between items-start mb-sm">
-            <p className="text-label-caps font-label-caps text-on-surface-variant">IN BILLING QUEUE</p>
-            <Glyph name="list_alt" className="text-primary-container" />
-          </div>
-          <div className="flex items-baseline gap-2">
-            <h3 className="text-headline-lg font-data-mono text-on-surface">{isLoading ? '…' : waitingCount}</h3>
-          </div>
-          <div className="mt-base w-full bg-surface-container h-1 rounded-full overflow-hidden">
-            <div className="bg-primary h-full" style={{ width: '40%' }}></div>
-          </div>
-        </div>
-        <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-card">
-          <div className="flex justify-between items-start mb-sm">
-            <p className="text-label-caps font-label-caps text-on-surface-variant">NOW SERVING</p>
-            <Glyph name="point_of_sale" className="text-secondary" />
-          </div>
-          <div className="flex items-baseline gap-2">
-            <h3 className="text-headline-lg font-data-mono text-on-surface">
-              {snapshot?.in_service?.ticket_number ?? '—'}
-            </h3>
-          </div>
-          <div className="mt-base w-full bg-surface-container h-1 rounded-full overflow-hidden">
-            <div className="bg-secondary h-full" style={{ width: '100%' }}></div>
-          </div>
-        </div>
-        <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-card">
-          <div className="flex justify-between items-start mb-sm">
-            <p className="text-label-caps font-label-caps text-on-surface-variant">SELECTED BILL BALANCE</p>
-            <Glyph name="payments" className="text-tertiary" />
-          </div>
-          <div className="flex items-baseline gap-2">
-            <h3 className="text-headline-lg font-data-mono text-on-surface">
-              {billLoading ? '…' : bill !== null ? kes(bill.balance) : '—'}
-            </h3>
-          </div>
-          <div className="mt-base w-full bg-surface-container h-1 rounded-full overflow-hidden">
-            <div className="bg-tertiary h-full" style={{ width: '60%' }}></div>
-          </div>
-        </div>
-        <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-card">
-          <div className="flex justify-between items-start mb-sm">
-            <p className="text-label-caps font-label-caps text-on-surface-variant">STATION STATUS</p>
-            <Glyph name="point_of_sale" className="text-primary" />
-          </div>
-          <div className="flex items-baseline gap-2">
-            <h3 className="text-headline-lg font-data-mono text-on-surface capitalize">
-              {snapshot?.station.status ?? '—'}
-            </h3>
-          </div>
-          <div className="mt-base w-full bg-surface-container h-1 rounded-full overflow-hidden">
-            <div className="bg-primary-container h-full w-full"></div>
-          </div>
-        </div>
+      <div className="mb-lg grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatTile
+          label="In billing queue"
+          value={waitingCount}
+          hint={waitingCount === 0 ? 'No one waiting' : 'Patients waiting to pay'}
+          icon={ListChecks}
+          tone={waitingCount > 0 ? 'primary' : 'neutral'}
+          loading={isLoading}
+        />
+        <StatTile
+          label="Now serving"
+          value={snapshot?.in_service?.ticket_number ?? '—'}
+          hint={snapshot?.in_service?.patient_name ?? 'Counter free'}
+          icon={CreditCard}
+          tone={snapshot?.in_service ? 'info' : 'neutral'}
+        />
+        <StatTile
+          label="Selected bill balance"
+          value={bill !== null ? kes(bill.balance) : '—'}
+          hint={bill !== null ? 'Outstanding on this bill' : 'Select a patient'}
+          icon={Banknote}
+          tone={bill !== null && Number(bill.balance) > 0 ? 'warning' : 'neutral'}
+          loading={billLoading}
+        />
+        <StatTile
+          label="Station status"
+          value={<span className="capitalize">{snapshot?.station.status ?? '—'}</span>}
+          hint="Billing counter"
+          icon={DoorOpen}
+          tone={snapshot?.station.status === 'open' ? 'success' : 'neutral'}
+        />
       </div>
 
       {feedback !== null && (

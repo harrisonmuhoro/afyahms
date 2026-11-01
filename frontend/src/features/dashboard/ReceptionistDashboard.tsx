@@ -177,7 +177,7 @@ export function ReceptionistDashboard(): JSX.Element {
           <p className="font-label-caps text-label-caps text-outline uppercase mb-2">Priority Cases</p>
           <div className="flex items-end gap-2">
             <h4 className={`text-headline-lg font-headline-lg ${priorityCount > 0 ? 'text-error' : 'text-on-surface'}`}>
-              {boardLoading && snapshot === null ? '…' : String(priorityCount).padStart(2, '0')}
+              {boardLoading && snapshot === null ? '…' : priorityCount}
             </h4>
             {priorityCount > 0 && <span className="text-error/60 text-[12px] pb-1">Fast-track</span>}
           </div>

@@ -138,7 +138,13 @@ export function LabDashboard(): JSX.Element {
   const advanceLabel = (o: LabOrder): string => (o.status === 'pending' ? 'Collect' : 'Analyse');
 
   return (
-    <div className="p-lg space-y-lg min-h-screen">
+    <div className="space-y-lg">
+      <div>
+        <h2 className="text-headline-lg font-headline-lg text-on-surface">Laboratory worklist</h2>
+        <p className="text-body-md text-on-surface-variant">
+          Collect samples, run analyses and verify results for this branch.
+        </p>
+      </div>
       {/* Dashboard Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter">
         <div className="bg-surface border border-outline-variant p-md rounded-xl shadow-card">
