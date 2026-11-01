@@ -116,7 +116,7 @@ export function BillingDashboard(): JSX.Element {
   const waitingCount = snapshot?.waiting.length ?? 0;
 
   return (
-    <div className="p-lg max-w-[1600px] mx-auto min-h-[calc(100vh-64px)]">
+    <div className="mx-auto max-w-[1600px]">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-lg">
         <div>
@@ -129,7 +129,7 @@ export function BillingDashboard(): JSX.Element {
 
       {/* Financial Overview KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-lg">
-        <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-card">
           <div className="flex justify-between items-start mb-sm">
             <p className="text-label-caps font-label-caps text-on-surface-variant">IN BILLING QUEUE</p>
             <Glyph name="list_alt" className="text-primary-container" />
@@ -141,7 +141,7 @@ export function BillingDashboard(): JSX.Element {
             <div className="bg-primary h-full" style={{ width: '40%' }}></div>
           </div>
         </div>
-        <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-card">
           <div className="flex justify-between items-start mb-sm">
             <p className="text-label-caps font-label-caps text-on-surface-variant">NOW SERVING</p>
             <Glyph name="point_of_sale" className="text-secondary" />
@@ -155,7 +155,7 @@ export function BillingDashboard(): JSX.Element {
             <div className="bg-secondary h-full" style={{ width: '100%' }}></div>
           </div>
         </div>
-        <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-card">
           <div className="flex justify-between items-start mb-sm">
             <p className="text-label-caps font-label-caps text-on-surface-variant">SELECTED BILL BALANCE</p>
             <Glyph name="payments" className="text-tertiary" />
@@ -169,7 +169,7 @@ export function BillingDashboard(): JSX.Element {
             <div className="bg-tertiary h-full" style={{ width: '60%' }}></div>
           </div>
         </div>
-        <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-card">
           <div className="flex justify-between items-start mb-sm">
             <p className="text-label-caps font-label-caps text-on-surface-variant">STATION STATUS</p>
             <Glyph name="point_of_sale" className="text-primary" />
@@ -197,7 +197,7 @@ export function BillingDashboard(): JSX.Element {
       <div className="grid grid-cols-12 gap-lg">
         {/* Billing Queue & Recent Transactions */}
         <div className="col-span-12 xl:col-span-7 space-y-lg">
-          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
+          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-card overflow-hidden">
             <div className="p-md border-b border-outline-variant flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <Glyph name="list_alt" className="text-primary" />
@@ -253,7 +253,7 @@ export function BillingDashboard(): JSX.Element {
           </div>
 
           {/* Recent Transactions Feed — no transactions endpoint yet */}
-          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-card">
             <div className="p-md border-b border-outline-variant flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <Glyph name="history" className="text-secondary" />
@@ -271,7 +271,7 @@ export function BillingDashboard(): JSX.Element {
 
         {/* Right Sidebar: Payment Panel & Insurance Tools */}
         <div className="col-span-12 xl:col-span-5 space-y-lg">
-          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
+          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-card overflow-hidden">
             <div className="p-md border-b border-outline-variant">
               <h4 className="text-headline-md font-headline-md text-on-surface">
                 {activeTicket !== null
@@ -444,7 +444,7 @@ export function BillingDashboard(): JSX.Element {
           </div>
 
           {/* Insurance Claims Panel — no claims backend yet */}
-          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
+          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-card overflow-hidden">
             <div className="p-md border-b border-outline-variant bg-tertiary/5">
               <h4 className="text-headline-md font-headline-md text-tertiary flex items-center gap-2">
                 <Glyph name="shield_with_heart" />
@@ -460,7 +460,7 @@ export function BillingDashboard(): JSX.Element {
           </div>
 
           {/* Quick Action Buttons */}
-          <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+          <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-card">
             <h4 className="text-label-caps font-label-caps text-on-surface-variant mb-md">Revenue Tools</h4>
             <div className="grid grid-cols-1 gap-2">
               <button

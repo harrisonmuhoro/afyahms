@@ -426,7 +426,7 @@ export function RadiologistDashboard(): JSX.Element {
                       onChange={(e) => setCriticalNotes(e.target.value)}
                       disabled={reportIsFinal}
                       aria-label="Critical finding notes"
-                      className="w-full h-16 text-body-sm bg-white border border-error/30 rounded-lg px-3 py-2 focus:ring-2 focus:ring-error/20 focus:border-error resize-none"
+                      className="w-full h-16 text-body-sm bg-surface border border-error/30 rounded-lg px-3 py-2 focus:ring-2 focus:ring-error/20 focus:border-error resize-none"
                       placeholder="Who was notified, when, and how…"
                     />
                   )}
@@ -462,10 +462,10 @@ export function RadiologistDashboard(): JSX.Element {
           <Glyph name="mic" size={28} className="relative z-10" />
           {/* Audio Wave Animation Placeholder */}
           <div className="absolute bottom-2 flex gap-0.5 items-end justify-center w-full opacity-0 group-active:opacity-100 transition-opacity">
-            <div className="w-1 h-2 bg-white animate-[bounce_0.8s_infinite]" />
-            <div className="w-1 h-4 bg-white animate-[bounce_1.2s_infinite]" />
-            <div className="w-1 h-3 bg-white animate-[bounce_1s_infinite]" />
-            <div className="w-1 h-5 bg-white animate-[bounce_0.9s_infinite]" />
+            <div className="w-1 h-2 bg-surface animate-[bounce_0.8s_infinite]" />
+            <div className="w-1 h-4 bg-surface animate-[bounce_1.2s_infinite]" />
+            <div className="w-1 h-3 bg-surface animate-[bounce_1s_infinite]" />
+            <div className="w-1 h-5 bg-surface animate-[bounce_0.9s_infinite]" />
           </div>
         </button>
       </div>

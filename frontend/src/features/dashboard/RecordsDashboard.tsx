@@ -36,7 +36,7 @@ function ReviewModal({ request, decision, onClose, onConfirm, pending }: ReviewM
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
+      <div className="bg-surface rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
         <div className="p-md border-b border-outline-variant flex items-center justify-between">
           <h3 className="font-bold text-on-surface">
             {decision === 'approved' ? 'Approve' : 'Reject'} correction — {request.field_name}
@@ -141,7 +141,7 @@ export function RecordsDashboard(): JSX.Element {
           </p>
         </div>
         <div className="flex gap-3">
-          <div className="bg-white border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl flex items-center px-4 py-2 gap-3 min-w-[140px]">
+          <div className="bg-surface border border-outline-variant shadow-card rounded-xl flex items-center px-4 py-2 gap-3 min-w-[140px]">
             <div className="w-10 h-10 rounded-full bg-error/10 flex items-center justify-center text-error">
               <Glyph name="priority_high" />
             </div>
@@ -150,7 +150,7 @@ export function RecordsDashboard(): JSX.Element {
               <p className="font-bold text-headline-md">{isLoading ? '…' : pending.length}</p>
             </div>
           </div>
-          <div className="bg-white border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl flex items-center px-4 py-2 gap-3 min-w-[140px]">
+          <div className="bg-surface border border-outline-variant shadow-card rounded-xl flex items-center px-4 py-2 gap-3 min-w-[140px]">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
               <Glyph name="task_alt" />
             </div>
@@ -159,7 +159,7 @@ export function RecordsDashboard(): JSX.Element {
               <p className="font-bold text-headline-md">{isLoading ? '…' : approvedCount}</p>
             </div>
           </div>
-          <div className="bg-white border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl flex items-center px-4 py-2 gap-3 min-w-[140px]">
+          <div className="bg-surface border border-outline-variant shadow-card rounded-xl flex items-center px-4 py-2 gap-3 min-w-[140px]">
             <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
               <Glyph name="block" />
             </div>
@@ -184,7 +184,7 @@ export function RecordsDashboard(): JSX.Element {
       <div className="grid grid-cols-12 gap-gutter">
         {/* Central: Pending Corrections Queue */}
         <div className="col-span-12 lg:col-span-8 space-y-gutter">
-          <section className="bg-white border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl overflow-hidden">
+          <section className="bg-surface border border-outline-variant shadow-card rounded-xl overflow-hidden">
             <div className="p-md flex items-center justify-between border-b border-outline-variant">
               <div className="flex items-center gap-2">
                 <Glyph name="rule" className="text-primary" />
@@ -265,7 +265,7 @@ export function RecordsDashboard(): JSX.Element {
 
           {/* Archive metrics — no storage/telemetry backend yet */}
           <section className="grid grid-cols-1 md:grid-cols-2 gap-gutter">
-            <div className="bg-white border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl p-md">
+            <div className="bg-surface border border-outline-variant shadow-card rounded-xl p-md">
               <h3 className="font-bold mb-4 flex items-center gap-2 text-on-surface">
                 <Glyph name="database" className="text-secondary" />
                 Storage Utilization
@@ -277,7 +277,7 @@ export function RecordsDashboard(): JSX.Element {
                 </p>
               </div>
             </div>
-            <div className="bg-primary-container/5 border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl p-md">
+            <div className="bg-primary-container/5 border border-outline-variant shadow-card rounded-xl p-md">
               <h3 className="font-bold mb-3 flex items-center gap-2 text-on-surface">
                 <Glyph name="analytics" className="text-primary" />
                 Daily Throughput
@@ -294,7 +294,7 @@ export function RecordsDashboard(): JSX.Element {
 
         {/* Right Sidebar: Decision history */}
         <div className="col-span-12 lg:col-span-4 space-y-gutter">
-          <section className="bg-white border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl p-md">
+          <section className="bg-surface border border-outline-variant shadow-card rounded-xl p-md">
             <h3 className="font-bold text-on-surface mb-3 flex items-center gap-2">
               <Glyph name="history" className="text-on-surface-variant" />
               Recent Decisions
@@ -345,7 +345,7 @@ export function RecordsDashboard(): JSX.Element {
 
       {/* Footer Utilities */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-        <div className="bg-white shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl p-lg flex flex-col justify-between min-h-[160px] bg-surface border-l-4 border-l-primary border border-outline-variant">
+        <div className="bg-surface shadow-card rounded-xl p-lg flex flex-col justify-between min-h-[160px] bg-surface border-l-4 border-l-primary border border-outline-variant">
           <Glyph name="policy" size={26} className="text-primary mb-2" />
           <div>
             <h4 className="font-bold text-on-surface">Privacy &amp; Compliance</h4>
@@ -354,7 +354,7 @@ export function RecordsDashboard(): JSX.Element {
             </p>
           </div>
         </div>
-        <div className="bg-white shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl p-lg flex flex-col justify-between min-h-[160px] bg-surface border-l-4 border-l-secondary border border-outline-variant">
+        <div className="bg-surface shadow-card rounded-xl p-lg flex flex-col justify-between min-h-[160px] bg-surface border-l-4 border-l-secondary border border-outline-variant">
           <Glyph name="verified_user" size={26} className="text-secondary mb-2" />
           <div>
             <h4 className="font-bold text-on-surface">Signature Audit</h4>
@@ -363,7 +363,7 @@ export function RecordsDashboard(): JSX.Element {
             </p>
           </div>
         </div>
-        <div className="bg-white shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl p-lg flex flex-col justify-between min-h-[160px] bg-surface border-l-4 border-l-tertiary border border-outline-variant">
+        <div className="bg-surface shadow-card rounded-xl p-lg flex flex-col justify-between min-h-[160px] bg-surface border-l-4 border-l-tertiary border border-outline-variant">
           <Glyph name="cloud_download" size={26} className="text-tertiary mb-2" />
           <div>
             <h4 className="font-bold text-on-surface">Bulk Data Export</h4>

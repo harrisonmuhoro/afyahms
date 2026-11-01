@@ -40,7 +40,7 @@ export function ReceptionistDashboard(): JSX.Element {
   const priorityCount = waiting.filter((t) => t.priority !== 'normal').length;
 
   return (
-    <div className="p-lg space-y-lg">
+    <div className="space-y-6">
       {/* Search and Chips Row */}
       <div className="space-y-md">
         <div className="relative max-w-2xl group">
@@ -53,7 +53,7 @@ export function ReceptionistDashboard(): JSX.Element {
             type="text"
           />
           {searchQuery.trim().length >= 2 && (
-            <div className="absolute z-20 mt-2 w-full bg-white border border-outline-variant rounded-2xl shadow-lg overflow-hidden">
+            <div className="absolute z-20 mt-2 w-full bg-surface border border-outline-variant rounded-2xl shadow-lg overflow-hidden">
               {searching ? (
                 <p className="px-4 py-3 text-body-sm text-on-surface-variant">Searching…</p>
               ) : hits.length === 0 ? (
@@ -134,7 +134,7 @@ export function ReceptionistDashboard(): JSX.Element {
 
         <button
           onClick={() => navigate('/queue/check-in')}
-          className="group flex items-center gap-lg p-lg bg-white border border-outline-variant rounded-2xl text-left shadow-sm hover:bg-surface-container-low transition-all active:scale-[0.98]"
+          className="group flex items-center gap-lg p-lg bg-surface border border-outline-variant rounded-2xl text-left shadow-sm hover:bg-surface-container-low transition-all active:scale-[0.98]"
         >
           <div className="bg-surface-container p-md rounded-xl">
             <Glyph name="confirmation_number" size={32} className="text-primary" />
@@ -151,7 +151,7 @@ export function ReceptionistDashboard(): JSX.Element {
 
       {/* KPI Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-md">
-        <div className="bg-white p-lg border border-outline-variant rounded-2xl shadow-sm">
+        <div className="bg-surface p-lg border border-outline-variant rounded-2xl shadow-sm">
           <p className="font-label-caps text-label-caps text-outline uppercase mb-2">Waiting Now</p>
           <div className="flex items-end gap-2">
             <h4 className="text-headline-lg font-headline-lg text-on-surface">
@@ -162,7 +162,7 @@ export function ReceptionistDashboard(): JSX.Element {
             </span>
           </div>
         </div>
-        <div className="bg-white p-lg border border-outline-variant rounded-2xl shadow-sm">
+        <div className="bg-surface p-lg border border-outline-variant rounded-2xl shadow-sm">
           <p className="font-label-caps text-label-caps text-outline uppercase mb-2">In Service</p>
           <div className="flex items-end gap-2">
             <h4 className="text-headline-lg font-headline-lg text-on-surface">
@@ -173,7 +173,7 @@ export function ReceptionistDashboard(): JSX.Element {
             </span>
           </div>
         </div>
-        <div className="bg-white p-lg border border-outline-variant rounded-2xl shadow-sm">
+        <div className="bg-surface p-lg border border-outline-variant rounded-2xl shadow-sm">
           <p className="font-label-caps text-label-caps text-outline uppercase mb-2">Priority Cases</p>
           <div className="flex items-end gap-2">
             <h4 className={`text-headline-lg font-headline-lg ${priorityCount > 0 ? 'text-error' : 'text-on-surface'}`}>
@@ -182,7 +182,7 @@ export function ReceptionistDashboard(): JSX.Element {
             {priorityCount > 0 && <span className="text-error/60 text-[12px] pb-1">Fast-track</span>}
           </div>
         </div>
-        <div className="bg-white p-lg border border-outline-variant rounded-2xl shadow-sm">
+        <div className="bg-surface p-lg border border-outline-variant rounded-2xl shadow-sm">
           <p className="font-label-caps text-label-caps text-outline uppercase mb-2">Desk Status</p>
           <div className="flex items-end gap-2">
             <h4 className="text-headline-lg font-headline-lg text-on-surface capitalize">
@@ -195,7 +195,7 @@ export function ReceptionistDashboard(): JSX.Element {
       {/* Main Area Split */}
       <div className="grid grid-cols-1 xl:grid-cols-10 gap-lg">
         {/* Left: Active Waiting Queue */}
-        <div className="xl:col-span-6 bg-white border border-outline-variant rounded-2xl shadow-sm flex flex-col min-h-[500px]">
+        <div className="xl:col-span-6 bg-surface border border-outline-variant rounded-2xl shadow-sm flex flex-col min-h-[500px]">
           <div className="p-md border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest rounded-t-2xl">
             <div className="flex items-center gap-2">
               <Glyph name="groups" className="text-primary" />
@@ -276,7 +276,7 @@ export function ReceptionistDashboard(): JSX.Element {
         </div>
 
         {/* Right: Today's Schedule — no staff appointments backend yet */}
-        <div className="xl:col-span-4 bg-white border border-outline-variant rounded-2xl shadow-sm flex flex-col">
+        <div className="xl:col-span-4 bg-surface border border-outline-variant rounded-2xl shadow-sm flex flex-col">
           <div className="p-md border-b border-outline-variant flex items-center gap-2 bg-surface-container-lowest rounded-t-2xl">
             <Glyph name="event" className="text-primary" />
             <h3 className="font-headline-md text-headline-md">Today's Schedule</h3>

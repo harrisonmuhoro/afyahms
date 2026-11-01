@@ -149,7 +149,7 @@ export function InventoryDashboard(): JSX.Element {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter">
-        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-card">
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-primary-container/10 rounded-lg text-primary">
               <Glyph name="payments" />
@@ -160,7 +160,7 @@ export function InventoryDashboard(): JSX.Element {
             {kpisLoading ? '…' : formatMoney(kpis?.total_inventory_value ?? 0)}
           </h3>
         </div>
-        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-card">
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-error-container/20 rounded-lg text-error">
               <Glyph name="warning" />
@@ -176,7 +176,7 @@ export function InventoryDashboard(): JSX.Element {
             {kpisLoading ? '…' : `${kpis?.low_stock_count ?? 0} Items`}
           </h3>
         </div>
-        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-card">
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-tertiary-container/10 rounded-lg text-tertiary">
               <Glyph name="event_busy" />
@@ -190,7 +190,7 @@ export function InventoryDashboard(): JSX.Element {
             {kpisLoading ? '…' : `${kpis?.expiring_soon_count ?? 0} Batches`}
           </h3>
         </div>
-        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-card">
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-secondary-container/20 rounded-lg text-secondary">
               <Glyph name="shopping_cart" />
@@ -212,7 +212,7 @@ export function InventoryDashboard(): JSX.Element {
       <div className="grid grid-cols-12 gap-gutter">
         {/* Stock Management Table Section */}
         <div className="col-span-12 lg:col-span-9 space-y-gutter">
-          <div className="bg-surface rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
+          <div className="bg-surface rounded-xl border border-outline-variant shadow-card overflow-hidden">
             <div className="p-md border-b border-outline-variant flex items-center justify-between bg-surface-container-lowest">
               <div className="flex items-center gap-4">
                 <h4 className="font-headline-md text-headline-md">Stock Inventory</h4>
@@ -290,7 +290,7 @@ export function InventoryDashboard(): JSX.Element {
           </div>
 
           {/* Expiry Watchlist Section */}
-          <div className="bg-surface rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
+          <div className="bg-surface rounded-xl border border-outline-variant shadow-card overflow-hidden">
             <div className="p-md border-b border-outline-variant bg-surface-container-lowest">
               <h4 className="font-headline-md text-headline-md flex items-center gap-2">
                 <Glyph name="timer" className="text-error" />
@@ -345,7 +345,7 @@ export function InventoryDashboard(): JSX.Element {
         {/* Right Sidebar: Supplier & Procurement */}
         <div className="col-span-12 lg:col-span-3 space-y-gutter">
           {/* Active Purchase Orders */}
-          <div className="bg-surface rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] flex flex-col h-fit">
+          <div className="bg-surface rounded-xl border border-outline-variant shadow-card flex flex-col h-fit">
             <div className="p-md border-b border-outline-variant flex items-center justify-between">
               <h4 className="font-headline-md text-headline-md">Recent POs</h4>
             </div>
@@ -386,7 +386,7 @@ export function InventoryDashboard(): JSX.Element {
           </div>
 
           {/* Top Suppliers */}
-          <div className="bg-surface rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] h-fit">
+          <div className="bg-surface rounded-xl border border-outline-variant shadow-card h-fit">
             <div className="p-md border-b border-outline-variant">
               <h4 className="font-headline-md text-headline-md">Top Suppliers</h4>
             </div>

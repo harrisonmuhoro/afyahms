@@ -119,7 +119,7 @@ export function PublicQueueBoard(): JSX.Element {
           <div className="grid grid-cols-1 gap-lg flex-1">
             {/* Hero Ticket */}
             <div
-              className={`bg-white border-2 border-primary rounded-[24px] p-xl flex items-center justify-between shadow-xl relative overflow-hidden transition-all duration-300 ${
+              className={`bg-surface border-2 border-primary rounded-[24px] p-xl flex items-center justify-between shadow-xl relative overflow-hidden transition-all duration-300 ${
                 heroTicketAlert ? 'bg-primary-container/20 animate-pulse' : ''
               }`}
             >
@@ -151,7 +151,7 @@ export function PublicQueueBoard(): JSX.Element {
               {secondary.map((b) => (
                 <div
                   key={b.code}
-                  className="bg-white border border-outline-variant rounded-[24px] p-lg flex items-center justify-between shadow-sm"
+                  className="bg-surface border border-outline-variant rounded-[24px] p-lg flex items-center justify-between shadow-sm"
                 >
                   <div className="flex flex-col">
                     <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Ticket</span>
@@ -172,7 +172,7 @@ export function PublicQueueBoard(): JSX.Element {
         </section>
 
         {/* Next Up */}
-        <aside className="w-[35%] bg-white border-l border-outline-variant p-lg flex flex-col gap-lg">
+        <aside className="w-[35%] bg-surface border-l border-outline-variant p-lg flex flex-col gap-lg">
           <div className="flex items-center justify-between border-b border-outline-variant pb-md">
             <div className="flex items-center gap-2">
               <Glyph name="hourglass_top" className="text-tertiary" />

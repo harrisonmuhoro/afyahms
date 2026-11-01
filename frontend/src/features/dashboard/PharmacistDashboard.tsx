@@ -76,7 +76,7 @@ export function PharmacistDashboard(): JSX.Element {
     Math.max(4, Math.min(100, Math.round((m.stock_quantity / LOW_STOCK_THRESHOLD) * 100)));
 
   return (
-    <div className="p-lg space-y-lg">
+    <div className="space-y-6">
       {/* Header & Quick Stats */}
       <div className="flex flex-col gap-lg mb-lg">
         <div className="flex justify-between items-end">
@@ -104,7 +104,7 @@ export function PharmacistDashboard(): JSX.Element {
 
         {/* Quick Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-md">
-          <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] flex flex-col gap-1">
+          <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-card flex flex-col gap-1">
             <span className="text-label-caps text-on-surface-variant">Dispensed Today</span>
             <div className="flex items-end justify-between">
               <span className="text-headline-lg font-bold text-primary">
@@ -113,7 +113,7 @@ export function PharmacistDashboard(): JSX.Element {
               <Glyph name="check_circle" className="text-primary" />
             </div>
           </div>
-          <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] flex flex-col gap-1">
+          <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-card flex flex-col gap-1">
             <span className="text-label-caps text-on-surface-variant">Pending Reviews</span>
             <div className="flex items-end justify-between">
               <span className="text-headline-lg font-bold text-on-surface">
@@ -127,7 +127,7 @@ export function PharmacistDashboard(): JSX.Element {
             </div>
           </div>
           <div
-            className={`bg-surface p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] flex flex-col gap-1 ${
+            className={`bg-surface p-md rounded-xl border border-outline-variant shadow-card flex flex-col gap-1 ${
               criticalStock.length > 0 ? 'border-l-4 border-l-error' : ''
             }`}
           >
@@ -139,7 +139,7 @@ export function PharmacistDashboard(): JSX.Element {
               <Glyph name="warning" className={`${criticalStock.length > 0 ? 'text-error' : 'text-on-surface-variant'}`} />
             </div>
           </div>
-          <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] flex flex-col gap-1">
+          <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-card flex flex-col gap-1">
             <span className="text-label-caps text-on-surface-variant">Catalog Items</span>
             <div className="flex items-end justify-between">
               <span className="text-headline-lg font-bold text-on-surface">
@@ -163,7 +163,7 @@ export function PharmacistDashboard(): JSX.Element {
       <div className="grid grid-cols-12 gap-lg items-start">
         {/* Left Column: Dispensing Queue */}
         <div className="col-span-12 lg:col-span-8 flex flex-col gap-lg">
-          <section className="bg-surface rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
+          <section className="bg-surface rounded-xl border border-outline-variant shadow-card overflow-hidden">
             <div className="p-md border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest">
               <h2 className="font-headline-md text-headline-md text-on-surface">Dispensing Queue</h2>
               <div className="flex gap-2">
@@ -275,7 +275,7 @@ export function PharmacistDashboard(): JSX.Element {
 
           {/* Inventory Overview */}
           <section className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-            <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] flex flex-col gap-md">
+            <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-card flex flex-col gap-md">
               <div className="flex justify-between items-center">
                 <h3 className="font-headline-md text-headline-md text-on-surface">Stock Critical</h3>
                 <Link to="/pharmacy/medications" className="text-primary text-label-caps hover:underline">
@@ -321,7 +321,7 @@ export function PharmacistDashboard(): JSX.Element {
               )}
             </div>
 
-            <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] flex flex-col items-center justify-center text-center gap-md relative overflow-hidden group">
+            <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-card flex flex-col items-center justify-center text-center gap-md relative overflow-hidden group">
               <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
               <div className="w-16 h-16 bg-primary-container/20 rounded-full flex items-center justify-center text-primary mb-2">
                 <Glyph name="inventory" size={28} />
@@ -342,7 +342,7 @@ export function PharmacistDashboard(): JSX.Element {
 
         {/* Right Column: Prescription Detail View */}
         <div className="col-span-12 lg:col-span-4 sticky top-[84px]">
-          <section className="bg-surface rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col">
+          <section className="bg-surface rounded-xl border border-outline-variant shadow-card overflow-hidden flex flex-col">
             {selected === null ? (
               <div className="p-lg py-12 text-center">
                 <Glyph name="contract" size={28} className="text-outline-variant" />

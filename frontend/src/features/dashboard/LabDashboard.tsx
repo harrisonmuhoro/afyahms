@@ -141,7 +141,7 @@ export function LabDashboard(): JSX.Element {
     <div className="p-lg space-y-lg min-h-screen">
       {/* Dashboard Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter">
-        <div className="bg-white border border-outline-variant p-md rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface border border-outline-variant p-md rounded-xl shadow-card">
           <p className="text-label-caps text-outline uppercase">Awaiting Collection</p>
           <div className="flex items-end justify-between mt-2">
             <span className="text-headline-lg font-headline-lg text-on-surface">
@@ -150,7 +150,7 @@ export function LabDashboard(): JSX.Element {
             <Glyph name="colorize" className="text-tertiary" />
           </div>
         </div>
-        <div className="bg-white border border-outline-variant p-md rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface border border-outline-variant p-md rounded-xl shadow-card">
           <p className="text-label-caps text-outline uppercase">STAT Pending</p>
           <div className="flex items-end justify-between mt-2">
             <span className={`text-headline-lg font-headline-lg ${statPending > 0 ? 'text-error' : 'text-on-surface'}`}>
@@ -163,14 +163,14 @@ export function LabDashboard(): JSX.Element {
             )}
           </div>
         </div>
-        <div className="bg-white border border-outline-variant p-md rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface border border-outline-variant p-md rounded-xl shadow-card">
           <p className="text-label-caps text-outline uppercase">In Analysis</p>
           <div className="flex items-end justify-between mt-2">
             <span className="text-headline-lg font-headline-lg text-on-surface">{isLoading ? '…' : inAnalysis}</span>
             <Glyph name="biotech" className="text-primary" />
           </div>
         </div>
-        <div className="bg-white border border-outline-variant p-md rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface border border-outline-variant p-md rounded-xl shadow-card">
           <p className="text-label-caps text-outline uppercase">Pending Verification</p>
           <div className="flex items-end justify-between mt-2">
             <span className="text-headline-lg font-headline-lg text-on-surface">{isLoading ? '…' : awaitingVerify}</span>
@@ -188,7 +188,7 @@ export function LabDashboard(): JSX.Element {
       {/* Main Work Area */}
       <div className="grid grid-cols-12 gap-gutter">
         {/* Lab Worklist */}
-        <section className="col-span-12 xl:col-span-8 bg-white border border-outline-variant rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
+        <section className="col-span-12 xl:col-span-8 bg-surface border border-outline-variant rounded-xl shadow-card overflow-hidden">
           <div className="p-md border-b border-outline-variant flex justify-between items-center">
             <h2 className="text-headline-md font-headline-md text-on-surface flex items-center gap-2">
               <Glyph name="format_list_bulleted" className="text-primary" /> Lab Worklist
@@ -290,7 +290,7 @@ export function LabDashboard(): JSX.Element {
 
         {/* Results Entry Form */}
         <section className="col-span-12 xl:col-span-4 space-y-gutter">
-          <div className="bg-white border border-outline-variant rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05)] p-md">
+          <div className="bg-surface border border-outline-variant rounded-xl shadow-card p-md">
             <div className="flex justify-between items-center mb-md">
               <h2 className="text-headline-md font-headline-md text-on-surface">Result Entry</h2>
               {selected !== null && (
@@ -463,7 +463,7 @@ export function LabDashboard(): JSX.Element {
           </div>
 
           {/* Visual QC Status — no QC backend yet */}
-          <div className="bg-white border border-outline-variant rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
+          <div className="bg-surface border border-outline-variant rounded-xl shadow-card overflow-hidden">
             <div className="p-md bg-surface-container-low border-b border-outline-variant">
               <h3 className="text-label-caps font-label-caps text-outline uppercase">DAILY QC TRENDS</h3>
             </div>

@@ -87,7 +87,7 @@ export function SystemSettings(): JSX.Element {
             {activeTab === 'Branch Management' && (
               <>
                 {/* Branch Details Card */}
-                <section className="bg-white rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+                <section className="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden">
                   <div className="p-md border-b border-outline-variant flex justify-between items-center">
                     <h3 className="font-headline-md text-headline-md">Branch Operations</h3>
                     <Link
@@ -147,7 +147,7 @@ export function SystemSettings(): JSX.Element {
                 {/* Advanced Settings Grid */}
                 <div className="grid grid-cols-2 gap-lg">
                   {/* All Branches */}
-                  <div className="bg-white rounded-xl border border-outline-variant shadow-sm p-lg">
+                  <div className="bg-surface rounded-xl border border-outline-variant shadow-sm p-lg">
                     <h3 className="font-headline-md text-headline-md mb-md">All Branches</h3>
                     {branchesLoading ? (
                       <p className="text-body-sm text-on-surface-variant">Loading…</p>
@@ -185,7 +185,7 @@ export function SystemSettings(): JSX.Element {
                     </Link>
                   </div>
                   {/* Active Staff */}
-                  <div className="bg-white rounded-xl border border-outline-variant shadow-sm p-lg">
+                  <div className="bg-surface rounded-xl border border-outline-variant shadow-sm p-lg">
                     <h3 className="font-headline-md text-headline-md mb-md">Active Staff</h3>
                     {staffLoading ? (
                       <p className="text-body-sm text-on-surface-variant">Loading staff…</p>
@@ -224,7 +224,7 @@ export function SystemSettings(): JSX.Element {
                   </div>
                 </div>
                 {/* Insurance tiers — no backend yet */}
-                <section className="bg-white rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+                <section className="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden">
                   <div className="p-md bg-surface-container-low border-b border-outline-variant">
                     <h3 className="font-headline-md text-headline-md">Finance &amp; Insurance Tiers</h3>
                   </div>
@@ -238,7 +238,7 @@ export function SystemSettings(): JSX.Element {
               </>
             )}
             {activeTab !== 'Branch Management' && (
-              <div className="bg-white rounded-xl border border-dashed border-outline-variant flex flex-col items-center justify-center h-64 text-on-surface-variant gap-2">
+              <div className="bg-surface rounded-xl border border-dashed border-outline-variant flex flex-col items-center justify-center h-64 text-on-surface-variant gap-2">
                 <Glyph name="construction" size={28} className="text-outline-variant" />
                 <p className="text-body-md">{activeTab} configuration will appear here once its backend module is enabled.</p>
               </div>

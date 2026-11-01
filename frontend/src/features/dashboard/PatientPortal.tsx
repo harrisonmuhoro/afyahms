@@ -47,7 +47,7 @@ export function PatientPortal(): JSX.Element {
       {/* Bento Grid Dashboard */}
       <div className="grid grid-cols-12 gap-gutter">
         {/* Upcoming Appointment: Priority Card */}
-        <div className="col-span-12 lg:col-span-8 bg-white border border-outline-variant shadow-sm rounded-[14px] transition-all hover:shadow-md p-lg flex flex-col gap-lg">
+        <div className="col-span-12 lg:col-span-8 bg-surface border border-outline-variant shadow-sm rounded-[14px] transition-all hover:shadow-md p-lg flex flex-col gap-lg">
           <div className="flex items-center gap-2">
             <span className="px-2 py-1 bg-secondary-container text-on-secondary-container rounded text-[10px] font-bold uppercase tracking-wider">
               Appointments
@@ -100,7 +100,7 @@ export function PatientPortal(): JSX.Element {
         </div>
 
         {/* Lab Results: Content Card */}
-        <div className="col-span-12 md:col-span-6 bg-white border border-outline-variant shadow-sm rounded-[14px] transition-all hover:shadow-md overflow-hidden flex flex-col">
+        <div className="col-span-12 md:col-span-6 bg-surface border border-outline-variant shadow-sm rounded-[14px] transition-all hover:shadow-md overflow-hidden flex flex-col">
           <div className="px-lg py-md border-b border-outline-variant flex justify-between items-center">
             <h3 className="font-headline-md text-headline-md">My Lab Results</h3>
             <Link to="/portal/results" className="text-primary font-semibold text-body-sm hover:underline">
@@ -120,7 +120,7 @@ export function PatientPortal(): JSX.Element {
         </div>
 
         {/* Prescription Refills */}
-        <div className="col-span-12 md:col-span-6 bg-white border border-outline-variant shadow-sm rounded-[14px] transition-all hover:shadow-md flex flex-col">
+        <div className="col-span-12 md:col-span-6 bg-surface border border-outline-variant shadow-sm rounded-[14px] transition-all hover:shadow-md flex flex-col">
           <div className="px-lg py-md border-b border-outline-variant flex justify-between items-center">
             <h3 className="font-headline-md text-headline-md">Prescription Refills</h3>
           </div>
@@ -197,7 +197,7 @@ export function PatientPortal(): JSX.Element {
         </div>
 
         {/* Visit History */}
-        <div className="col-span-12 lg:col-span-7 bg-white border border-outline-variant shadow-sm rounded-[14px] transition-all hover:shadow-md overflow-hidden flex flex-col">
+        <div className="col-span-12 lg:col-span-7 bg-surface border border-outline-variant shadow-sm rounded-[14px] transition-all hover:shadow-md overflow-hidden flex flex-col">
           <div className="px-lg py-md border-b border-outline-variant flex justify-between items-center">
             <h3 className="font-headline-md text-headline-md">Visit History</h3>
             <Link to="/portal/records" className="text-primary font-semibold text-body-sm hover:underline">

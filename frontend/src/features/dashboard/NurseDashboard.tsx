@@ -44,7 +44,7 @@ export function NurseDashboard(): JSX.Element {
   };
 
   return (
-    <div className="p-lg space-y-lg">
+    <div className="space-y-6">
       {/* Header Section */}
       <section className="flex flex-wrap items-end justify-between gap-4">
         <div className="space-y-1">
@@ -95,7 +95,7 @@ export function NurseDashboard(): JSX.Element {
         {isLoading && snapshot === null ? (
           <p className="py-10 text-center text-body-md text-on-surface-variant">Loading queue…</p>
         ) : queue.length === 0 ? (
-          <div className="bg-white border border-outline-variant rounded-xl py-10 text-center">
+          <div className="bg-surface border border-outline-variant rounded-xl py-10 text-center">
             <Glyph name="event_seat" size={28} className="text-outline-variant" />
             <p className="mt-2 text-body-md text-on-surface-variant">No patients waiting for triage.</p>
           </div>
@@ -109,7 +109,7 @@ export function NurseDashboard(): JSX.Element {
                 <div
                   key={ticket.id}
                   className={cn(
-                    'relative overflow-hidden bg-white border rounded-xl p-md flex items-center justify-between gap-4',
+                    'relative overflow-hidden bg-surface border rounded-xl p-md flex items-center justify-between gap-4',
                     serving ? 'border-primary/40 ring-2 ring-primary/10' : 'border-outline-variant',
                   )}
                 >
@@ -184,7 +184,7 @@ export function NurseDashboard(): JSX.Element {
         ) : (
           <div className="space-y-3">
             {pendingMeds.map((med) => (
-              <div key={med.id} className="bg-white border border-outline-variant rounded-xl p-md flex items-center justify-between gap-4">
+              <div key={med.id} className="bg-surface border border-outline-variant rounded-xl p-md flex items-center justify-between gap-4">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-semibold text-on-surface truncate">{med.medication?.generic_name}</p>
