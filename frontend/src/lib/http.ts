@@ -42,6 +42,15 @@ export class HttpError extends Error {
       return new HttpError(env.status, env.type, env.message, env.details ?? null);
     }
 
+    if (data?.message) {
+      return new HttpError(
+        err.response?.status ?? 0,
+        'RequestError',
+        data.message,
+        data.errors ?? null,
+      );
+    }
+
     return new HttpError(err.response?.status ?? 0, 'NetworkError', err.message);
   }
 }

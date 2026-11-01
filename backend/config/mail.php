@@ -24,6 +24,9 @@ return [
         'array' => [
             'transport' => 'array',
         ],
+        'resend' => [
+            'transport' => 'resend',
+        ],
         'failover' => [
             'transport' => 'failover',
             'mailers'   => ['smtp', 'log'],

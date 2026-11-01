@@ -11,9 +11,8 @@ Route::post('/login', [AuthController::class, 'login'])
     ->name('login');
 
 Route::prefix('forgot-password')->name('forgot-password.')->group(function () {
-    Route::post('/request', [\App\Modules\Auth\Controllers\ForgotPasswordController::class, 'requestReset'])->name('request');
-    Route::post('/verify',  [\App\Modules\Auth\Controllers\ForgotPasswordController::class, 'verifyCode'])->name('verify');
-    Route::post('/reset',   [\App\Modules\Auth\Controllers\ForgotPasswordController::class, 'resetPassword'])->name('reset');
+    Route::post('/request', [\App\Modules\Auth\Controllers\ForgotPasswordController::class, 'requestReset'])->middleware('throttle:auth')->name('request');
+    Route::post('/reset',   [\App\Modules\Auth\Controllers\ForgotPasswordController::class, 'resetPassword'])->middleware('throttle:auth')->name('reset');
 });
 
 Route::prefix('google')->name('google.')->group(function () {

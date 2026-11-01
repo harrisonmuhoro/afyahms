@@ -6,7 +6,9 @@ export interface ApiError {
 }
 
 export interface ApiErrorEnvelope {
-  error: ApiError;
+  error?: ApiError;
+  message?: string;
+  errors?: Record<string, string[]>;
 }
 
 export interface Paginated<T> {
