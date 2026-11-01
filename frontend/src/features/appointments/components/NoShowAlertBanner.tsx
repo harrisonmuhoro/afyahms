@@ -1,3 +1,4 @@
+import { Glyph } from '@/components/icons/Glyph';
 interface NoShowAlertBannerProps {
   noShowCount: number;
   patientName: string;
@@ -15,9 +16,7 @@ export function NoShowAlertBanner({ noShowCount, patientName }: NoShowAlertBanne
       role="alert"
       className="flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-700/50 dark:bg-amber-950/30"
     >
-      <span className="material-symbols-outlined mt-0.5 text-[20px] text-amber-600 dark:text-amber-400 shrink-0">
-        warning
-      </span>
+      <Glyph name="warning" size={20} className="mt-0.5 text-amber-600 dark:text-amber-400 shrink-0" />
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-amber-900 dark:text-amber-300">
           Repeat No-Show Risk

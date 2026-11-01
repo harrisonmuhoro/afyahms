@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import type { AppointmentStatus } from '../types';
+import { Glyph } from '@/components/icons/Glyph';
 
 interface AppointmentActionsMenuProps {
   appointmentId: string;
@@ -77,7 +78,7 @@ export function AppointmentActionsMenu({
         className="flex items-center gap-1 rounded-lg border border-outline-variant px-3 py-1.5 text-xs font-medium text-on-surface-variant hover:bg-surface-container transition-colors"
       >
         Actions
-        <span className="material-symbols-outlined text-[14px]">expand_more</span>
+        <Glyph name="expand_more" size={14} />
       </button>
 
       {open && (
@@ -98,11 +99,11 @@ export function AppointmentActionsMenu({
                   : 'text-on-surface',
               ].join(' ')}
             >
-              {action === 'confirm'    && <span className="material-symbols-outlined text-[16px] text-teal-600">check_circle</span>}
-              {action === 'check_in'  && <span className="material-symbols-outlined text-[16px] text-green-600">login</span>}
-              {action === 'reschedule'&& <span className="material-symbols-outlined text-[16px] text-blue-600">schedule</span>}
-              {action === 'cancel'    && <span className="material-symbols-outlined text-[16px] text-red-500">cancel</span>}
-              {action === 'no_show'   && <span className="material-symbols-outlined text-[16px] text-orange-500">person_off</span>}
+              {action === 'confirm'    && <Glyph name="check_circle" size={16} className="text-teal-600" />}
+              {action === 'check_in'  && <Glyph name="login" size={16} className="text-green-600" />}
+              {action === 'reschedule'&& <Glyph name="schedule" size={16} className="text-blue-600" />}
+              {action === 'cancel'    && <Glyph name="cancel" size={16} className="text-red-500" />}
+              {action === 'no_show'   && <Glyph name="person_off" size={16} className="text-orange-500" />}
               {ACTION_LABELS[action]}
             </button>
           ))}

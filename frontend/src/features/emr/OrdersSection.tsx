@@ -8,6 +8,7 @@ import { httpClient } from '@/lib/http';
 import { PermissionButton } from '@/components/auth/PermissionButton';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { cn } from '@/lib/cn';
+import { Glyph } from '@/components/icons/Glyph';
 
 /* ─── Types ─────────────────────────────────────────────────────────────── */
 interface LabTest {
@@ -73,11 +74,11 @@ interface ImagingOrder {
 const STATUS_CHIP: Record<string, { label: string; cls: string }> = {
   pending:    { label: 'Pending',    cls: 'bg-amber-50 text-amber-700 border-amber-200' },
   collected:  { label: 'Collected',  cls: 'bg-blue-50 text-blue-700 border-blue-200' },
-  processing: { label: 'Processing', cls: 'bg-purple-50 text-purple-700 border-purple-200' },
+  processing: { label: 'Processing', cls: 'bg-blue-50 text-blue-700 border-blue-200' },
   resulted:   { label: 'Resulted',   cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
   cancelled:  { label: 'Cancelled',  cls: 'bg-surface-container text-tertiary border-outline-variant' },
   scheduled:  { label: 'Scheduled',  cls: 'bg-blue-50 text-blue-700 border-blue-200' },
-  acquired:   { label: 'Acquired',   cls: 'bg-purple-50 text-purple-700 border-purple-200' },
+  acquired:   { label: 'Acquired',   cls: 'bg-blue-50 text-blue-700 border-blue-200' },
 };
 
 const PRIORITY_CLS: Record<string, string> = {
@@ -182,7 +183,7 @@ function LabOrdersPanel({ visitId }: { visitId: number }): JSX.Element {
     <div>
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-body-md flex items-center gap-2 text-on-surface">
-          <span className="material-symbols-outlined text-primary text-[20px]">science</span>
+          <Glyph name="science" size={20} className="text-primary" />
           Laboratory Tests
         </h3>
         <PermissionButton
@@ -190,7 +191,7 @@ function LabOrdersPanel({ visitId }: { visitId: number }): JSX.Element {
           onClick={() => setShowForm((v) => !v)}
           className="btn-secondary text-[12px] flex items-center gap-1"
         >
-          <span className="material-symbols-outlined text-[16px]">{showForm ? 'close' : 'add'}</span>
+          <Glyph name={showForm ? 'close' : 'add'} size={16} />
           {showForm ? 'Cancel' : 'Order Test'}
         </PermissionButton>
       </div>
@@ -253,7 +254,7 @@ function LabOrdersPanel({ visitId }: { visitId: number }): JSX.Element {
         <p className="text-[12px] text-tertiary py-4">Loading orders…</p>
       ) : orders.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-8 text-center text-on-surface-variant gap-2">
-          <span className="material-symbols-outlined text-[36px] text-outline-variant">biotech</span>
+          <Glyph name="biotech" size={28} className="text-outline-variant" />
           <p className="text-body-sm">No lab orders yet for this visit.</p>
         </div>
       ) : (
@@ -349,7 +350,7 @@ function ImagingOrdersPanel({ visitId }: { visitId: number }): JSX.Element {
     <div>
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-body-md flex items-center gap-2 text-on-surface">
-          <span className="material-symbols-outlined text-primary text-[20px]">radiology</span>
+          <Glyph name="radiology" size={20} className="text-primary" />
           Imaging / Radiology
         </h3>
         <PermissionButton
@@ -357,7 +358,7 @@ function ImagingOrdersPanel({ visitId }: { visitId: number }): JSX.Element {
           onClick={() => setShowForm((v) => !v)}
           className="btn-secondary text-[12px] flex items-center gap-1"
         >
-          <span className="material-symbols-outlined text-[16px]">{showForm ? 'close' : 'add'}</span>
+          <Glyph name={showForm ? 'close' : 'add'} size={16} />
           {showForm ? 'Cancel' : 'Order Study'}
         </PermissionButton>
       </div>
@@ -420,7 +421,7 @@ function ImagingOrdersPanel({ visitId }: { visitId: number }): JSX.Element {
         <p className="text-[12px] text-tertiary py-4">Loading imaging orders…</p>
       ) : orders.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-8 text-center text-on-surface-variant gap-2">
-          <span className="material-symbols-outlined text-[36px] text-outline-variant">radiology</span>
+          <Glyph name="radiology" size={28} className="text-outline-variant" />
           <p className="text-body-sm">No imaging orders yet for this visit.</p>
         </div>
       ) : (

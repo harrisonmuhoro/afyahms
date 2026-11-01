@@ -18,7 +18,7 @@ function ResultCard({ result }: { result: PortalResult }): JSX.Element {
   const iconName = result.source === 'lab' ? 'laboratory' : 'radiology';
   const iconBg = result.source === 'lab'
     ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400'
-    : 'bg-violet-100 text-violet-600 dark:bg-violet-900/40 dark:text-violet-400';
+    : 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400';
   const dateStr = result.resulted_at ?? result.reported_at ?? result.created_at;
   const dateLabel = dateStr
     ? new Date(dateStr).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })

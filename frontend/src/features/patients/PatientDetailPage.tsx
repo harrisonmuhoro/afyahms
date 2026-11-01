@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { usePatient, useUpdatePatient } from './api';
+import { usePatient, usePatientAllergies, useUpdatePatient } from './api';
+import { Alert, Avatar, Badge, ErrorState, Skeleton } from '@/components/ui';
+import type { Patient, PatientAllergy } from './types';
 import { HttpError } from '@/lib/http';
 
 // ────────────────────────────────────────────────────────────
@@ -52,6 +54,7 @@ export function PatientDetailPage(): JSX.Element {
   const update = useUpdatePatient();
   const { hasPermission } = useAuth();
   const canEdit = hasPermission('patients.update');
+  const { allergies, isLoading: allergiesLoading } = usePatientAllergies(uuid);
 
   const [form, setForm] = useState<FormState | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -157,90 +160,95 @@ export function PatientDetailPage(): JSX.Element {
   };
 
   // ── Loading / error states ────────────────────────────────
-  if (isLoading || form === null) {
-    return (
-      <div className="flex items-center gap-2 text-sm text-stone-500">
-        <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-stone-300 border-t-brand-500" />
-        Loading patient record…
-      </div>
-    );
-  }
-
   if (error !== null) {
     return (
-      <div role="alert" className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-950/40 dark:text-red-200">
-        Failed to load patient record. The patient may not exist or you may not have permission to view it.
+      <div className="card">
+        <ErrorState
+          title="Patient record unavailable"
+          error={error}
+          description="The patient may not exist, or your role may not have access to this record."
+        />
+        <div className="border-t border-line px-4 py-3 text-center">
+          <Link to="/patients" className="text-sm font-medium text-primary hover:underline">Back to patient register</Link>
+        </div>
       </div>
     );
   }
 
-  if (patient === null) {
-    return <p className="text-sm text-stone-500">Patient not found.</p>;
+  if (!isLoading && patient === null) {
+    return (
+      <div className="card">
+        <ErrorState title="Patient not found" description="No patient matches this link. Search the patient register instead." />
+        <div className="border-t border-line px-4 py-3 text-center">
+          <Link to="/patients" className="text-sm font-medium text-primary hover:underline">Back to patient register</Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading || form === null || patient === null) {
+    return (
+      <div role="status" aria-label="Loading patient record" className="space-y-4">
+        <div className="card flex items-center gap-4 p-5">
+          <Skeleton className="h-14 w-14 rounded-full" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-5 w-48" />
+            <Skeleton className="h-3.5 w-72" />
+          </div>
+        </div>
+        <Skeleton className="h-64 w-full rounded-xl" />
+      </div>
+    );
   }
 
   // ── Page ─────────────────────────────────────────────────
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
-      {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold text-stone-900 dark:text-stone-100">
-            {patient.full_name}
-          </h1>
-          <p className="font-mono text-xs text-stone-500">{patient.patient_number}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          {canEdit && (
+    <div className="mx-auto max-w-5xl space-y-5">
+      <PatientBanner
+        patient={patient}
+        allergies={allergies}
+        allergiesLoading={allergiesLoading}
+        actions={
+          canEdit ? (
             editing ? (
               <>
                 <button
                   type="button"
-                  className="btn-ghost text-sm"
+                  className="btn-secondary"
                   onClick={() => {
                     setEditing(false);
                     setFieldErrors({});
                     setGeneralError(null);
                   }}
                 >
-                  View Only
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   form="patient-edit-form"
                   disabled={update.isPending}
-                  className="btn-primary text-sm disabled:opacity-50"
+                  className="btn-primary"
                 >
-                  {update.isPending ? 'Saving…' : 'Save Changes'}
+                  {update.isPending ? 'Saving…' : 'Save changes'}
                 </button>
               </>
             ) : (
               <button
                 type="button"
                 id="btn-edit-patient"
-                className="btn-primary text-sm"
+                className="btn-secondary"
                 onClick={() => { setEditing(true); setSuccessMsg(null); setGeneralError(null); }}
               >
-                Edit Patient
+                Edit details
               </button>
             )
-          )}
-          <Link to="/patients" className="btn-ghost text-sm">
-            ← Back
-          </Link>
-        </div>
-      </div>
+          ) : null
+        }
+      />
 
       {/* Feedback banners */}
-      {successMsg !== null && (
-        <div role="status" className="rounded-md bg-green-50 px-4 py-3 text-sm text-green-800 dark:bg-green-950/40 dark:text-green-200">
-          ✓ {successMsg}
-        </div>
-      )}
-      {generalError !== null && (
-        <div role="alert" className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-950/40 dark:text-red-200">
-          {generalError}
-        </div>
-      )}
+      {successMsg !== null && <Alert tone="success">{successMsg}</Alert>}
+      {generalError !== null && <Alert tone="danger" title="Changes not saved">{generalError}</Alert>}
 
       <form id="patient-edit-form" onSubmit={(e) => { void onSubmit(e); }}>
         <div className="grid gap-4 md:grid-cols-2">
@@ -548,5 +556,96 @@ function Field({ label, required = false, error, children }: FieldProps): JSX.El
         <span className="mt-1 text-[11px] font-normal text-red-600 dark:text-red-400">{error}</span>
       )}
     </label>
+  );
+}
+
+// ────────────────────────────────────────────────────────────
+// Patient identity + safety banner
+// ────────────────────────────────────────────────────────────
+function formatDob(iso: string | null): string | null {
+  if (iso === null) return null;
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? null : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function severityTone(severity: string | null): 'danger' | 'warning' {
+  return severity !== null && /severe|life|anaphyl|high/i.test(severity) ? 'danger' : 'warning';
+}
+
+interface PatientBannerProps {
+  patient: Patient;
+  allergies: PatientAllergy[];
+  allergiesLoading: boolean;
+  actions: React.ReactNode;
+}
+
+function PatientBanner({ patient, allergies, allergiesLoading, actions }: PatientBannerProps): JSX.Element {
+  const active = allergies.filter((a) => a.is_active);
+  const dob = formatDob(patient.date_of_birth);
+  const sex = patient.gender !== null ? patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1) : null;
+  const facts: Array<{ label: string; value: string | null }> = [
+    { label: 'Age', value: patient.age !== null ? `${patient.age} yrs` : null },
+    { label: 'Sex', value: sex },
+    { label: 'Date of birth', value: dob },
+    { label: 'Blood group', value: patient.blood_group },
+    { label: 'Phone', value: patient.phone },
+    { label: 'National ID', value: patient.national_id },
+    { label: 'SHA number', value: patient.sha_number },
+  ];
+
+  return (
+    <section aria-label="Patient summary" className="card overflow-hidden">
+      <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start">
+        <Avatar name={patient.full_name} src={patient.photo_path} size="xl" />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-xl font-semibold tracking-tight text-ink">{patient.full_name}</h1>
+            {patient.deceased ? (
+              <Badge tone="neutral" dot>Deceased</Badge>
+            ) : !patient.is_active ? (
+              <Badge tone="warning" dot>Inactive record</Badge>
+            ) : null}
+            {patient.merged_into !== null && <Badge tone="info">Merged record</Badge>}
+          </div>
+          <p className="mt-0.5 font-mono text-[13px] text-ink-secondary">{patient.patient_number}</p>
+          <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-3 lg:grid-cols-4">
+            {facts.map((fact) => (
+              <div key={fact.label} className="min-w-0">
+                <dt className="text-[11px] font-medium uppercase tracking-wide text-ink-muted">{fact.label}</dt>
+                <dd className="truncate text-sm text-ink">{fact.value ?? <span className="text-ink-muted">Not recorded</span>}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+        {actions !== null && <div className="flex shrink-0 flex-wrap gap-2 sm:justify-end">{actions}</div>}
+      </div>
+
+      <div
+        className={
+          active.length > 0
+            ? 'border-t border-danger/25 bg-danger-soft px-5 py-3'
+            : 'border-t border-line bg-surface-muted px-5 py-3'
+        }
+      >
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <span className={`text-xs font-semibold uppercase tracking-wide ${active.length > 0 ? 'text-danger' : 'text-ink-muted'}`}>
+            Allergies
+          </span>
+          {allergiesLoading ? (
+            <Skeleton className="h-5 w-40" />
+          ) : active.length === 0 ? (
+            <span className="text-sm text-ink-secondary">No known allergies recorded</span>
+          ) : (
+            active.map((allergy) => (
+              <Badge key={allergy.id} tone={severityTone(allergy.severity)} dot>
+                <span className="font-semibold">{allergy.allergen}</span>
+                {allergy.reaction !== null && <span className="font-normal">— {allergy.reaction}</span>}
+                {allergy.severity !== null && <span className="font-normal opacity-80">({allergy.severity})</span>}
+              </Badge>
+            ))
+          )}
+        </div>
+      </div>
+    </section>
   );
 }

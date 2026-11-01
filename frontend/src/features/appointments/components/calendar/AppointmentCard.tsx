@@ -11,8 +11,8 @@ interface AppointmentCardProps {
 const TYPE_COLORS: Record<string, string> = {
   new_patient:         'border-l-blue-500 bg-blue-50 dark:bg-blue-950/30',
   follow_up:           'border-l-teal-500 bg-teal-50 dark:bg-teal-950/30',
-  procedure:           'border-l-purple-500 bg-purple-50 dark:bg-purple-950/30',
-  anc:                 'border-l-pink-500 bg-pink-50 dark:bg-pink-950/30',
+  procedure:           'border-l-purple-500 bg-blue-50 dark:bg-blue-950/30',
+  anc:                 'border-l-pink-500 bg-blue-50 dark:bg-blue-950/30',
   immunization:        'border-l-green-500 bg-green-50 dark:bg-green-950/30',
   lab_radiology:       'border-l-amber-500 bg-amber-50 dark:bg-amber-950/30',
   specialist_referral: 'border-l-orange-500 bg-orange-50 dark:bg-orange-950/30',

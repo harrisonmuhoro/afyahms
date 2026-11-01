@@ -115,7 +115,7 @@ export function StockLevelsReport(): JSX.Element {
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Out of Stock</h3>
-              <p className="mt-2 text-3xl font-black text-rose-600">{data.kpis.out_of_stock.toLocaleString()}</p>
+              <p className="mt-2 text-3xl font-black text-red-600">{data.kpis.out_of_stock.toLocaleString()}</p>
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Total Value</h3>
@@ -174,7 +174,7 @@ export function StockLevelsReport(): JSX.Element {
                         <td className="px-6 py-4 text-right tabular-nums font-medium">Ksh {row.total_value.toLocaleString()}</td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-md ${
-                            row.status === 'Out of Stock' ? 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400'
+                            row.status === 'Out of Stock' ? 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400'
                             : row.status === 'Low Stock' ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400'
                             : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400'
                           }`}>{row.status}</span>

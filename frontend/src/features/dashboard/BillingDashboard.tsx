@@ -3,6 +3,7 @@ import { useBoard } from '@/features/queue/api';
 import { useBill, useRecordPayment, useMarkBillCleared } from '@/features/queue/billingApi';
 import { httpClient } from '@/lib/http';
 import type { QueueTicket } from '@/features/queue/types';
+import { Glyph } from '@/components/icons/Glyph';
 
 const PAYMENT_METHODS = [
   { key: 'cash', label: 'Cash', icon: 'payments' },
@@ -131,7 +132,7 @@ export function BillingDashboard(): JSX.Element {
         <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
           <div className="flex justify-between items-start mb-sm">
             <p className="text-label-caps font-label-caps text-on-surface-variant">IN BILLING QUEUE</p>
-            <span className="material-symbols-outlined text-primary-container">list_alt</span>
+            <Glyph name="list_alt" className="text-primary-container" />
           </div>
           <div className="flex items-baseline gap-2">
             <h3 className="text-headline-lg font-data-mono text-on-surface">{isLoading ? '…' : waitingCount}</h3>
@@ -143,7 +144,7 @@ export function BillingDashboard(): JSX.Element {
         <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
           <div className="flex justify-between items-start mb-sm">
             <p className="text-label-caps font-label-caps text-on-surface-variant">NOW SERVING</p>
-            <span className="material-symbols-outlined text-secondary">point_of_sale</span>
+            <Glyph name="point_of_sale" className="text-secondary" />
           </div>
           <div className="flex items-baseline gap-2">
             <h3 className="text-headline-lg font-data-mono text-on-surface">
@@ -157,7 +158,7 @@ export function BillingDashboard(): JSX.Element {
         <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
           <div className="flex justify-between items-start mb-sm">
             <p className="text-label-caps font-label-caps text-on-surface-variant">SELECTED BILL BALANCE</p>
-            <span className="material-symbols-outlined text-tertiary">payments</span>
+            <Glyph name="payments" className="text-tertiary" />
           </div>
           <div className="flex items-baseline gap-2">
             <h3 className="text-headline-lg font-data-mono text-on-surface">
@@ -171,7 +172,7 @@ export function BillingDashboard(): JSX.Element {
         <div className="bg-surface-container-lowest p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
           <div className="flex justify-between items-start mb-sm">
             <p className="text-label-caps font-label-caps text-on-surface-variant">STATION STATUS</p>
-            <span className="material-symbols-outlined text-primary">point_of_sale</span>
+            <Glyph name="point_of_sale" className="text-primary" />
           </div>
           <div className="flex items-baseline gap-2">
             <h3 className="text-headline-lg font-data-mono text-on-surface capitalize">
@@ -199,7 +200,7 @@ export function BillingDashboard(): JSX.Element {
           <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
             <div className="p-md border-b border-outline-variant flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">list_alt</span>
+                <Glyph name="list_alt" className="text-primary" />
                 <h4 className="text-headline-md font-headline-md text-on-surface">Billing Queue</h4>
               </div>
             </div>
@@ -207,7 +208,7 @@ export function BillingDashboard(): JSX.Element {
               <p className="p-md py-10 text-center text-body-md text-on-surface-variant">Loading queue…</p>
             ) : tickets.length === 0 ? (
               <div className="p-md py-10 text-center">
-                <span className="material-symbols-outlined text-[32px] text-outline-variant">receipt_long</span>
+                <Glyph name="receipt_long" size={28} className="text-outline-variant" />
                 <p className="mt-2 text-body-md text-on-surface-variant">No patients waiting at billing.</p>
               </div>
             ) : (
@@ -242,7 +243,7 @@ export function BillingDashboard(): JSX.Element {
                             Serving
                           </span>
                         )}
-                        <span className="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+                        <Glyph name="chevron_right" className="text-on-surface-variant" />
                       </div>
                     </button>
                   );
@@ -255,12 +256,12 @@ export function BillingDashboard(): JSX.Element {
           <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
             <div className="p-md border-b border-outline-variant flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-secondary">history</span>
+                <Glyph name="history" className="text-secondary" />
                 <h4 className="text-headline-md font-headline-md text-on-surface">Recent Transactions</h4>
               </div>
             </div>
             <div className="p-md py-8 text-center">
-              <span className="material-symbols-outlined text-[28px] text-outline-variant">receipt</span>
+              <Glyph name="receipt" size={24} className="text-outline-variant" />
               <p className="mt-2 text-body-sm text-on-surface-variant">
                 A live payment feed will appear here once the transactions endpoint is available.
               </p>
@@ -374,7 +375,7 @@ export function BillingDashboard(): JSX.Element {
                                 : 'border-outline-variant text-on-surface-variant hover:bg-surface-container'
                             }`}
                           >
-                            <span className="material-symbols-outlined text-[16px]">{m.icon}</span>
+                            <Glyph name={m.icon} size={16} />
                             {m.label}
                           </button>
                         ))}
@@ -413,7 +414,7 @@ export function BillingDashboard(): JSX.Element {
                         disabled={tenderedNum <= 0 || recordPayment.isPending}
                         className="flex-1 bg-primary text-white py-2.5 rounded-lg font-semibold active:scale-95 transition-transform disabled:opacity-50 flex items-center justify-center gap-2"
                       >
-                        <span className="material-symbols-outlined text-[18px]">point_of_sale</span>
+                        <Glyph name="point_of_sale" size={18} />
                         {recordPayment.isPending ? 'Processing…' : 'Collect Payment'}
                       </button>
                       <button
@@ -431,9 +432,7 @@ export function BillingDashboard(): JSX.Element {
 
                 {bill.is_cleared && (
                   <p className="text-body-sm text-secondary font-semibold flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                      check_circle
-                    </span>
+                    <Glyph name="check_circle" size={16} />
                     Bill cleared
                     {bill.cleared_at !== null
                       ? ` on ${new Date(bill.cleared_at).toLocaleString('en-GB')}`
@@ -448,12 +447,12 @@ export function BillingDashboard(): JSX.Element {
           <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
             <div className="p-md border-b border-outline-variant bg-tertiary/5">
               <h4 className="text-headline-md font-headline-md text-tertiary flex items-center gap-2">
-                <span className="material-symbols-outlined">shield_with_heart</span>
+                <Glyph name="shield_with_heart" />
                 Insurance Claims Status
               </h4>
             </div>
             <div className="p-md py-8 text-center">
-              <span className="material-symbols-outlined text-[28px] text-outline-variant">shield</span>
+              <Glyph name="shield" size={24} className="text-outline-variant" />
               <p className="mt-2 text-body-sm text-on-surface-variant">
                 Claim tracking will appear here once the insurance module is enabled.
               </p>
@@ -469,12 +468,12 @@ export function BillingDashboard(): JSX.Element {
                 disabled={activeTicket?.visit_id == null}
                 className="w-full bg-primary-container text-on-primary-container p-4 rounded-lg flex flex-col items-start gap-1 hover:brightness-110 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span className="material-symbols-outlined text-[24px]">description</span>
+                <Glyph name="description" size={22} />
                 <span className="font-bold text-body-md">Download Receipt PDF</span>
                 <span className="text-[11px] opacity-80">Generate & open a print-ready receipt</span>
               </button>
               <button className="w-full bg-surface border border-outline-variant text-on-surface p-4 rounded-lg flex flex-col items-start gap-1 hover:bg-surface-container transition-all">
-                <span className="material-symbols-outlined text-[24px] text-tertiary">assessment</span>
+                <Glyph name="assessment" size={22} className="text-tertiary" />
                 <span className="font-bold text-body-md">Export Revenue Report</span>
                 <span className="text-[11px] text-on-surface-variant">Daily, Weekly or Monthly PDF/Excel</span>
               </button>
@@ -484,8 +483,8 @@ export function BillingDashboard(): JSX.Element {
       </div>
       
       {/* Floating Action Button (Contextual) */}
-      <button className="fixed bottom-lg right-lg w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all group z-50">
-        <span className="material-symbols-outlined text-[28px]">post_add</span>
+      <button className="fixed bottom-lg right-lg w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-all group z-50">
+        <Glyph name="post_add" size={24} />
         <span className="absolute right-full mr-4 bg-inverse-surface text-inverse-on-surface px-3 py-1.5 rounded text-body-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">New Bill Item</span>
       </button>
     </div>

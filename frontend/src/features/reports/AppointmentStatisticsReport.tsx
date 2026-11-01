@@ -127,11 +127,11 @@ export function AppointmentStatisticsReport(): JSX.Element {
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-5 shadow-sm">
               <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wide">Missed</h3>
-              <p className="mt-2 text-2xl font-black text-rose-600">{data.kpis.missed.toLocaleString()}</p>
+              <p className="mt-2 text-2xl font-black text-red-600">{data.kpis.missed.toLocaleString()}</p>
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-5 shadow-sm">
               <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wide">Attendance</h3>
-              <p className="mt-2 text-2xl font-black text-purple-600">{data.kpis.attendance_rate}</p>
+              <p className="mt-2 text-2xl font-black text-blue-600">{data.kpis.attendance_rate}</p>
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-5 shadow-sm">
               <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wide">Cancellation</h3>
@@ -139,7 +139,7 @@ export function AppointmentStatisticsReport(): JSX.Element {
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-5 shadow-sm">
               <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wide">No-show</h3>
-              <p className="mt-2 text-2xl font-black text-rose-600">{data.kpis.no_show_rate}</p>
+              <p className="mt-2 text-2xl font-black text-red-600">{data.kpis.no_show_rate}</p>
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-5 shadow-sm">
               <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wide">Avg Wait</h3>
@@ -274,7 +274,7 @@ export function AppointmentStatisticsReport(): JSX.Element {
                         <td className="px-6 py-4 font-medium">{row.date}</td>
                         <td className="px-6 py-4 text-right tabular-nums">{row.booked.toLocaleString()}</td>
                         <td className="px-6 py-4 text-right tabular-nums text-emerald-600">{row.attended.toLocaleString()}</td>
-                        <td className="px-6 py-4 text-right tabular-nums text-rose-600">{row.missed.toLocaleString()}</td>
+                        <td className="px-6 py-4 text-right tabular-nums text-red-600">{row.missed.toLocaleString()}</td>
                         <td className="px-6 py-4 text-right tabular-nums font-medium">{row.rate}</td>
                       </tr>
                     ))

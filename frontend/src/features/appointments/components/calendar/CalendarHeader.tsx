@@ -1,4 +1,5 @@
 import { format, startOfWeek, endOfWeek } from 'date-fns';
+import { Glyph } from '@/components/icons/Glyph';
 
 export type CalendarViewMode = 'day' | 'week' | 'month';
 
@@ -35,7 +36,7 @@ export function CalendarHeader({
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-outline-variant bg-surface p-3 dark:bg-stone-900">
       {/* Left: date title */}
       <div className="flex items-center gap-3">
-        <span className="material-symbols-outlined text-[22px] text-primary">calendar_month</span>
+        <Glyph name="calendar_month" size={22} className="text-primary" />
         <div>
           <p className="text-sm font-semibold text-on-surface">{title}</p>
           {isToday && viewMode === 'day' && (
@@ -77,7 +78,7 @@ export function CalendarHeader({
             aria-label="Previous"
             className="rounded-lg border border-outline-variant p-1.5 text-on-surface-variant hover:bg-surface-container transition-colors"
           >
-            <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+            <Glyph name="chevron_left" size={18} />
           </button>
           <button
             type="button"
@@ -93,7 +94,7 @@ export function CalendarHeader({
             aria-label="Next"
             className="rounded-lg border border-outline-variant p-1.5 text-on-surface-variant hover:bg-surface-container transition-colors"
           >
-            <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+            <Glyph name="chevron_right" size={18} />
           </button>
         </div>
       </div>

@@ -7,6 +7,7 @@ import { AppointmentStatusBadge } from '../components/AppointmentStatusBadge';
 import { AppointmentActionsMenu } from '../components/AppointmentActionsMenu';
 import { NoShowAlertBanner } from '../components/NoShowAlertBanner';
 import { useConfirmAppointment, useCheckInPatient, useMarkNoShowAppointment } from '../api';
+import { Glyph } from '@/components/icons/Glyph';
 
 
 function formatTime(t: string): string {
@@ -88,7 +89,7 @@ export function AppointmentDetailPage(): JSX.Element {
   if (error || !appointment) {
     return (
       <div className="flex flex-col items-center gap-4 py-16 text-center">
-        <span className="material-symbols-outlined text-4xl text-on-surface-variant/40">event_busy</span>
+        <Glyph name="event_busy" size={30} className="text-on-surface-variant/40" />
         <p className="text-sm text-on-surface-variant">Appointment not found or you don't have access.</p>
         <Link to="/appointments" className="btn-primary text-sm">
           Back to Appointments
@@ -112,7 +113,7 @@ export function AppointmentDetailPage(): JSX.Element {
             className="rounded-full p-1.5 text-on-surface-variant hover:bg-surface-container transition-colors"
             aria-label="Go back"
           >
-            <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+            <Glyph name="arrow_back" size={20} />
           </button>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
@@ -270,7 +271,7 @@ export function AppointmentDetailPage(): JSX.Element {
 function DetailRow({ icon, label, children }: { icon: string; label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3 px-6 py-4">
-      <span className="material-symbols-outlined mt-0.5 text-[18px] text-on-surface-variant shrink-0">{icon}</span>
+      <Glyph name={icon} size={18} className="mt-0.5 text-on-surface-variant shrink-0" />
       <div className="flex-1 min-w-0">
         <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-on-surface-variant/70"
            dangerouslySetInnerHTML={{ __html: label }} />

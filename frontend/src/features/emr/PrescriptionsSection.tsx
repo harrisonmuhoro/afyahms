@@ -11,6 +11,7 @@ import { httpClient } from '@/lib/http';
 import { PermissionButton } from '@/components/auth/PermissionButton';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { cn } from '@/lib/cn';
+import { Glyph } from '@/components/icons/Glyph';
 
 /* ─── Types ─────────────────────────────────────────────────────────────── */
 interface Medication {
@@ -142,7 +143,7 @@ export function PrescriptionsSection({ patientId }: { patientId: number }): JSX.
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-body-md flex items-center gap-2 text-on-surface">
-          <span className="material-symbols-outlined text-primary text-[20px]">prescriptions</span>
+          <Glyph name="prescriptions" size={20} className="text-primary" />
           Prescriptions
         </h3>
         <PermissionButton
@@ -150,7 +151,7 @@ export function PrescriptionsSection({ patientId }: { patientId: number }): JSX.
           onClick={() => setShowForm((v) => !v)}
           className="btn-secondary text-[12px] flex items-center gap-1"
         >
-          <span className="material-symbols-outlined text-[16px]">{showForm ? 'close' : 'add'}</span>
+          <Glyph name={showForm ? 'close' : 'add'} size={16} />
           {showForm ? 'Cancel' : 'New Prescription'}
         </PermissionButton>
       </div>
@@ -211,7 +212,7 @@ export function PrescriptionsSection({ patientId }: { patientId: number }): JSX.
                       className="p-1.5 text-error hover:bg-error-container rounded-lg transition-colors"
                       aria-label="Remove item"
                     >
-                      <span className="material-symbols-outlined text-[18px]">delete</span>
+                      <Glyph name="delete" size={18} />
                     </button>
                   )}
                 </div>
@@ -224,7 +225,7 @@ export function PrescriptionsSection({ patientId }: { patientId: number }): JSX.
             onClick={addItem}
             className="text-primary text-[12px] font-semibold flex items-center gap-1 hover:underline"
           >
-            <span className="material-symbols-outlined text-[16px]">add</span>
+            <Glyph name="add" size={16} />
             Add another medication
           </button>
 
@@ -263,7 +264,7 @@ export function PrescriptionsSection({ patientId }: { patientId: number }): JSX.
         <p className="text-[12px] text-tertiary py-4">Loading prescriptions…</p>
       ) : prescriptions.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-8 text-center text-on-surface-variant gap-2">
-          <span className="material-symbols-outlined text-[36px] text-outline-variant">medication</span>
+          <Glyph name="medication" size={28} className="text-outline-variant" />
           <p className="text-body-sm">No prescriptions for this patient yet.</p>
         </div>
       ) : (
@@ -287,7 +288,7 @@ export function PrescriptionsSection({ patientId }: { patientId: number }): JSX.
                 <div className="divide-y divide-outline-variant">
                   {rx.items.map((item) => (
                     <div key={item.id} className="flex items-start gap-3 px-4 py-2.5">
-                      <span className="material-symbols-outlined text-primary text-[18px] mt-0.5">pill</span>
+                      <Glyph name="pill" size={18} className="text-primary mt-0.5" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-semibold text-body-sm text-on-surface">

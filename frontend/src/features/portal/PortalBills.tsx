@@ -52,7 +52,7 @@ export function PortalBills(): JSX.Element {
       {isLoading ? (
         <div className="rounded-2xl bg-stone-100 p-6 animate-pulse dark:bg-stone-800" style={{ height: 120 }} />
       ) : totalOutstanding > 0 ? (
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-600 to-teal-800 p-6 text-white shadow-lg">
+        <div className="relative overflow-hidden rounded-2xl bg-teal-600 p-6 text-white shadow-lg">
           <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10" />
           <div className="pointer-events-none absolute -bottom-4 right-16 h-20 w-20 rounded-full bg-white/5" />
           <p className="text-sm font-medium text-teal-200">Total Outstanding Balance</p>

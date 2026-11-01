@@ -45,7 +45,7 @@ function SettingsModal({ title, children, onClose, maxWidth = 'max-w-lg' }: Sett
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* backdrop */}
       <div
-        className="absolute inset-0 bg-stone-950/70 backdrop-blur-sm"
+        className="absolute inset-0 bg-stone-950/70"
         onClick={() => onClose()}
         aria-hidden="true"
       />
@@ -219,7 +219,7 @@ export default function SettingsPage(): JSX.Element {
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-12">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-stone-900 to-stone-500 dark:from-stone-100 dark:to-stone-400">
+        <h1 className="text-3xl font-black bg-clip-text text-transparent bg-stone-900 dark:bg-stone-100">
           {t('settings:title', 'Settings')}
         </h1>
         <p className="mt-2 text-sm text-stone-500 font-medium">
@@ -229,7 +229,7 @@ export default function SettingsPage(): JSX.Element {
 
       <div className="flex flex-col md:flex-row gap-8">
         {/* Sidebar Navigation */}
-        <div className="w-full md:w-64 flex-shrink-0 space-y-2 bg-white/40 dark:bg-stone-950/40 p-2 rounded-2xl backdrop-blur-md border border-stone-200/50 dark:border-stone-800/50">
+        <div className="w-full md:w-64 flex-shrink-0 space-y-2 bg-white/40 dark:bg-stone-950/40 p-2 rounded-2xl border border-stone-200/50 dark:border-stone-800/50">
           {[
             { id: 'profile', icon: 'user', label: t('settings:profile.title', 'Profile') },
             { id: 'appearance', icon: 'sun', label: t('settings:appearance.title', 'Appearance & Language') },
@@ -252,7 +252,7 @@ export default function SettingsPage(): JSX.Element {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 bg-white/60 dark:bg-stone-900/40 rounded-3xl p-6 md:p-8 backdrop-blur-xl border border-stone-200/50 dark:border-stone-800/50 shadow-sm relative overflow-hidden min-h-[400px]">
+        <div className="flex-1 bg-white/60 dark:bg-stone-900/40 rounded-3xl p-6 md:p-8 border border-stone-200/50 dark:border-stone-800/50 shadow-sm relative overflow-hidden min-h-[400px]">
           {/* Decorative glow */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -260,7 +260,7 @@ export default function SettingsPage(): JSX.Element {
           {activeTab === 'profile' && (
             <div className="animate-in fade-in slide-in-from-right-4 duration-500 relative z-10 space-y-6">
               <div className="flex items-center gap-4 pb-6 border-b border-stone-100 dark:border-stone-800">
-                <div className="h-20 w-20 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-brand-500/20">
+                <div className="h-20 w-20 rounded-full bg-brand-400 flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-brand-500/20">
                   {user?.name?.charAt(0) ?? 'U'}
                 </div>
                 <div>
@@ -385,7 +385,7 @@ export default function SettingsPage(): JSX.Element {
                   type="button"
                   disabled={securityBusy}
                   onClick={user?.mfa_enabled ? openDisableMfaModal : () => { void openEnableMfaModal(); }}
-                  className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 ${user?.mfa_enabled ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 hover:bg-rose-100 border border-rose-200 dark:border-rose-800' : 'bg-stone-900 text-white dark:bg-white dark:text-stone-900 hover:shadow-md'}`}
+                  className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm disabled:cursor-not-allowed disabled:opacity-60 ${user?.mfa_enabled ? 'bg-red-50 dark:bg-red-900/20 text-red-600 hover:bg-red-100 border border-red-200 dark:border-red-800' : 'bg-stone-900 text-white dark:bg-white dark:text-stone-900 hover:shadow-md'}`}
                 >
                   {user?.mfa_enabled ? 'Disable MFA' : 'Enable MFA'}
                 </button>
@@ -484,10 +484,10 @@ export default function SettingsPage(): JSX.Element {
                           />
                         </div>
 
-                        <div className="space-y-2 p-3 bg-rose-50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-900/50 rounded-xl">
-                          <p className="text-sm font-bold text-rose-600 dark:text-rose-400">⚠ Save these recovery codes!</p>
-                          <p className="text-xs text-rose-500 dark:text-rose-300">You will not see them again. Use them to log in if you lose your device.</p>
-                          <ul className="grid grid-cols-2 gap-1.5 text-xs font-mono bg-white dark:bg-stone-900 p-3 rounded-lg border border-rose-100 dark:border-stone-800">
+                        <div className="space-y-2 p-3 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/50 rounded-xl">
+                          <p className="text-sm font-bold text-red-600 dark:text-red-400">⚠ Save these recovery codes!</p>
+                          <p className="text-xs text-red-500 dark:text-red-300">You will not see them again. Use them to log in if you lose your device.</p>
+                          <ul className="grid grid-cols-2 gap-1.5 text-xs font-mono bg-white dark:bg-stone-900 p-3 rounded-lg border border-red-100 dark:border-stone-800">
                             {mfaEnrollment.recovery_codes.map((code) => (
                               <li key={code} className="text-stone-700 dark:text-stone-300">{code}</li>
                             ))}
@@ -523,7 +523,7 @@ export default function SettingsPage(): JSX.Element {
                       required
                       value={disablePassword}
                       onChange={(e) => setDisablePassword(e.target.value)}
-                      className="w-full px-4 py-2.5 pr-10 border border-stone-200 dark:border-stone-700 rounded-xl bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 focus:ring-2 focus:ring-rose-500 outline-none"
+                      className="w-full px-4 py-2.5 pr-10 border border-stone-200 dark:border-stone-700 rounded-xl bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 focus:ring-2 focus:ring-red-500 outline-none"
                       placeholder="Enter your password"
                       autoComplete="current-password"
                     />
@@ -535,7 +535,7 @@ export default function SettingsPage(): JSX.Element {
                 
                 <div className="flex justify-end gap-3 pt-2">
                   <button type="button" onClick={() => closeSecurityModal()} className="px-4 py-2 text-sm font-semibold rounded-xl border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-300 transition-colors">Cancel</button>
-                  <button type="submit" disabled={securityBusy || !disablePassword} className="px-5 py-2 text-sm font-bold bg-rose-600 hover:bg-rose-500 text-white rounded-xl transition-colors disabled:opacity-50 shadow-sm">Disable MFA</button>
+                  <button type="submit" disabled={securityBusy || !disablePassword} className="px-5 py-2 text-sm font-bold bg-red-600 hover:bg-red-500 text-white rounded-xl transition-colors disabled:opacity-50 shadow-sm">Disable MFA</button>
                 </div>
               </form>
             </SettingsModal>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { httpClient } from '@/lib/http';
+import { Glyph } from '@/components/icons/Glyph';
 
 interface Doctor {
   id: string;
@@ -82,9 +83,7 @@ export function DoctorSelector({
         <span className={selected ? 'text-on-surface' : 'text-on-surface-variant/60'}>
           {selected ? selected.name : isLoading ? 'Loading doctors…' : 'Select a doctor'}
         </span>
-        <span className="material-symbols-outlined text-[18px] text-on-surface-variant shrink-0">
-          {open ? 'expand_less' : 'expand_more'}
-        </span>
+        <Glyph name={open ? 'expand_less' : 'expand_more'} size={18} className="text-on-surface-variant shrink-0" />
       </button>
 
       {/* Dropdown */}
@@ -93,7 +92,7 @@ export function DoctorSelector({
           {/* Search */}
           <div className="border-b border-outline-variant/40 p-2">
             <div className="flex items-center gap-2 rounded-lg bg-surface-container px-3 py-1.5">
-              <span className="material-symbols-outlined text-[16px] text-on-surface-variant">search</span>
+              <Glyph name="search" size={16} className="text-on-surface-variant" />
               <input
                 autoFocus
                 type="text"

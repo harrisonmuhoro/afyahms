@@ -5,6 +5,7 @@ import { useBranches } from '@/features/branches/BranchProvider';
 import { useBoard, useStartTicket } from '@/features/queue/api';
 import type { MtsCategory, QueueTicket } from '@/features/queue/types';
 import { cn } from '@/lib/cn';
+import { Glyph } from '@/components/icons/Glyph';
 
 const MTS_BAR: Record<MtsCategory, string> = {
   red:    'bg-red-600',
@@ -63,12 +64,12 @@ export function DoctorDashboard(): JSX.Element {
           <h2 className="font-headline-lg text-headline-lg text-on-surface">{greeting}</h2>
           <div className="flex items-center gap-md mt-1 flex-wrap">
             <div className="flex items-center gap-1.5 text-tertiary">
-              <span className="material-symbols-outlined text-[18px]">calendar_today</span>
+              <Glyph name="calendar_today" size={18} />
               <span className="text-body-md">{today}</span>
             </div>
             {activeBranch !== null && (
               <div className="flex items-center gap-1.5 text-primary bg-primary-container/10 px-2 py-0.5 rounded">
-                <span className="material-symbols-outlined text-[18px]">door_open</span>
+                <Glyph name="door_open" size={18} />
                 <span className="text-body-md font-medium">{activeBranch.name}</span>
               </div>
             )}
@@ -110,7 +111,7 @@ export function DoctorDashboard(): JSX.Element {
         <div className="bg-white border border-outline-variant rounded-xl p-md shadow-[0px_1px_3px_rgba(0,0,0,0.05)] hover:border-primary/30 transition-colors">
           <div className="flex justify-between items-start">
             <span className="text-label-caps text-tertiary">Patients in My Queue</span>
-            <span className="material-symbols-outlined text-primary">groups</span>
+            <Glyph name="groups" className="text-primary" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-[32px] font-bold text-on-surface">
@@ -126,7 +127,7 @@ export function DoctorDashboard(): JSX.Element {
         <div className="bg-white border border-outline-variant rounded-xl p-md shadow-[0px_1px_3px_rgba(0,0,0,0.05)] hover:border-primary/30 transition-colors">
           <div className="flex justify-between items-start">
             <span className="text-label-caps text-tertiary">Seen Today</span>
-            <span className="material-symbols-outlined text-secondary">check_circle</span>
+            <Glyph name="check_circle" className="text-secondary" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-[32px] font-bold text-on-surface">—</span>
@@ -138,7 +139,7 @@ export function DoctorDashboard(): JSX.Element {
         <div className="bg-white border border-outline-variant rounded-xl p-md shadow-[0px_1px_3px_rgba(0,0,0,0.05)] hover:border-primary/30 transition-colors">
           <div className="flex justify-between items-start">
             <span className="text-label-caps text-tertiary">Pending Lab Results</span>
-            <span className="material-symbols-outlined text-amber-500" style={{ fontVariationSettings: "'FILL' 1" }}>warning</span>
+            <Glyph name="warning" className="text-amber-500" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-[32px] font-bold text-on-surface">—</span>
@@ -150,7 +151,7 @@ export function DoctorDashboard(): JSX.Element {
         <div className="bg-white border border-outline-variant rounded-xl p-md shadow-[0px_1px_3px_rgba(0,0,0,0.05)] hover:border-primary/30 transition-colors">
           <div className="flex justify-between items-start">
             <span className="text-label-caps text-tertiary">Prescriptions Pending</span>
-            <span className="material-symbols-outlined text-tertiary">pill</span>
+            <Glyph name="pill" className="text-tertiary" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-[32px] font-bold text-on-surface">—</span>
@@ -193,7 +194,7 @@ export function DoctorDashboard(): JSX.Element {
                 onClick={() => navigate('/queue/board/DOC')}
                 className="mb-3 text-primary text-body-sm font-semibold flex items-center gap-1 hover:underline"
               >
-                <span className="material-symbols-outlined text-sm">history</span>
+                <Glyph name="history" size={14} />
                 Queue Logs
               </button>
             </div>
@@ -218,7 +219,7 @@ export function DoctorDashboard(): JSX.Element {
                     <div className="text-right">
                       <p className="text-label-caps text-tertiary mb-1">Wait Time</p>
                       <span className="text-amber-600 font-data-mono font-bold text-body-md flex items-center gap-1">
-                        <span className="material-symbols-outlined text-sm">schedule</span>
+                        <Glyph name="schedule" size={14} />
                         {waitMinutes(inService) ?? '—'}m
                       </span>
                     </div>
@@ -230,7 +231,7 @@ export function DoctorDashboard(): JSX.Element {
                       disabled={startTicket.isPending}
                       className="bg-primary text-on-primary px-6 py-2 rounded-lg font-semibold text-body-md hover:brightness-110 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-50"
                     >
-                      <span className="material-symbols-outlined text-sm">play_arrow</span>
+                      <Glyph name="play_arrow" size={14} />
                       Start Encounter
                     </button>
                     <button className="border border-outline-variant text-on-surface px-4 py-2 rounded-lg font-semibold text-body-md hover:bg-surface-container transition-all">
@@ -248,7 +249,7 @@ export function DoctorDashboard(): JSX.Element {
               {/* Empty state */}
               {snapshot !== null && tabTickets.length === 0 && (tab !== 'waiting' || inService === null) && (
                 <div className="py-10 text-center">
-                  <span className="material-symbols-outlined text-[32px] text-outline-variant">inbox</span>
+                  <Glyph name="inbox" size={28} className="text-outline-variant" />
                   <p className="mt-2 text-body-sm font-medium text-outline">Queue is empty</p>
                 </div>
               )}
@@ -296,7 +297,7 @@ export function DoctorDashboard(): JSX.Element {
           {/* Quick Actions */}
           <div className="bg-white border border-outline-variant rounded-xl p-md shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
             <h3 className="text-label-caps text-tertiary mb-md flex items-center gap-2">
-              <span className="material-symbols-outlined text-[16px]">bolt</span> Quick Actions
+              <Glyph name="bolt" size={16} /> Quick Actions
             </h3>
             <div className="grid grid-cols-2 gap-sm">
               {[
@@ -310,7 +311,7 @@ export function DoctorDashboard(): JSX.Element {
                   onClick={() => navigate(to)}
                   className="flex flex-col items-center justify-center gap-2 p-3 border border-outline-variant rounded-lg hover:bg-primary-container/10 hover:border-primary/30 transition-all group"
                 >
-                  <span className="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">{icon}</span>
+                  <Glyph name={icon} className="text-primary transition-transform" />
                   <span className="text-[11px] font-semibold">{label}</span>
                 </button>
               ))}
@@ -323,7 +324,7 @@ export function DoctorDashboard(): JSX.Element {
               <h3 className="text-label-caps text-on-surface">Results Ready</h3>
             </div>
             <div className="p-md text-center py-8">
-              <span className="material-symbols-outlined text-[32px] text-outline-variant block mb-2">biotech</span>
+              <Glyph name="biotech" size={28} className="text-outline-variant block mb-2" />
               <p className="text-body-sm text-outline">No pending results</p>
             </div>
           </div>
@@ -340,7 +341,7 @@ export function DoctorDashboard(): JSX.Element {
               </button>
             </div>
             <div className="p-md text-center py-8">
-              <span className="material-symbols-outlined text-[32px] text-outline-variant block mb-2">calendar_month</span>
+              <Glyph name="calendar_month" size={28} className="text-outline-variant block mb-2" />
               <p className="text-body-sm text-outline">No appointments today</p>
             </div>
           </div>

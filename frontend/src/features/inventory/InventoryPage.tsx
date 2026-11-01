@@ -7,7 +7,7 @@ import { stockStatus, type StockStatus } from './types';
 const STATUS_BADGE: Record<StockStatus, string> = {
   in_stock: 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20',
   low: 'bg-amber-500/10 text-amber-600 border border-amber-500/20',
-  out: 'bg-rose-500/10 text-rose-600 border border-rose-500/20 animate-pulse',
+  out: 'bg-red-500/10 text-red-600 border border-red-500/20 animate-pulse',
 };
 
 function formatMoney(value: number | null): string {
@@ -43,14 +43,14 @@ export function InventoryPage(): JSX.Element {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-stone-900 to-stone-500 dark:from-stone-100 dark:to-stone-400">
+          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-stone-900 dark:bg-stone-100">
             {t('inventory:title')}
           </h1>
           <p className="mt-1 text-sm text-stone-500">{t('inventory:subtitle')}</p>
         </div>
         
         <div className="flex gap-3">
-          <button className="px-4 py-2 bg-stone-900 dark:bg-white text-white dark:text-stone-900 rounded-xl font-medium shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
+          <button className="px-4 py-2 bg-stone-900 dark:bg-white text-white dark:text-stone-900 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300">
             + New Item
           </button>
         </div>
@@ -58,26 +58,26 @@ export function InventoryPage(): JSX.Element {
 
       {/* Summary stats - Glassmorphism */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div className="p-5 rounded-2xl bg-white/60 dark:bg-stone-900/60 backdrop-blur-xl border border-white/20 dark:border-stone-800/50 shadow-sm hover:shadow-md transition-shadow">
+        <div className="p-5 rounded-2xl bg-white/60 dark:bg-stone-900/60 border border-white/20 dark:border-stone-800/50 shadow-sm hover:shadow-md transition-shadow">
           <span className="text-xs font-semibold tracking-wider text-stone-500 uppercase">{t('inventory:stats.total')}</span>
           <div className="mt-2 text-3xl font-black text-stone-800 dark:text-stone-100">{stats.total}</div>
         </div>
-        <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border border-amber-100/50 dark:border-amber-900/30 shadow-sm hover:shadow-md transition-shadow">
+        <div className="p-5 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-100/50 dark:border-amber-900/30 shadow-sm hover:shadow-md transition-shadow">
           <span className="text-xs font-semibold tracking-wider text-amber-700/80 dark:text-amber-500/80 uppercase">{t('inventory:stats.low')}</span>
           <div className="mt-2 text-3xl font-black text-amber-600 dark:text-amber-500">{stats.low}</div>
         </div>
-        <div className="p-5 rounded-2xl bg-gradient-to-br from-rose-50 to-red-50 dark:from-rose-950/30 dark:to-red-950/30 border border-rose-100/50 dark:border-rose-900/30 shadow-sm hover:shadow-md transition-shadow">
-          <span className="text-xs font-semibold tracking-wider text-rose-700/80 dark:text-rose-500/80 uppercase">{t('inventory:stats.out')}</span>
-          <div className="mt-2 text-3xl font-black text-rose-600 dark:text-rose-500">{stats.out}</div>
+        <div className="p-5 rounded-2xl bg-red-50 dark:bg-red-950/30 border border-red-100/50 dark:border-red-900/30 shadow-sm hover:shadow-md transition-shadow">
+          <span className="text-xs font-semibold tracking-wider text-red-700/80 dark:text-red-500/80 uppercase">{t('inventory:stats.out')}</span>
+          <div className="mt-2 text-3xl font-black text-red-600 dark:text-red-500">{stats.out}</div>
         </div>
-        <div className="p-5 rounded-2xl bg-white/60 dark:bg-stone-900/60 backdrop-blur-xl border border-white/20 dark:border-stone-800/50 shadow-sm hover:shadow-md transition-shadow">
+        <div className="p-5 rounded-2xl bg-white/60 dark:bg-stone-900/60 border border-white/20 dark:border-stone-800/50 shadow-sm hover:shadow-md transition-shadow">
           <span className="text-xs font-semibold tracking-wider text-stone-500 uppercase">{t('inventory:stats.value')}</span>
           <div className="mt-2 text-3xl font-black text-emerald-600 dark:text-emerald-400">{formatMoney(stats.value)}</div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4 bg-white/50 dark:bg-stone-900/50 p-4 rounded-2xl backdrop-blur-sm border border-stone-200/50 dark:border-stone-800/50">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 bg-white/50 dark:bg-stone-900/50 p-4 rounded-2xl border border-stone-200/50 dark:border-stone-800/50">
         <div className="relative flex-1">
           <Icon
             name="search"
@@ -110,14 +110,14 @@ export function InventoryPage(): JSX.Element {
       </div>
 
       {error !== null && (
-        <div role="alert" className="p-4 rounded-xl bg-rose-50/80 text-rose-600 border border-rose-200 backdrop-blur-sm flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+        <div role="alert" className="p-4 rounded-xl bg-red-50/80 text-red-600 border border-red-200 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
           <Icon name="close" size={20} />
           <span className="text-sm font-medium">{t('inventory:load_error')}</span>
         </div>
       )}
 
       {/* Table */}
-      <div className="rounded-2xl border border-stone-200/60 dark:border-stone-800/60 bg-white/80 dark:bg-stone-950/80 backdrop-blur-xl shadow-sm overflow-hidden">
+      <div className="rounded-2xl border border-stone-200/60 dark:border-stone-800/60 bg-white/80 dark:bg-stone-950/80 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm whitespace-nowrap">
             <thead className="bg-stone-50/80 dark:bg-stone-900/80 border-b border-stone-200/60 dark:border-stone-800/60">
@@ -174,7 +174,7 @@ export function InventoryPage(): JSX.Element {
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${STATUS_BADGE[status]}`}>
-                        {status === 'out' && <span className="w-1.5 h-1.5 rounded-full bg-rose-500 mr-1.5 animate-pulse"></span>}
+                        {status === 'out' && <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5 animate-pulse"></span>}
                         {t(`inventory:status.${status}`)}
                       </span>
                     </td>

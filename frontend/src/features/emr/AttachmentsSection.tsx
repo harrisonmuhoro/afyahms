@@ -8,6 +8,7 @@
  */
 import { type DragEvent, useRef, useState } from 'react';
 import { cn } from '@/lib/cn';
+import { Glyph } from '@/components/icons/Glyph';
 
 /* ─── Types ─────────────────────────────────────────────────────────────── */
 interface Attachment {
@@ -98,7 +99,7 @@ export function AttachmentsSection(): JSX.Element {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-body-md flex items-center gap-2 text-on-surface">
-          <span className="material-symbols-outlined text-primary text-[20px]">attach_file</span>
+          <Glyph name="attach_file" size={20} className="text-primary" />
           Attachments & Clinical Documents
         </h3>
         <button
@@ -106,7 +107,7 @@ export function AttachmentsSection(): JSX.Element {
           onClick={() => inputRef.current?.click()}
           className="btn-secondary text-[12px] flex items-center gap-1"
         >
-          <span className="material-symbols-outlined text-[16px]">upload</span>
+          <Glyph name="upload" size={16} />
           Upload
         </button>
         <input
@@ -138,12 +139,12 @@ export function AttachmentsSection(): JSX.Element {
       >
         {uploading ? (
           <div className="flex flex-col items-center gap-2">
-            <span className="material-symbols-outlined text-[40px] text-primary animate-pulse">cloud_upload</span>
+            <Glyph name="cloud_upload" size={32} className="text-primary animate-pulse" />
             <p className="text-body-sm text-primary font-semibold">Uploading…</p>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2 text-on-surface-variant">
-            <span className={cn('material-symbols-outlined text-[40px]', dragging ? 'text-primary' : 'text-outline-variant')}>cloud_upload</span>
+            <Glyph name="cloud_upload" size={32} className={cn('', dragging ? 'text-primary' : 'text-outline-variant')} />
             <p className="text-body-sm font-semibold">
               {dragging ? 'Drop files here' : 'Drag & drop files or click to upload'}
             </p>
@@ -154,7 +155,7 @@ export function AttachmentsSection(): JSX.Element {
 
       {err !== null && (
         <p className="text-error text-[12px] flex items-center gap-1">
-          <span className="material-symbols-outlined text-[16px]">error</span>
+          <Glyph name="error" size={16} />
           {err}
         </p>
       )}
@@ -162,7 +163,7 @@ export function AttachmentsSection(): JSX.Element {
       {/* File list */}
       {attachments.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-6 text-on-surface-variant gap-2 text-center">
-          <span className="material-symbols-outlined text-[32px] text-outline-variant">folder_open</span>
+          <Glyph name="folder_open" size={28} className="text-outline-variant" />
           <p className="text-body-sm">No documents attached to this encounter yet.</p>
           <p className="text-[11px] text-tertiary">Upload X-rays, lab reports, consent forms, or any clinical document.</p>
         </div>
@@ -182,7 +183,7 @@ export function AttachmentsSection(): JSX.Element {
                 />
               ) : (
                 <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-primary text-[24px]">{mimeIcon(att.mime)}</span>
+                  <Glyph name={mimeIcon(att.mime)} size={22} className="text-primary" />
                 </div>
               )}
 
@@ -202,7 +203,7 @@ export function AttachmentsSection(): JSX.Element {
                     className="p-1.5 text-primary hover:bg-primary/10 rounded-lg transition-colors"
                     aria-label="Open file"
                   >
-                    <span className="material-symbols-outlined text-[18px]">open_in_new</span>
+                    <Glyph name="open_in_new" size={18} />
                   </a>
                 )}
                 <button
@@ -211,7 +212,7 @@ export function AttachmentsSection(): JSX.Element {
                   className="p-1.5 text-error hover:bg-error-container rounded-lg transition-colors"
                   aria-label="Remove attachment"
                 >
-                  <span className="material-symbols-outlined text-[18px]">delete</span>
+                  <Glyph name="delete" size={18} />
                 </button>
               </div>
             </div>
@@ -221,7 +222,7 @@ export function AttachmentsSection(): JSX.Element {
 
       {/* Info banner */}
       <div className="flex items-start gap-2 p-3 rounded-xl bg-primary/5 border border-primary/20 text-[11px] text-on-surface-variant">
-        <span className="material-symbols-outlined text-primary text-[16px] mt-0.5">info</span>
+        <Glyph name="info" size={16} className="text-primary mt-0.5" />
         <p>
           Documents uploaded here are stored securely and linked to this encounter.
           Only staff with document access permissions can view or delete them.

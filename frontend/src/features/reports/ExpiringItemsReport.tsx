@@ -125,7 +125,7 @@ export function ExpiringItemsReport(): JSX.Element {
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Already Expired</h3>
-              <p className="mt-2 text-3xl font-black text-rose-600">{data.kpis.expired.toLocaleString()}</p>
+              <p className="mt-2 text-3xl font-black text-red-600">{data.kpis.expired.toLocaleString()}</p>
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Value at Risk</h3>
@@ -183,7 +183,7 @@ export function ExpiringItemsReport(): JSX.Element {
                         <td className="px-6 py-4 text-right tabular-nums font-medium">Ksh {row.value_at_risk.toLocaleString()}</td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-md ${
-                            row.urgency === 'Expired' ? 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400'
+                            row.urgency === 'Expired' ? 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400'
                             : row.urgency === 'Critical' ? 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400'
                             : row.urgency === 'Warning' ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400'
                             : 'bg-stone-100 text-stone-700 dark:bg-stone-500/20 dark:text-stone-400'

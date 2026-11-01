@@ -1,18 +1,9 @@
+import { Glyph } from '@/components/icons/Glyph';
 export function LoginScreen(): JSX.Element {
   return (
     <main className="flex min-h-screen w-full bg-background text-on-surface font-body-md selection:bg-primary-container selection:text-white">
       {/* Left Panel: Brand & Marketing (45%) */}
-      <section className="relative hidden lg:flex lg:w-[45%] flex-col justify-between p-xl overflow-hidden bg-gradient-to-br from-[#0D9488] to-[#042F2E]">
-        {/* Decorative Elements */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0)',
-            backgroundSize: '40px 40px'
-          }}
-        ></div>
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary-container/20 rounded-full blur-[120px]"></div>
-        <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-black/20 rounded-full blur-[100px]"></div>
+      <section className="relative hidden lg:flex lg:w-[45%] flex-col justify-between p-xl overflow-hidden bg-inverse-surface">
         {/* Content Container */}
         <div className="relative z-10 flex flex-col h-full">
           {/* Brand Identity */}
@@ -33,25 +24,19 @@ export function LoginScreen(): JSX.Element {
             <ul className="space-y-md">
               <li className="flex items-center gap-4 text-white/90">
                 <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-primary-fixed" style={{ fontVariationSettings: "'wght' 300" }}>
-                    hub
-                  </span>
+                  <Glyph name="hub" className="text-primary-fixed" />
                 </div>
                 <span className="font-body-md">Multi-branch Coordination</span>
               </li>
               <li className="flex items-center gap-4 text-white/90">
                 <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-primary-fixed" style={{ fontVariationSettings: "'wght' 300" }}>
-                    insights
-                  </span>
+                  <Glyph name="insights" className="text-primary-fixed" />
                 </div>
                 <span className="font-body-md">Real-time Clinical Insights</span>
               </li>
               <li className="flex items-center gap-4 text-white/90">
                 <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-primary-fixed" style={{ fontVariationSettings: "'wght' 300" }}>
-                    security
-                  </span>
+                  <Glyph name="security" className="text-primary-fixed" />
                 </div>
                 <span className="font-body-md">Secure Patient Records</span>
               </li>
@@ -150,7 +135,7 @@ export function LoginScreen(): JSX.Element {
           <div className="mt-xl pt-lg border-t border-outline-variant/50 flex flex-col sm:flex-row items-center justify-between gap-md">
             <div className="flex items-center gap-4 text-body-sm text-on-surface-variant">
               <button className="hover:text-primary transition-colors flex items-center gap-1">
-                English <span className="material-symbols-outlined text-[16px]">expand_more</span>
+                English <Glyph name="expand_more" size={16} />
               </button>
               <button className="hover:text-primary transition-colors">Swahili</button>
             </div>

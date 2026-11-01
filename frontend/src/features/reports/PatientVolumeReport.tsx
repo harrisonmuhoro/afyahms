@@ -117,7 +117,7 @@ export function PatientVolumeReport(): JSX.Element {
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Returning</h3>
-              <p className="mt-2 text-3xl font-black text-purple-600">{data.kpis.returning.toLocaleString()}</p>
+              <p className="mt-2 text-3xl font-black text-blue-600">{data.kpis.returning.toLocaleString()}</p>
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">New:Return Ratio</h3>
@@ -169,7 +169,7 @@ export function PatientVolumeReport(): JSX.Element {
                         <td className="px-6 py-4 font-medium">{row.date}</td>
                         <td className="px-6 py-4 text-right font-medium tabular-nums">{row.total.toLocaleString()}</td>
                         <td className="px-6 py-4 text-right tabular-nums text-emerald-600">{row.new_patients.toLocaleString()}</td>
-                        <td className="px-6 py-4 text-right tabular-nums text-purple-600">{row.returning.toLocaleString()}</td>
+                        <td className="px-6 py-4 text-right tabular-nums text-blue-600">{row.returning.toLocaleString()}</td>
                       </tr>
                     ))
                   )}

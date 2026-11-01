@@ -6,6 +6,7 @@ import {
   useFinalizeReport,
 } from '@/features/radiology/api';
 import type { ImagingOrder, ImagingOrderStatus } from '@/features/radiology/types';
+import { Glyph } from '@/components/icons/Glyph';
 
 const MODALITY_FILTERS = ['ALL', 'XR', 'CT', 'MRI', 'US'] as const;
 
@@ -130,7 +131,7 @@ export function RadiologistDashboard(): JSX.Element {
         <div className="bg-surface border border-outline-variant rounded-xl shadow-sm flex flex-col h-full max-h-[800px]">
           <div className="p-md border-b border-outline-variant flex items-center justify-between">
             <h2 className="font-headline-md text-primary flex items-center gap-2">
-              <span className="material-symbols-outlined">list_alt</span>
+              <Glyph name="list_alt" />
               Worklist
             </h2>
             <span className="text-label-caps bg-primary-container/20 text-primary px-2 py-1 rounded">
@@ -163,7 +164,7 @@ export function RadiologistDashboard(): JSX.Element {
               </p>
             ) : worklist.length === 0 ? (
               <div className="p-md text-center py-8">
-                <span className="material-symbols-outlined text-[32px] text-outline-variant">radiology</span>
+                <Glyph name="radiology" size={28} className="text-outline-variant" />
                 <p className="mt-2 text-body-md text-on-surface-variant">No active imaging orders.</p>
               </div>
             ) : (
@@ -189,7 +190,7 @@ export function RadiologistDashboard(): JSX.Element {
                           critical ? 'text-error' : active ? 'text-primary' : 'text-tertiary'
                         }`}
                       >
-                        {critical && <span className="material-symbols-outlined text-[14px]">warning</span>}
+                        {critical && <Glyph name="warning" size={14} />}
                         {order.priority.toUpperCase()}
                       </span>
                       <span className="text-data-mono text-[11px] text-on-surface-variant">
@@ -241,7 +242,7 @@ export function RadiologistDashboard(): JSX.Element {
       <div className="col-span-12 xl:col-span-6 flex flex-col gap-md h-full overflow-hidden">
         <div className="bg-inverse-surface rounded-xl flex-1 flex flex-col overflow-hidden border border-outline relative min-h-[500px]">
           {/* Viewer Toolbar */}
-          <div className="h-12 bg-black/40 backdrop-blur-md flex items-center justify-between px-md border-b border-white/10 z-10">
+          <div className="h-12 bg-black/40 flex items-center justify-between px-md border-b border-white/10 z-10">
             <div className="flex items-center gap-1">
               {(['zoom_in', 'pan_tool', 'contrast', 'straighten'] as const).map((tool) => (
                 <button
@@ -251,7 +252,7 @@ export function RadiologistDashboard(): JSX.Element {
                   title="Viewer tools available when PACS is connected"
                   className="p-1.5 rounded text-white/40 cursor-not-allowed"
                 >
-                  <span className="material-symbols-outlined text-[20px]">{tool}</span>
+                  <Glyph name={tool} size={20} />
                 </button>
               ))}
             </div>
@@ -327,7 +328,7 @@ export function RadiologistDashboard(): JSX.Element {
             <h3 className="text-label-caps text-on-surface-variant uppercase">Peer Review Queue</h3>
           </div>
           <div className="p-3 bg-surface-container-low rounded border border-dashed border-outline-variant text-center">
-            <span className="material-symbols-outlined text-[22px] text-outline-variant">verified_user</span>
+            <Glyph name="verified_user" size={22} className="text-outline-variant" />
             <p className="text-[11px] text-on-surface-variant mt-1">
               Second-opinion requests will appear here once peer review is enabled.
             </p>
@@ -456,9 +457,9 @@ export function RadiologistDashboard(): JSX.Element {
       
       {/* Floating Voice Dictation Control */}
       <div className="fixed bottom-lg right-lg z-50">
-        <button className="w-16 h-16 bg-primary rounded-full shadow-lg flex items-center justify-center text-white hover:scale-105 active:scale-95 transition-all group overflow-hidden relative">
+        <button className="w-16 h-16 bg-primary rounded-full shadow-lg flex items-center justify-center text-white active:scale-95 transition-all group overflow-hidden relative">
           <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-          <span className="material-symbols-outlined text-[32px] relative z-10" style={{ fontVariationSettings: "'FILL' 1" }}>mic</span>
+          <Glyph name="mic" size={28} className="relative z-10" />
           {/* Audio Wave Animation Placeholder */}
           <div className="absolute bottom-2 flex gap-0.5 items-end justify-center w-full opacity-0 group-active:opacity-100 transition-opacity">
             <div className="w-1 h-2 bg-white animate-[bounce_0.8s_infinite]" />

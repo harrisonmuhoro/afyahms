@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMedications, usePrescriptions, useUpdatePrescriptionStatus } from '@/features/pharmacy/api';
 import type { Medication, Prescription } from '@/features/pharmacy/types';
+import { Glyph } from '@/components/icons/Glyph';
 
 /** Stock below this level is flagged low; below half of it, critical. */
 const LOW_STOCK_THRESHOLD = 20;
@@ -88,14 +89,14 @@ export function PharmacistDashboard(): JSX.Element {
               to="/pharmacy/medications"
               className="flex items-center gap-2 px-md py-2 border border-outline-variant rounded-lg text-body-md font-medium hover:bg-surface-container-low transition-colors"
             >
-              <span className="material-symbols-outlined text-[20px]">inventory</span>
+              <Glyph name="inventory" size={20} />
               Full Inventory
             </Link>
             <Link
               to="/pharmacy/prescriptions"
               className="flex items-center gap-2 px-md py-2 bg-primary text-on-primary rounded-lg text-body-md font-medium hover:opacity-90 transition-opacity"
             >
-              <span className="material-symbols-outlined text-[20px]">prescriptions</span>
+              <Glyph name="prescriptions" size={20} />
               All Prescriptions
             </Link>
           </div>
@@ -109,7 +110,7 @@ export function PharmacistDashboard(): JSX.Element {
               <span className="text-headline-lg font-bold text-primary">
                 {rxLoading ? '…' : dispensedToday.length}
               </span>
-              <span className="material-symbols-outlined text-primary">check_circle</span>
+              <Glyph name="check_circle" className="text-primary" />
             </div>
           </div>
           <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] flex flex-col gap-1">
@@ -135,12 +136,7 @@ export function PharmacistDashboard(): JSX.Element {
               <span className="text-headline-lg font-bold text-on-surface">
                 {medsLoading ? '…' : String(criticalStock.length).padStart(2, '0')}
               </span>
-              <span
-                className={`material-symbols-outlined ${criticalStock.length > 0 ? 'text-error' : 'text-on-surface-variant'}`}
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                warning
-              </span>
+              <Glyph name="warning" className={`${criticalStock.length > 0 ? 'text-error' : 'text-on-surface-variant'}`} />
             </div>
           </div>
           <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] flex flex-col gap-1">
@@ -149,7 +145,7 @@ export function PharmacistDashboard(): JSX.Element {
               <span className="text-headline-lg font-bold text-on-surface">
                 {medsLoading ? '…' : medications.length}
               </span>
-              <span className="material-symbols-outlined text-on-surface-variant">medication</span>
+              <Glyph name="medication" className="text-on-surface-variant" />
             </div>
           </div>
         </div>
@@ -209,9 +205,7 @@ export function PharmacistDashboard(): JSX.Element {
                   ) : pending.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="px-md py-10 text-center">
-                        <span className="material-symbols-outlined text-[32px] text-outline-variant">
-                          medication_liquid
-                        </span>
+                        <Glyph name="medication_liquid" size={28} className="text-outline-variant" />
                         <p className="mt-2 text-body-md text-on-surface-variant">
                           Queue is clear — no prescriptions awaiting dispensing.
                         </p>
@@ -292,7 +286,7 @@ export function PharmacistDashboard(): JSX.Element {
                 <p className="text-body-sm text-on-surface-variant py-4">Loading stock levels…</p>
               ) : lowStock.length === 0 ? (
                 <p className="flex items-center gap-2 py-4 text-body-sm text-on-surface-variant">
-                  <span className="material-symbols-outlined text-[18px] text-secondary">check_circle</span>
+                  <Glyph name="check_circle" size={18} className="text-secondary" />
                   All stock levels are healthy.
                 </p>
               ) : (
@@ -330,7 +324,7 @@ export function PharmacistDashboard(): JSX.Element {
             <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] flex flex-col items-center justify-center text-center gap-md relative overflow-hidden group">
               <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
               <div className="w-16 h-16 bg-primary-container/20 rounded-full flex items-center justify-center text-primary mb-2">
-                <span className="material-symbols-outlined text-[32px]">inventory</span>
+                <Glyph name="inventory" size={28} />
               </div>
               <h3 className="font-headline-md text-headline-md">Medication Catalog</h3>
               <p className="text-body-md text-on-surface-variant max-w-[200px]">
@@ -351,7 +345,7 @@ export function PharmacistDashboard(): JSX.Element {
           <section className="bg-surface rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col">
             {selected === null ? (
               <div className="p-lg py-12 text-center">
-                <span className="material-symbols-outlined text-[32px] text-outline-variant">contract</span>
+                <Glyph name="contract" size={28} className="text-outline-variant" />
                 <p className="mt-2 text-body-md text-on-surface-variant">
                   Select a prescription from the queue to review its details.
                 </p>
@@ -421,12 +415,7 @@ export function PharmacistDashboard(): JSX.Element {
                         {item.medication !== undefined &&
                           item.medication.stock_quantity < item.quantity && (
                             <div className="mt-3 bg-error-container/10 border border-error/20 p-2.5 rounded-lg flex gap-2">
-                              <span
-                                className="material-symbols-outlined text-error text-[18px]"
-                                style={{ fontVariationSettings: "'FILL' 1" }}
-                              >
-                                warning
-                              </span>
+                              <Glyph name="warning" size={18} className="text-error" />
                               <p className="text-body-sm text-on-surface-variant">
                                 <span className="font-bold text-error">INSUFFICIENT STOCK — </span>
                                 only {item.medication.stock_quantity} in stock for a quantity of {item.quantity}.
@@ -445,7 +434,7 @@ export function PharmacistDashboard(): JSX.Element {
                         disabled={updateStatus.isPending}
                         className="w-full py-3 bg-primary text-on-primary rounded-lg font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
                       >
-                        <span className="material-symbols-outlined text-[20px]">verified_user</span>
+                        <Glyph name="verified_user" size={20} />
                         {updateStatus.isPending ? 'Dispensing…' : 'Verify & Dispense'}
                       </button>
                     </div>
@@ -456,9 +445,7 @@ export function PharmacistDashboard(): JSX.Element {
                       <p className="text-label-caps text-on-surface-variant mb-md">CLINICAL NOTES</p>
                       <div className="flex gap-3">
                         <div className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center">
-                          <span className="material-symbols-outlined text-[18px] text-on-surface-variant">
-                            history
-                          </span>
+                          <Glyph name="history" size={18} className="text-on-surface-variant" />
                         </div>
                         <div className="flex-1">
                           <p className="text-body-sm text-on-surface italic">"{selected.notes}"</p>

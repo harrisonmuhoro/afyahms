@@ -163,7 +163,7 @@ export function OutstandingInvoicesReport(): JSX.Element {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Total Outstanding</h3>
-              <p className="mt-2 text-3xl font-black text-rose-600">
+              <p className="mt-2 text-3xl font-black text-red-600">
                  Ksh {data.kpis.total_outstanding.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
@@ -181,7 +181,7 @@ export function OutstandingInvoicesReport(): JSX.Element {
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Oldest Unpaid</h3>
-              <p className="mt-2 text-3xl font-black text-rose-500">
+              <p className="mt-2 text-3xl font-black text-red-500">
                  {new Date(data.kpis.oldest_unpaid).toLocaleDateString()}
               </p>
             </div>
@@ -257,12 +257,12 @@ export function OutstandingInvoicesReport(): JSX.Element {
                          <td className="px-6 py-4 truncate max-w-[150px]">{row.service}</td>
                          <td className="px-6 py-4 text-right tabular-nums">{row.total_amount.toLocaleString()}</td>
                          <td className="px-6 py-4 text-right tabular-nums">{row.paid_amount.toLocaleString()}</td>
-                         <td className="px-6 py-4 text-right font-bold tabular-nums text-rose-600">{row.balance.toLocaleString()}</td>
+                         <td className="px-6 py-4 text-right font-bold tabular-nums text-red-600">{row.balance.toLocaleString()}</td>
                          <td className="px-6 py-4 text-center tabular-nums font-mono text-xs">{row.days_outstanding}</td>
                          <td className="px-6 py-4">
                             <span className={`inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-md ${
                               row.status === 'Unpaid' 
-                                ? 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400'
+                                ? 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400'
                                 : 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400'
                             }`}>
                               {row.status}

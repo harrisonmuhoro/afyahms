@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useCorrectionRequests, useReviewCorrection } from '@/features/records/api';
 import type { DataCorrectionRequest } from '@/features/records/types';
+import { Glyph } from '@/components/icons/Glyph';
 
 function timeAgo(iso: string | null): string {
   if (iso === null) return '—';
@@ -41,7 +42,7 @@ function ReviewModal({ request, decision, onClose, onConfirm, pending }: ReviewM
             {decision === 'approved' ? 'Approve' : 'Reject'} correction — {request.field_name}
           </h3>
           <button type="button" onClick={onClose} className="p-1 text-on-surface-variant hover:text-on-surface">
-            <span className="material-symbols-outlined">close</span>
+            <Glyph name="close" />
           </button>
         </div>
         <div className="p-md space-y-3">
@@ -142,7 +143,7 @@ export function RecordsDashboard(): JSX.Element {
         <div className="flex gap-3">
           <div className="bg-white border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl flex items-center px-4 py-2 gap-3 min-w-[140px]">
             <div className="w-10 h-10 rounded-full bg-error/10 flex items-center justify-center text-error">
-              <span className="material-symbols-outlined">priority_high</span>
+              <Glyph name="priority_high" />
             </div>
             <div>
               <p className="text-[11px] font-label-caps text-on-surface-variant">PENDING</p>
@@ -151,9 +152,7 @@ export function RecordsDashboard(): JSX.Element {
           </div>
           <div className="bg-white border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl flex items-center px-4 py-2 gap-3 min-w-[140px]">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
-                task_alt
-              </span>
+              <Glyph name="task_alt" />
             </div>
             <div>
               <p className="text-[11px] font-label-caps text-on-surface-variant">APPROVED</p>
@@ -162,7 +161,7 @@ export function RecordsDashboard(): JSX.Element {
           </div>
           <div className="bg-white border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl flex items-center px-4 py-2 gap-3 min-w-[140px]">
             <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
-              <span className="material-symbols-outlined">block</span>
+              <Glyph name="block" />
             </div>
             <div>
               <p className="text-[11px] font-label-caps text-on-surface-variant">REJECTED</p>
@@ -188,7 +187,7 @@ export function RecordsDashboard(): JSX.Element {
           <section className="bg-white border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl overflow-hidden">
             <div className="p-md flex items-center justify-between border-b border-outline-variant">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">rule</span>
+                <Glyph name="rule" className="text-primary" />
                 <h3 className="font-bold text-on-surface">Pending Data Corrections</h3>
               </div>
               <span className="bg-primary text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">
@@ -203,7 +202,7 @@ export function RecordsDashboard(): JSX.Element {
               </p>
             ) : pending.length === 0 ? (
               <div className="p-md py-10 text-center">
-                <span className="material-symbols-outlined text-[32px] text-outline-variant">task_alt</span>
+                <Glyph name="task_alt" size={28} className="text-outline-variant" />
                 <p className="mt-2 text-body-md text-on-surface-variant">No pending correction requests.</p>
               </div>
             ) : (
@@ -268,11 +267,11 @@ export function RecordsDashboard(): JSX.Element {
           <section className="grid grid-cols-1 md:grid-cols-2 gap-gutter">
             <div className="bg-white border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl p-md">
               <h3 className="font-bold mb-4 flex items-center gap-2 text-on-surface">
-                <span className="material-symbols-outlined text-secondary">database</span>
+                <Glyph name="database" className="text-secondary" />
                 Storage Utilization
               </h3>
               <div className="py-6 text-center">
-                <span className="material-symbols-outlined text-[28px] text-outline-variant">cloud_off</span>
+                <Glyph name="cloud_off" size={24} className="text-outline-variant" />
                 <p className="mt-2 text-body-sm text-on-surface-variant">
                   Storage metrics will appear here once archive telemetry is connected.
                 </p>
@@ -280,11 +279,11 @@ export function RecordsDashboard(): JSX.Element {
             </div>
             <div className="bg-primary-container/5 border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl p-md">
               <h3 className="font-bold mb-3 flex items-center gap-2 text-on-surface">
-                <span className="material-symbols-outlined text-primary">analytics</span>
+                <Glyph name="analytics" className="text-primary" />
                 Daily Throughput
               </h3>
               <div className="py-6 text-center">
-                <span className="material-symbols-outlined text-[28px] text-outline-variant">monitoring</span>
+                <Glyph name="monitoring" size={24} className="text-outline-variant" />
                 <p className="mt-2 text-body-sm text-on-surface-variant">
                   Archive volume trends will appear here once reporting is enabled.
                 </p>
@@ -297,7 +296,7 @@ export function RecordsDashboard(): JSX.Element {
         <div className="col-span-12 lg:col-span-4 space-y-gutter">
           <section className="bg-white border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl p-md">
             <h3 className="font-bold text-on-surface mb-3 flex items-center gap-2">
-              <span className="material-symbols-outlined text-on-surface-variant">history</span>
+              <Glyph name="history" className="text-on-surface-variant" />
               Recent Decisions
             </h3>
             {decided.length === 0 ? (
@@ -346,8 +345,8 @@ export function RecordsDashboard(): JSX.Element {
 
       {/* Footer Utilities */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-        <div className="bg-white shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl p-lg flex flex-col justify-between min-h-[160px] bg-gradient-to-br from-surface to-primary-container/5 border-l-4 border-l-primary border border-outline-variant">
-          <span className="material-symbols-outlined text-primary text-3xl mb-2">policy</span>
+        <div className="bg-white shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl p-lg flex flex-col justify-between min-h-[160px] bg-surface border-l-4 border-l-primary border border-outline-variant">
+          <Glyph name="policy" size={26} className="text-primary mb-2" />
           <div>
             <h4 className="font-bold text-on-surface">Privacy &amp; Compliance</h4>
             <p className="text-xs text-on-surface-variant">
@@ -355,8 +354,8 @@ export function RecordsDashboard(): JSX.Element {
             </p>
           </div>
         </div>
-        <div className="bg-white shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl p-lg flex flex-col justify-between min-h-[160px] bg-gradient-to-br from-surface to-secondary-container/5 border-l-4 border-l-secondary border border-outline-variant">
-          <span className="material-symbols-outlined text-secondary text-3xl mb-2">verified_user</span>
+        <div className="bg-white shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl p-lg flex flex-col justify-between min-h-[160px] bg-surface border-l-4 border-l-secondary border border-outline-variant">
+          <Glyph name="verified_user" size={26} className="text-secondary mb-2" />
           <div>
             <h4 className="font-bold text-on-surface">Signature Audit</h4>
             <p className="text-xs text-on-surface-variant">
@@ -364,8 +363,8 @@ export function RecordsDashboard(): JSX.Element {
             </p>
           </div>
         </div>
-        <div className="bg-white shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl p-lg flex flex-col justify-between min-h-[160px] bg-gradient-to-br from-surface to-tertiary-container/5 border-l-4 border-l-tertiary border border-outline-variant">
-          <span className="material-symbols-outlined text-tertiary text-3xl mb-2">cloud_download</span>
+        <div className="bg-white shadow-[0px_1px_3px_rgba(0,0,0,0.05)] rounded-xl p-lg flex flex-col justify-between min-h-[160px] bg-surface border-l-4 border-l-tertiary border border-outline-variant">
+          <Glyph name="cloud_download" size={26} className="text-tertiary mb-2" />
           <div>
             <h4 className="font-bold text-on-surface">Bulk Data Export</h4>
             <p className="text-xs text-on-surface-variant">

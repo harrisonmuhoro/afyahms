@@ -147,7 +147,7 @@ export function ScheduleModal({ isOpen, onClose, schedule, branchId }: ScheduleM
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/50 p-4 backdrop-blur-sm dark:bg-black/60">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/50 p-4 dark:bg-black/60">
       <div className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-stone-900">
         
         <div className="flex items-center justify-between border-b border-stone-200 px-6 py-4 dark:border-stone-800">

@@ -21,6 +21,7 @@ import { PrescriptionsSection } from './PrescriptionsSection';
 import { AttachmentsSection } from './AttachmentsSection';
 import type { Disposition, Encounter, SoapInput } from './types';
 import { cn } from '@/lib/cn';
+import { Glyph } from '@/components/icons/Glyph';
 
 const DISPOSITIONS: Disposition[] = ['discharged', 'admitted', 'referred', 'followup', 'deceased', 'none'];
 
@@ -56,7 +57,7 @@ export function EncounterPage(): JSX.Element {
           </p>
         </div>
         <Link to="/queue/board/DOC" className="text-primary hover:underline font-semibold text-body-sm flex items-center gap-1">
-          <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+          <Glyph name="arrow_back" size={18} />
           {t('common:back')}
         </Link>
       </div>
@@ -267,7 +268,7 @@ function EncounterWorkspace({ encounter }: { encounter: Encounter }): JSX.Elemen
         <div className="lg:col-span-3 space-y-md">
           <div className="bg-white border border-outline-variant rounded-xl p-md shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
             <h3 className="text-label-caps text-on-surface-variant mb-3 flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px]">medical_services</span>
+              <Glyph name="medical_services" size={18} />
               Problem List
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -281,12 +282,12 @@ function EncounterWorkspace({ encounter }: { encounter: Encounter }): JSX.Elemen
           </div>
           <div className="bg-white border border-outline-variant rounded-xl p-md shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
             <h3 className="text-label-caps text-on-surface-variant mb-3 flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px]">prescriptions</span>
+              <Glyph name="prescriptions" size={18} />
               Current Medications
             </h3>
             <ul className="space-y-2">
               <li className="flex items-start gap-2 p-2 rounded-lg bg-surface-container-low">
-                <span className="material-symbols-outlined text-primary text-[18px] mt-0.5">pill</span>
+                <Glyph name="pill" size={18} className="text-primary mt-0.5" />
                 <div>
                   <p className="text-body-sm font-semibold">Metformin 500mg</p>
                   <p className="text-[11px] text-on-surface-variant">1 tab twice daily</p>
@@ -297,7 +298,7 @@ function EncounterWorkspace({ encounter }: { encounter: Encounter }): JSX.Elemen
           <div className="bg-white border border-outline-variant rounded-xl overflow-hidden shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
             <div className="p-md border-b border-outline-variant bg-surface-container-low flex justify-between items-center cursor-pointer">
               <h3 className="text-label-caps text-on-surface-variant">Visit History</h3>
-              <span className="material-symbols-outlined text-[18px]">expand_more</span>
+              <Glyph name="expand_more" size={18} />
             </div>
             <div className="divide-y divide-outline-variant">
               <div className="p-md hover:bg-surface-container-highest cursor-pointer">
@@ -338,7 +339,7 @@ function EncounterWorkspace({ encounter }: { encounter: Encounter }): JSX.Elemen
                     <h2 className="text-body-sm font-semibold text-on-surface">{t('emr:soap_note')}</h2>
                     {signed && (
                       <span className="text-[11px] text-tertiary flex items-center gap-1">
-                        <span className="material-symbols-outlined text-[14px]">lock</span>
+                        <Glyph name="lock" size={14} />
                         Signed — read only
                       </span>
                     )}
@@ -439,19 +440,19 @@ function EncounterWorkspace({ encounter }: { encounter: Encounter }): JSX.Elemen
               <div className="absolute left-0 top-1/2 w-full h-[2px] bg-surface-container-high -z-0"></div>
               <div className="z-10 flex flex-col items-center gap-1">
                 <div className="w-8 h-8 rounded-full bg-white text-on-surface-variant flex items-center justify-center border-2 border-outline-variant shadow-sm">
-                  <span className="material-symbols-outlined text-[16px]">biotech</span>
+                  <Glyph name="biotech" size={16} />
                 </div>
                 <span className="text-[10px] font-bold text-on-surface-variant uppercase">Lab</span>
               </div>
               <div className="z-10 flex flex-col items-center gap-1">
                 <div className="w-8 h-8 rounded-full bg-white text-on-surface-variant flex items-center justify-center border-2 border-outline-variant shadow-sm">
-                  <span className="material-symbols-outlined text-[16px]">radiology</span>
+                  <Glyph name="radiology" size={16} />
                 </div>
                 <span className="text-[10px] font-bold text-on-surface-variant uppercase">Imaging</span>
               </div>
               <div className="z-10 flex flex-col items-center gap-1">
                 <div className="w-8 h-8 rounded-full bg-white text-on-surface-variant flex items-center justify-center border-2 border-outline-variant shadow-sm">
-                  <span className="material-symbols-outlined text-[16px]">medication</span>
+                  <Glyph name="medication" size={16} />
                 </div>
                 <span className="text-[10px] font-bold text-on-surface-variant uppercase">Pharmacy</span>
               </div>
@@ -529,7 +530,7 @@ function PostSignatureActionBar({
           : 'bg-white text-on-surface border-outline-variant hover:border-primary/40 hover:bg-primary/5'
       )}
     >
-      <span className="material-symbols-outlined text-[18px]">{icon}</span>
+      <Glyph name={icon} size={18} />
       {label}
     </button>
   );
@@ -540,7 +541,7 @@ function PostSignatureActionBar({
         <p className="text-label-caps text-on-surface-variant">Next Actions</p>
         {signedAt !== null && (
           <span className="text-[11px] text-tertiary flex items-center gap-1">
-            <span className="material-symbols-outlined text-[14px]">lock</span>
+            <Glyph name="lock" size={14} />
             Signed {new Date(signedAt).toLocaleString('en-KE', { dateStyle: 'short', timeStyle: 'short' })}
           </span>
         )}
@@ -677,7 +678,7 @@ function PostSignModal({
         <div className="p-6 border-b border-outline-variant flex items-start justify-between">
           <div>
             <h2 className="text-headline-sm font-bold text-on-surface flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary text-[28px]">lock</span>
+              <Glyph name="lock" size={24} className="text-primary" />
               Note Signed and Locked
             </h2>
             <p className="text-body-sm text-on-surface-variant mt-1">
@@ -688,7 +689,7 @@ function PostSignModal({
             onClick={onClose}
             className="text-on-surface-variant hover:bg-surface-container p-2 rounded-full transition-colors"
           >
-            <span className="material-symbols-outlined">close</span>
+            <Glyph name="close" />
           </button>
         </div>
         <div className="p-6">
@@ -838,7 +839,7 @@ function DiagnosesSection({ encounter }: { encounter: Encounter }): JSX.Element 
                   className="text-error hover:bg-error/10 p-1.5 rounded transition-colors"
                   title={t('common:remove')}
                 >
-                  <span className="material-symbols-outlined text-[18px]">delete</span>
+                  <Glyph name="delete" size={18} />
                 </PermissionButton>
               )}
             </li>
@@ -851,7 +852,7 @@ function DiagnosesSection({ encounter }: { encounter: Encounter }): JSX.Element 
       {editable && (
         <div className="pt-2 space-y-2 relative">
           <div className="relative">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+            <Glyph name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
             <input
               type="text"
               value={term}
@@ -935,7 +936,7 @@ function StatusBadge({ status }: { status: Encounter['status'] }): JSX.Element {
   return (
     <span className={cn('flex items-center gap-1.5 px-3 py-1 rounded-full text-label-caps', styles[status])}>
       {status === 'in_progress' && <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />}
-      {status === 'completed' && <span className="material-symbols-outlined text-[14px]">check_circle</span>}
+      {status === 'completed' && <Glyph name="check_circle" size={14} />}
       {t(`emr:status.${status}`)}
     </span>
   );

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { httpClient } from '@/lib/http';
 import type { HttpError } from '@/lib/http';
-import type { PaginatedPatients, Patient, PatientSearchHit } from './types';
+import type { PaginatedPatients, Patient, PatientAllergy, PatientSearchHit } from './types';
 
 interface ListPatientsArgs {
   page?: number;
@@ -214,5 +214,28 @@ export function useDeletePatient(): {
     mutate: mutation.mutate,
     isPending: mutation.isPending,
     error: (mutation.error as HttpError | null) ?? null,
+  };
+}
+
+/** Recorded allergies for a patient (GET /patients/{uuid}/allergies). */
+export function usePatientAllergies(uuid: string | undefined, enabled = true): {
+  allergies: PatientAllergy[];
+  isLoading: boolean;
+  error: unknown;
+} {
+  const query = useQuery({
+    queryKey: ['patients', uuid, 'allergies'],
+    queryFn: async () => {
+      const response = await httpClient.get<{ data: PatientAllergy[] } | PatientAllergy[]>(`/patients/${uuid}/allergies`);
+      return Array.isArray(response) ? response : response.data;
+    },
+    enabled: enabled && uuid !== undefined,
+    staleTime: 60_000,
+  });
+
+  return {
+    allergies: query.data ?? [],
+    isLoading: query.isLoading,
+    error: query.error,
   };
 }

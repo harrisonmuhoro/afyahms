@@ -126,7 +126,7 @@ export function PatientEncountersReport(): JSX.Element {
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Avg Encounters/Day</h3>
-              <p className="mt-2 text-3xl font-black text-purple-600">{avgPerDay.toLocaleString()}</p>
+              <p className="mt-2 text-3xl font-black text-blue-600">{avgPerDay.toLocaleString()}</p>
             </div>
           </div>
 
@@ -185,7 +185,7 @@ export function PatientEncountersReport(): JSX.Element {
                         <td className="px-6 py-4">
                           <span className={`inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-md ${
                             row.status === 'Completed' ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400'
-                            : row.status === 'Cancelled' ? 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400'
+                            : row.status === 'Cancelled' ? 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400'
                             : 'bg-stone-100 text-stone-700 dark:bg-stone-500/20 dark:text-stone-400'
                           }`}>{row.status}</span>
                         </td>

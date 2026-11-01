@@ -29,7 +29,7 @@ export function PortalModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-stone-900/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-stone-900/60" onClick={onClose} />
       <div className={`relative w-full ${maxWidth} animate-fade-in rounded-2xl bg-white shadow-2xl dark:bg-stone-900`}>
         <div className="flex items-center justify-between border-b border-stone-100 px-6 py-4 dark:border-stone-800">
           <h3 className="text-lg font-bold text-stone-900 dark:text-stone-100">{title}</h3>
