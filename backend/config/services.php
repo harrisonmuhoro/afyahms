@@ -18,6 +18,7 @@ return [
 
     'resend' => [
         'key' => env('RESEND_API_KEY'),
+        'ca_bundle' => env('RESEND_CA_BUNDLE'),
     ],
 
 ];
