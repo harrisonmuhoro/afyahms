@@ -2,6 +2,8 @@ import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useMemo } from 'react';
 import { usePatients } from './api';
+import { Badge, EmptyState, ErrorState, Skeleton } from '@/components/ui';
+import type { Patient } from './types';
 
 export function PatientsPage(): JSX.Element {
   const { t } = useTranslation(['patients', 'common', 'errors']);
@@ -122,88 +124,93 @@ export function PatientsPage(): JSX.Element {
         </button>
       </form>
 
-      {error !== null && (
-        <div role="alert" className="rounded-md bg-red-50 px-3 py-2 text-sm text-clinical-critical dark:bg-red-950/40">
-          {t('errors:generic')}
+      {error !== null ? (
+        <div className="card">
+          <ErrorState title={t('errors:generic')} error={error} />
         </div>
-      )}
-
-      <div className="card overflow-hidden">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-stone-200 bg-stone-50 text-xs uppercase text-stone-500 dark:border-stone-800 dark:bg-stone-900/60">
-            <tr>
-              <th scope="col" className="px-4 py-2 font-medium">{t('patients:fields.patient_number')}</th>
-              <th scope="col" className="px-4 py-2 font-medium">{t('patients:fields.full_name')}</th>
-              <th scope="col" className="px-4 py-2 font-medium">{t('patients:fields.gender')}</th>
-              <th scope="col" className="px-4 py-2 font-medium">{t('patients:fields.age')}</th>
-              <th scope="col" className="px-4 py-2 font-medium">{t('patients:fields.phone')}</th>
-              <th scope="col" className="px-4 py-2 font-medium">{t('patients:fields.sha_number')}</th>
-              <th scope="col" className="px-4 py-2 font-medium text-right">{t('common:actions')}</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-200 dark:divide-stone-800">
-            {isLoading && (
-              <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-stone-500">
-                  {t('common:loading')}
-                </td>
-              </tr>
-            )}
-            {!isLoading && data.length === 0 && (
-              <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-stone-500">
-                  {t('patients:empty')}
-                </td>
-              </tr>
-            )}
+      ) : isLoading ? (
+        <div className="card space-y-3 p-4" role="status" aria-label={t('common:loading')}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-10 w-full" />
+          ))}
+        </div>
+      ) : data.length === 0 ? (
+        <div className="card">
+          <EmptyState
+            title={t('patients:empty')}
+            description="Check the spelling, or search by patient number, phone or national ID."
+            action={<Link to="/patients/new" className="btn-primary btn-sm">Register patient</Link>}
+          />
+        </div>
+      ) : (
+        <>
+          {/* Mobile: card list */}
+          <ul className="card divide-y divide-line md:hidden">
             {data.map((patient) => (
-              <tr key={patient.id} className="hover:bg-stone-50 dark:hover:bg-stone-900/40">
-                <td className="px-4 py-2 font-mono text-xs">{patient.patient_number}</td>
-                <td className="px-4 py-2 font-medium">
-                  <Link to={`/patients/${patient.id}`} className="text-brand-700 hover:underline dark:text-brand-300">
-                    {patient.full_name}
-                  </Link>
-                  {patient.deceased && (
-                    <span className="ml-2 badge bg-stone-300 text-stone-700 text-[10px]">
-                      {t('patients:badges.deceased')}
-                    </span>
-                  )}
-                  {!patient.is_active && (
-                    <span className="ml-2 badge bg-amber-100 text-amber-800 text-[10px]">
-                      {t('patients:badges.inactive')}
-                    </span>
-                  )}
-                  {patient.merged_into !== null && (
-                    <span className="ml-2 badge bg-stone-200 text-stone-700 text-[10px]">
-                      {t('patients:badges.merged')}
-                    </span>
-                  )}
-                </td>
-                <td className="px-4 py-2 text-stone-600 dark:text-stone-300">
-                  {patient.gender === null ? '—' : t(`patients:gender.${patient.gender}`)}
-                </td>
-                <td className="px-4 py-2 text-stone-600 dark:text-stone-300">
-                  {patient.age ?? '—'}
-                </td>
-                <td className="px-4 py-2 text-stone-600 dark:text-stone-300">
-                  {patient.phone ?? '—'}
-                </td>
-                <td className="px-4 py-2 font-mono text-xs text-stone-500">
-                  {patient.sha_number ?? '—'}
-                </td>
-                <td className="px-4 py-2 text-right">
-                  <Link
-                    to={`/patients/${patient.id}`}
-                    className="text-xs text-brand-700 hover:underline dark:text-brand-300"
-                  >
-                    {t('common:edit')}
-                  </Link>
-                </td>
-              </tr>
+              <li key={patient.id}>
+                <Link to={`/patients/${patient.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-surface-muted">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="truncate font-medium text-ink">{patient.full_name}</span>
+                      <PatientFlags patient={patient} t={t} />
+                    </div>
+                    <p className="mt-0.5 font-mono text-xs text-ink-secondary">{patient.patient_number}</p>
+                    <p className="mt-0.5 text-xs text-ink-muted">
+                      {[patient.gender === null ? null : t(`patients:gender.${patient.gender}`), patient.age !== null ? `${patient.age} yrs` : null, patient.phone]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </p>
+                  </div>
+                  <span aria-hidden className="text-ink-muted">›</span>
+                </Link>
+              </li>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </ul>
+
+          {/* Tablet and up: table */}
+          <div className="card hidden overflow-x-auto md:block">
+            <table className="table-base">
+              <thead>
+                <tr>
+                  <th scope="col">{t('patients:fields.patient_number')}</th>
+                  <th scope="col">{t('patients:fields.full_name')}</th>
+                  <th scope="col">{t('patients:fields.gender')}</th>
+                  <th scope="col">{t('patients:fields.age')}</th>
+                  <th scope="col">{t('patients:fields.phone')}</th>
+                  <th scope="col">{t('patients:fields.sha_number')}</th>
+                  <th scope="col" className="text-right">{t('common:actions')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((patient) => (
+                  <tr key={patient.id}>
+                    <td className="whitespace-nowrap font-mono text-xs text-ink-secondary">{patient.patient_number}</td>
+                    <td className="font-medium">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <Link to={`/patients/${patient.id}`} className="text-ink hover:text-primary hover:underline">
+                          {patient.full_name}
+                        </Link>
+                        <PatientFlags patient={patient} t={t} />
+                      </div>
+                    </td>
+                    <td className="text-ink-secondary">
+                      {patient.gender === null ? '—' : t(`patients:gender.${patient.gender}`)}
+                    </td>
+                    <td className="text-ink-secondary">{patient.age ?? '—'}</td>
+                    <td className="whitespace-nowrap text-ink-secondary">{patient.phone ?? '—'}</td>
+                    <td className="font-mono text-xs text-ink-muted">{patient.sha_number ?? '—'}</td>
+                    <td className="text-right">
+                      <Link to={`/patients/${patient.id}`} className="btn-ghost btn-sm">
+                        {t('common:view', 'Open')}
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
 
       <div className="flex items-center justify-between text-xs text-stone-500">
         <span>
@@ -249,5 +256,15 @@ export function PatientsPage(): JSX.Element {
         )}
       </div>
     </div>
+  );
+}
+
+function PatientFlags({ patient, t }: { patient: Patient; t: (key: string) => string }): JSX.Element {
+  return (
+    <>
+      {patient.deceased && <Badge tone="neutral">{t('patients:badges.deceased')}</Badge>}
+      {!patient.is_active && <Badge tone="warning" dot>{t('patients:badges.inactive')}</Badge>}
+      {patient.merged_into !== null && <Badge tone="info">{t('patients:badges.merged')}</Badge>}
+    </>
   );
 }
