@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Modules\Admin\Rbac;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,8 +24,7 @@ final class EnsureMfaConfirmed
             return $next($request);
         }
 
-        $required = $user->hasAnyRole(Rbac::MFA_REQUIRED);
-        if (! $required && ! $user->mfa_enabled) {
+        if (! $user->mfa_enabled) {
             return $next($request);
         }
 

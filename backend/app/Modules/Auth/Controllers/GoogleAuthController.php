@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\CompleteProfileRequest;
 use App\Models\User;
 use App\Services\Auth\PatientRegistrationService;
-use App\Modules\Admin\Rbac;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -71,7 +70,7 @@ final class GoogleAuthController extends Controller
             return response()->json(['message' => 'This account is unavailable. Contact your administrator.'], 403);
         }
 
-        if ($user->hasAnyRole(Rbac::MFA_REQUIRED) || $user->mfa_enabled) {
+        if ($user->mfa_enabled) {
             return response()->json(['message' => 'Staff accounts must sign in with their password and complete MFA.'], 403);
         }
 

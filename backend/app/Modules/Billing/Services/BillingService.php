@@ -13,7 +13,6 @@ use App\Modules\Billing\Models\BillPayment;
 use App\Modules\Queue\Models\Visit;
 use App\Modules\Appointments\Models\Appointment;
 use App\Modules\Tenancy\Scopes\BranchScope;
-use App\Exceptions\Domain\ConflictException;
 use Illuminate\Support\Facades\DB;
 
 /**

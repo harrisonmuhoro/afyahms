@@ -42,10 +42,8 @@ final class Rbac
         'patient'         => 'Patient',
     ];
 
-    /**
-     * Roles that MUST enroll in MFA (foundation §11).
-     */
-    public const MFA_REQUIRED = ['superadmin', 'hospital-admin', 'doctor', 'pharmacist'];
+    /** MFA is optional for every role; users can enable it from account settings. */
+    public const MFA_REQUIRED = [];
 
     /**
      * Permission catalogue. Mirrors `docs/08-rbac-matrix.md`.

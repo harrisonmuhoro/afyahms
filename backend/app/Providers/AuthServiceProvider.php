@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Modules\Admin\Rbac;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Finder\Finder;
@@ -25,7 +24,7 @@ final class AuthServiceProvider extends ServiceProvider
                 return null;
             }
 
-            if ($user->hasAnyRole(Rbac::MFA_REQUIRED) || $user->mfa_enabled) {
+            if ($user->mfa_enabled) {
                 $confirmedAt = $user->mfa_confirmed_at;
                 $fresh = $user->mfa_enabled
                     && $confirmedAt !== null

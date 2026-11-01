@@ -7,7 +7,6 @@ namespace App\Modules\Auth\Services;
 use App\Exceptions\Domain\ForbiddenException;
 use App\Exceptions\Domain\ValidationFailedException;
 use App\Models\User;
-use App\Modules\Admin\Rbac;
 use App\Modules\Auth\Models\LoginHistory;
 use App\Modules\Auth\Services\LoginHistoryService;
 use App\Modules\Tenancy\Models\Branch;
@@ -106,9 +105,8 @@ final class AuthService
         $this->history->clearFailures($user);
 
         $activeMfa = $user->activeMfa();
-        $requiresMfaEnrollment = $user->hasAnyRole(Rbac::MFA_REQUIRED)
-            && (! $user->mfa_enabled || $activeMfa === null);
-        $requiresMfaStep = ! $requiresMfaEnrollment && $user->mfa_enabled && $activeMfa !== null;
+        $requiresMfaEnrollment = false;
+        $requiresMfaStep = $user->mfa_enabled && $activeMfa !== null;
         $mfaType = $requiresMfaStep ? $activeMfa->type : null;
 
         if ($requiresMfaStep && $mfaType === 'email') {
