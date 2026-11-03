@@ -4,402 +4,195 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { useBranches } from '@/features/branches/BranchProvider';
 import { useKpis } from '@/features/queue/api';
 import { Icon } from '@/components/icons/Icon';
-import { NAV_ITEMS, isNavItemVisible, type NavItem } from '@/config/navigation';
-import type { IconName } from '@/components/icons/Icon';
+import { NAV_ITEMS, NAV_SECTIONS, isNavItemVisible, type NavItem } from '@/config/navigation';
+import { Alert, Panel, StatTile } from '@/components/ui';
+import { roleLabel } from '@/components/layout/AppShell';
+import { Activity, ListOrdered, UserCheck, HeartPulse } from 'lucide-react';
 import { SuperadminDashboard } from './SuperadminDashboard';
 
-/* ─── Module category metadata ──────────────────────────────────────────────── */
-interface ModuleMeta {
-  group: string;
-  description: string;
-  colorClass: string;       // Tailwind bg for icon container
-  textClass: string;        // Tailwind text for icon
-  borderHover: string;      // Tailwind hover border colour
-}
-
-const MODULE_META: Partial<Record<string, ModuleMeta>> = {
-  '/': {
-    group: 'Overview',
-    description: 'Your personalised portal',
-    colorClass: 'bg-brand-50 dark:bg-brand-950/50',
-    textClass: 'text-brand-600 dark:text-brand-400',
-    borderHover: 'hover:border-brand-300 dark:hover:border-brand-700',
-  },
-  '/queue/check-in': {
-    group: 'Intake',
-    description: 'Register walk-in patients',
-    colorClass: 'bg-teal-50 dark:bg-teal-950/50',
-    textClass: 'text-teal-600 dark:text-teal-400',
-    borderHover: 'hover:border-teal-300 dark:hover:border-teal-700',
-  },
-  '/queue': {
-    group: 'Intake',
-    description: 'Manage all station boards',
-    colorClass: 'bg-teal-50 dark:bg-teal-950/50',
-    textClass: 'text-teal-600 dark:text-teal-400',
-    borderHover: 'hover:border-teal-300 dark:hover:border-teal-700',
-  },
-  '/queue/board/TRI': {
-    group: 'Intake',
-    description: 'Triage & MTS assessment',
-    colorClass: 'bg-orange-50 dark:bg-orange-950/50',
-    textClass: 'text-orange-600 dark:text-orange-400',
-    borderHover: 'hover:border-orange-300 dark:hover:border-orange-700',
-  },
-  '/patients': {
-    group: 'Intake',
-    description: 'Patient records & search',
-    colorClass: 'bg-sky-50 dark:bg-sky-950/50',
-    textClass: 'text-sky-600 dark:text-sky-400',
-    borderHover: 'hover:border-sky-300 dark:hover:border-sky-700',
-  },
-  '/queue/board/DOC': {
-    group: 'Clinical',
-    description: 'SOAP notes & ICD-10 coding',
-    colorClass: 'bg-indigo-50 dark:bg-indigo-950/50',
-    textClass: 'text-indigo-600 dark:text-indigo-400',
-    borderHover: 'hover:border-indigo-300 dark:hover:border-indigo-700',
-  },
-  '/queue/board/LAB': {
-    group: 'Diagnostics',
-    description: 'Lab orders & results',
-    colorClass: 'bg-violet-50 dark:bg-violet-950/50',
-    textClass: 'text-violet-600 dark:text-violet-400',
-    borderHover: 'hover:border-violet-300 dark:hover:border-violet-700',
-  },
-  '/queue/board/RAD': {
-    group: 'Diagnostics',
-    description: 'Radiology queue & imaging',
-    colorClass: 'bg-purple-50 dark:bg-purple-950/50',
-    textClass: 'text-purple-600 dark:text-purple-400',
-    borderHover: 'hover:border-purple-300 dark:hover:border-purple-700',
-  },
-  '/queue/board/PHA': {
-    group: 'Pharmacy',
-    description: 'Dispense & stock management',
-    colorClass: 'bg-emerald-50 dark:bg-emerald-950/50',
-    textClass: 'text-emerald-600 dark:text-emerald-400',
-    borderHover: 'hover:border-emerald-300 dark:hover:border-emerald-700',
-  },
-  '/queue/board/BIL': {
-    group: 'Finance',
-    description: 'Invoices, payments & SHA',
-    colorClass: 'bg-rose-50 dark:bg-rose-950/50',
-    textClass: 'text-rose-600 dark:text-rose-400',
-    borderHover: 'hover:border-rose-300 dark:hover:border-rose-700',
-  },
-  '/inventory': {
-    group: 'Back Office',
-    description: 'Stock & procurement',
-    colorClass: 'bg-amber-50 dark:bg-amber-950/50',
-    textClass: 'text-amber-600 dark:text-amber-400',
-    borderHover: 'hover:border-amber-300 dark:hover:border-amber-700',
-  },
-  '/reports': {
-    group: 'Back Office',
-    description: 'Analytics & exports',
-    colorClass: 'bg-slate-50 dark:bg-slate-900/50',
-    textClass: 'text-slate-600 dark:text-slate-400',
-    borderHover: 'hover:border-slate-300 dark:hover:border-slate-600',
-  },
-  '/branches': {
-    group: 'Back Office',
-    description: 'Facilities & branch config',
-    colorClass: 'bg-slate-50 dark:bg-slate-900/50',
-    textClass: 'text-slate-600 dark:text-slate-400',
-    borderHover: 'hover:border-slate-300 dark:hover:border-slate-600',
-  },
-  '/audit': {
-    group: 'Back Office',
-    description: 'Security & audit logs',
-    colorClass: 'bg-slate-50 dark:bg-slate-900/50',
-    textClass: 'text-slate-600 dark:text-slate-400',
-    borderHover: 'hover:border-slate-300 dark:hover:border-slate-600',
-  },
-  '/settings': {
-    group: 'Back Office',
-    description: 'System settings',
-    colorClass: 'bg-slate-50 dark:bg-slate-900/50',
-    textClass: 'text-slate-600 dark:text-slate-400',
-    borderHover: 'hover:border-slate-300 dark:hover:border-slate-600',
-  },
+/** One-line purpose for each workspace so staff know where a link leads. */
+const MODULE_DESCRIPTIONS: Partial<Record<string, string>> = {
+  '/profile': 'Your details, password and sign-in security',
+  '/messages': 'Conversations with colleagues and patients',
+  '/queue/check-in': 'Register walk-in patients and issue tickets',
+  '/queue': 'All service points and who is waiting',
+  '/queue/board/TRI': 'Vital signs and triage category',
+  '/patients': 'Search, register and update patient records',
+  '/appointments': 'Clinic bookings, schedules and no-shows',
+  '/queue/board/DOC': 'Consultations, notes, orders and prescriptions',
+  '/queue/board/LAB': 'Sample collection, processing and results',
+  '/queue/board/RAD': 'Imaging requests and reports',
+  '/queue/board/PHA': 'Prescriptions awaiting dispensing',
+  '/queue/board/BIL': 'Invoices, payments, receipts and SHA claims',
+  '/inventory': 'Stock levels, batches and expiry',
+  '/admin/staff': 'Staff accounts, roles and access',
+  '/reports': 'Clinical, financial and operational reports',
+  '/branches': 'Facilities and branch configuration',
+  '/audit': 'Who did what, and when',
+  '/settings': 'Hospital-wide configuration',
 };
 
-const GROUP_ORDER = ['Intake', 'Clinical', 'Diagnostics', 'Pharmacy', 'Finance', 'Back Office'];
+/** Role → its focused work dashboard. */
+const ROLE_WORKSPACE: Array<{ role: string; to: string; label: string }> = [
+  { role: 'doctor', to: '/doctor-dashboard', label: 'Clinical dashboard' },
+  { role: 'nurse', to: '/nurse-dashboard', label: 'Nursing dashboard' },
+  { role: 'receptionist', to: '/receptionist-dashboard', label: 'Front desk dashboard' },
+  { role: 'pharmacist', to: '/pharmacist-dashboard', label: 'Pharmacy dashboard' },
+  { role: 'lab-technician', to: '/lab-dashboard', label: 'Laboratory dashboard' },
+  { role: 'radiologist', to: '/radiologist-dashboard', label: 'Radiology dashboard' },
+  { role: 'cashier', to: '/billing-dashboard', label: 'Billing dashboard' },
+  { role: 'records-officer', to: '/records-dashboard', label: 'Records dashboard' },
+];
 
-/* ─── Helpers ────────────────────────────────────────────────────────────────── */
-function initials(name: string): string {
-  return name
-    .split(' ')
-    .slice(0, 2)
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase();
-}
-
-function greetingPrefix(): string {
-  const hour = new Date().getHours();
+function greetingPrefix(date: Date): string {
+  const hour = date.getHours();
   if (hour < 12) return 'Good morning';
   if (hour < 17) return 'Good afternoon';
   return 'Good evening';
 }
 
-/* ─── Stat strip card ────────────────────────────────────────────────────────── */
-interface StatCardProps {
-  icon: IconName;
-  label: string;
-  value: string;
-  iconClass: string;
-  iconBg: string;
-}
-
-function StatCard({ icon, label, value, iconClass, iconBg }: StatCardProps): JSX.Element {
-  return (
-    <div className="stat-strip">
-      <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${iconBg}`}>
-        <Icon name={icon} size={17} className={iconClass} />
-      </div>
-      <p className="mt-2 text-2xl font-bold text-stone-900 dark:text-stone-50">{value}</p>
-      <p className="text-xs font-medium text-stone-600 dark:text-stone-400">{label}</p>
-    </div>
-  );
-}
-
-/* ─── Module tile ────────────────────────────────────────────────────────────── */
-interface TileProps {
-  item: NavItem;
-  meta: ModuleMeta;
-  index: number;
-}
-
-function ModuleTile({ item, meta, index }: TileProps): JSX.Element {
-  const { t } = useTranslation(['nav']);
+function WorkspaceLink({ item, label }: { item: NavItem; label: string }): JSX.Element {
   return (
     <Link
       to={item.to}
-      className={`group module-tile ${meta.borderHover}`}
-      style={{ animationDelay: `${index * 40}ms` }}
+      className="group flex items-start gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-surface-muted"
     >
-      {/* Icon container */}
-      <span className={`module-tile-icon ${meta.colorClass}`}>
-        <Icon name={item.icon} size={22} className={meta.textClass} />
+      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-muted text-ink-secondary group-hover:bg-primary-soft group-hover:text-primary">
+        <Icon name={item.icon} size={16} />
       </span>
-
-      {/* Text */}
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-semibold text-stone-800 dark:text-stone-100">
-          {t(item.key)}
-        </span>
-        <span className="block truncate text-xs text-stone-600 dark:text-stone-400">
-          {meta.description}
-        </span>
+        <span className="block text-sm font-medium text-ink">{label}</span>
+        {MODULE_DESCRIPTIONS[item.to] !== undefined && (
+          <span className="block text-xs text-ink-muted">{MODULE_DESCRIPTIONS[item.to]}</span>
+        )}
       </span>
-
-      {/* Arrow */}
-      <Icon
-        name="arrowRight"
-        size={14}
-        className="shrink-0 text-stone-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-stone-500 dark:text-stone-600 dark:group-hover:text-stone-400"
-      />
+      <Icon name="chevronRight" size={16} className="mt-2 shrink-0 text-line-strong group-hover:text-ink-muted" />
     </Link>
   );
 }
 
-/* ─── Main component ─────────────────────────────────────────────────────────── */
-/**
- * Role-scoped landing portal. Renders one tile per module the signed-in user
- * may access (driven by the same RBAC-gated nav config as the sidebar), so a
- * receptionist sees check-in/queue/patients while a lab tech sees the LAB board.
- */
 export function DashboardPage(): JSX.Element {
   const { t } = useTranslation(['nav', 'app']);
   const { user, hasPermission } = useAuth();
   const { activeBranch } = useBranches();
-  const { data: kpiData } = useKpis();
+  const { data: kpiData, isLoading: kpiLoading } = useKpis();
   const roles = user?.roles ?? [];
-  const isSuperadmin = roles.includes('superadmin');
 
-  if (isSuperadmin) {
+  if (roles.includes('superadmin')) {
     return <SuperadminDashboard />;
   }
+
+  const now = new Date();
   const firstName = user?.name.split(' ')[0] ?? null;
-  const primaryRoleLabel = isSuperadmin
-    ? 'Superadmin - system root'
-    : user?.roles[0]?.replace(/-/g, ' ') ?? null;
-  const dashboardTitle = isSuperadmin
-    ? 'System administration'
-    : user !== null && firstName !== null
-      ? `${greetingPrefix()}, ${firstName}`
-      : t('app:name');
-  const dashboardSubtitle = isSuperadmin
-    ? 'Global configuration, audit, reports, and hospital setup'
-    : activeBranch?.name ?? 'Hospital operations';
-  const statCards = isSuperadmin
-    ? [
-        {
-          icon: 'branches' as const,
-          label: 'Configured branches',
-          value: '—',
-          iconBg: 'bg-sky-50 dark:bg-sky-950/50',
-          iconClass: 'text-sky-600 dark:text-sky-400',
-        },
-        {
-          icon: 'audit' as const,
-          label: 'Security events',
-          value: '—',
-          iconBg: 'bg-rose-50 dark:bg-rose-950/50',
-          iconClass: 'text-rose-600 dark:text-rose-400',
-        },
-        {
-          icon: 'settings' as const,
-          label: 'System controls',
-          value: '—',
-          iconBg: 'bg-stone-100 dark:bg-stone-900',
-          iconClass: 'text-stone-600 dark:text-stone-300',
-        },
-      ]
-    : [
-        {
-          icon: 'queue' as const,
-          label: 'Active queue tickets',
-          value: kpiData?.active_tickets?.toString() ?? '—',
-          iconBg: 'bg-teal-50 dark:bg-teal-950/50',
-          iconClass: 'text-teal-600 dark:text-teal-400',
-        },
-        {
-          icon: 'patients' as const,
-          label: 'Patients seen today',
-          value: kpiData?.patients_seen?.toString() ?? '—',
-          iconBg: 'bg-sky-50 dark:bg-sky-950/50',
-          iconClass: 'text-sky-600 dark:text-sky-400',
-        },
-        {
-          icon: 'triage' as const,
-          label: 'Awaiting triage',
-          value: kpiData?.awaiting_triage?.toString() ?? '—',
-          iconBg: 'bg-orange-50 dark:bg-orange-950/50',
-          iconClass: 'text-orange-600 dark:text-orange-400',
-        },
-      ];
+  const visible = NAV_ITEMS.filter((item) => item.to !== '/' && isNavItemVisible(item, roles, hasPermission));
+  const can = (to: string): boolean => visible.some((item) => item.to === to);
+  const workspaces = ROLE_WORKSPACE.filter((w) => roles.includes(w.role));
+  const awaitingTriage = kpiData?.awaiting_triage ?? 0;
+  const activeTickets = kpiData?.active_tickets ?? 0;
+  const showQueue = hasPermission('queue.read');
 
-  // Everything the user can reach, minus the dashboard tile itself.
-  const tiles = NAV_ITEMS.filter(
-    (item) => item.to !== '/' && isNavItemVisible(item, roles, hasPermission),
-  );
-
-  // Group tiles by module category
-  const grouped = GROUP_ORDER.reduce<Record<string, { item: NavItem; meta: ModuleMeta }[]>>(
-    (acc, group) => {
-      acc[group] = tiles
-        .filter((item) => (MODULE_META[item.to]?.group ?? 'Back Office') === group)
-        .map((item) => ({ item, meta: MODULE_META[item.to] ?? MODULE_META['/settings']! }));
-      return acc;
-    },
-    {},
-  );
-
-  // Global tile index for stagger delay
-  let tileIndex = 0;
+  const groups = NAV_SECTIONS.filter((section) => section !== 'workspace')
+    .map((section) => ({ section, items: visible.filter((item) => item.section === section) }))
+    .filter((g) => g.items.length > 0);
+  const personal = visible.filter((item) => item.section === 'workspace');
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8 animate-fade-in">
-      {/* ── Greeting header ─────────────────────────────────────────────── */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-4">
-          {/* Avatar */}
-          {user !== null && (
-            <span className="avatar-lg shrink-0" aria-label={`Avatar for ${user.name}`}>
-              {initials(user.name)}
-            </span>
-          )}
-          <div>
-            <h1 className="text-2xl font-bold text-stone-900 dark:text-stone-50">
-              {dashboardTitle}
-            </h1>
-            <p className="mt-1 text-sm font-medium text-stone-600 dark:text-stone-300">
-              {dashboardSubtitle}
-            </p>
-            <div className="mt-1 flex flex-wrap items-center gap-2">
-              {/* Role badge */}
-              {primaryRoleLabel !== null && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-800 ring-1 ring-brand-200 dark:bg-brand-950/50 dark:text-brand-300 dark:ring-brand-800">
-                  <Icon name="user" size={10} />
-                  {primaryRoleLabel}
-                </span>
-              )}
-              {/* Branch badge */}
-              {activeBranch !== null && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-800 dark:bg-stone-800 dark:text-stone-100">
-                  <Icon name="branches" size={10} />
-                  {activeBranch.name}
-                  <span className="font-mono text-[10px] text-stone-600 dark:text-stone-400">({activeBranch.code})</span>
-                </span>
-              )}
-            </div>
+    <div className="space-y-6">
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-[13px] text-ink-muted">
+            {now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          </p>
+          <h1 className="mt-0.5 text-xl font-semibold tracking-tight text-ink sm:text-[22px]">
+            {firstName !== null ? `${greetingPrefix(now)}, ${firstName}` : t('app:name')}
+          </h1>
+          <p className="mt-1 text-sm text-ink-secondary">
+            {roleLabel(roles[0])}
+            {activeBranch !== null && <> · {activeBranch.name}</>}
+          </p>
+        </div>
+        {workspaces.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {workspaces.map((w) => (
+              <Link key={w.to} to={w.to} className="btn-primary">
+                {w.label}
+                <Icon name="arrowRight" size={16} />
+              </Link>
+            ))}
           </div>
-        </div>
+        )}
+      </header>
 
-        {/* Current time */}
-        <div className="text-right">
-          <p className="text-sm font-medium text-stone-600 dark:text-stone-300">
-            {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
-          </p>
-          <p className="text-xs text-stone-500 dark:text-stone-400">
-            {new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
-          </p>
-        </div>
-      </div>
+      {showQueue && (
+        <section aria-labelledby="today-heading" className="space-y-3">
+          <h2 id="today-heading" className="text-sm font-semibold text-ink">Today at this branch</h2>
+          {awaitingTriage > 0 && can('/queue/board/TRI') && (
+            <Alert
+              tone="warning"
+              title={`${awaitingTriage} ${awaitingTriage === 1 ? 'patient is' : 'patients are'} waiting for triage`}
+              action={<Link to="/queue/board/TRI" className="btn-secondary btn-sm">Open triage</Link>}
+            >
+              Patients are assessed before they can be seen by a clinician.
+            </Alert>
+          )}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <StatTile
+              label="In the queue now"
+              value={activeTickets}
+              hint="Active tickets across all service points"
+              icon={ListOrdered}
+              tone="primary"
+              loading={kpiLoading && kpiData === null}
+              to="/queue"
+            />
+            <StatTile
+              label="Patients seen today"
+              value={kpiData?.patients_seen ?? 0}
+              hint="Visits completed since midnight"
+              icon={UserCheck}
+              tone="success"
+              loading={kpiLoading && kpiData === null}
+            />
+            <StatTile
+              label="Awaiting triage"
+              value={awaitingTriage}
+              hint={awaitingTriage > 0 ? 'Needs nursing attention' : 'No one waiting'}
+              icon={HeartPulse}
+              tone={awaitingTriage > 0 ? 'warning' : 'neutral'}
+              loading={kpiLoading && kpiData === null}
+              to={can('/queue/board/TRI') ? '/queue/board/TRI' : undefined}
+            />
+          </div>
+        </section>
+      )}
 
-      {/* ── Stat strip ──────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {statCards.map((stat) => (
-          <StatCard
-            key={stat.label}
-            icon={stat.icon}
-            label={stat.label}
-            value={stat.value}
-            iconBg={stat.iconBg}
-            iconClass={stat.iconClass}
-          />
-        ))}
-      </div>
-
-      {/* ── Module groups ────────────────────────────────────────────────── */}
-      {tiles.length === 0 ? (
-        <div className="card p-8 text-center">
-          <Icon name="lock" size={32} className="mx-auto text-stone-300 dark:text-stone-600" />
-          <p className="mt-3 text-sm font-medium text-stone-500">No modules available for your role yet.</p>
-        </div>
+      {visible.length === 0 ? (
+        <Panel>
+          <div className="flex flex-col items-center py-8 text-center">
+            <Activity aria-hidden size={22} className="text-ink-muted" />
+            <p className="mt-3 text-sm font-medium text-ink">No work areas are assigned to your role yet</p>
+            <p className="mt-1 text-[13px] text-ink-muted">Ask your hospital administrator to review your role and permissions.</p>
+          </div>
+        </Panel>
       ) : (
-        GROUP_ORDER.map((group) => {
-          const groupTiles = grouped[group];
-          if (groupTiles === undefined || groupTiles.length === 0) return null;
-
-          return (
-            <section key={group}>
-              {/* Section header */}
-              <div className="mb-3 flex items-center gap-3">
-                <h2 className="section-title">{group}</h2>
-                <div className="h-px flex-1 bg-stone-200 dark:bg-stone-800" />
-              </div>
-
-              {/* Tile grid */}
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {groupTiles.map(({ item, meta }) => {
-                  const idx = tileIndex++;
-                  return (
-                    <ModuleTile
-                      key={item.to}
-                      item={item}
-                      meta={meta}
-                      index={idx}
-                    />
-                  );
-                })}
-              </div>
-            </section>
-          );
-        })
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:col-span-2">
+            {groups.map(({ section, items }) => (
+              <Panel key={section} title={t(`nav:section_${section}`)} flush bodyClassName="p-1.5">
+                {items.map((item) => (
+                  <WorkspaceLink key={item.to} item={item} label={t(item.key)} />
+                ))}
+              </Panel>
+            ))}
+          </div>
+          {personal.length > 0 && (
+            <Panel title="Your account" flush bodyClassName="p-1.5" className="self-start">
+              {personal.map((item) => (
+                <WorkspaceLink key={item.to} item={item} label={t(item.key)} />
+              ))}
+            </Panel>
+          )}
+        </div>
       )}
     </div>
   );

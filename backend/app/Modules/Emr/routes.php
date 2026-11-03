@@ -71,19 +71,19 @@ Route::middleware(['auth:sanctum', 'break.glass'])->group(function (): void {
         ->name('diagnoses.catalog.search');
 
     // eMAR
-    Route::get('/emar/pending', [\App\Modules\EMR\Controllers\EmrMedicationController::class, 'pending'])
+    Route::get('/emar/pending', [\App\Modules\Emr\Controllers\EmrMedicationController::class, 'pending'])
         ->middleware('permission:emr.read')
         ->name('emar.pending');
 
-    Route::get('/encounters/visit/{visit}/emar',  [\App\Modules\EMR\Controllers\EmrMedicationController::class, 'index'])
+    Route::get('/encounters/visit/{visit}/emar',  [\App\Modules\Emr\Controllers\EmrMedicationController::class, 'index'])
         ->middleware('permission:emr.read')
         ->name('encounters.emar.index');
 
-    Route::post('/encounters/visit/{visit}/emar', [\App\Modules\EMR\Controllers\EmrMedicationController::class, 'store'])
+    Route::post('/encounters/visit/{visit}/emar', [\App\Modules\Emr\Controllers\EmrMedicationController::class, 'store'])
         ->middleware('permission:emr.create')
         ->name('encounters.emar.store');
 
-    Route::patch('/encounters/visit/{visit}/emar/{emarRecord}', [\App\Modules\EMR\Controllers\EmrMedicationController::class, 'update'])
+    Route::patch('/encounters/visit/{visit}/emar/{emarRecord}', [\App\Modules\Emr\Controllers\EmrMedicationController::class, 'update'])
         ->middleware('permission:emr.update')
         ->name('encounters.emar.update');
 });

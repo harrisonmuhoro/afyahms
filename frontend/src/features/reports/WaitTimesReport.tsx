@@ -114,7 +114,7 @@ export function WaitTimesReport(): JSX.Element {
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Longest Stage</h3>
-              <p className="mt-2 text-xl font-black text-rose-600 truncate" title={data.kpis.longest_stage}>{data.kpis.longest_stage}</p>
+              <p className="mt-2 text-xl font-black text-red-600 truncate" title={data.kpis.longest_stage}>{data.kpis.longest_stage}</p>
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Peak Hour</h3>
@@ -171,7 +171,7 @@ export function WaitTimesReport(): JSX.Element {
                         <td className="px-6 py-4 font-medium">{row.station}</td>
                         <td className="px-6 py-4 text-right tabular-nums">{row.avg_wait}</td>
                         <td className="px-6 py-4 text-right tabular-nums">{row.avg_service}</td>
-                        <td className="px-6 py-4 text-right tabular-nums font-medium text-rose-600">{row.max_wait}</td>
+                        <td className="px-6 py-4 text-right tabular-nums font-medium text-red-600">{row.max_wait}</td>
                         <td className="px-6 py-4 text-right tabular-nums">{row.tickets.toLocaleString()}</td>
                       </tr>
                     ))

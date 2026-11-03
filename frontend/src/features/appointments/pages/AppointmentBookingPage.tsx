@@ -8,6 +8,7 @@ import { SlotPicker } from '../components/SlotPicker';
 import { BookingConfirmModal } from '../components/booking/BookingConfirmModal';
 import { useBookAppointment } from '../hooks/useBookAppointment';
 import { useSchedules } from '../api';
+import { Glyph } from '@/components/icons/Glyph';
 
 interface SelectedPatient {
   id: string;
@@ -78,7 +79,7 @@ export function AppointmentBookingPage(): JSX.Element {
           className="rounded-full p-1.5 text-on-surface-variant hover:bg-surface-container transition-colors"
           aria-label="Go back"
         >
-          <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+          <Glyph name="arrow_back" size={20} />
         </button>
         <div>
           <h1 className="text-xl font-semibold text-on-surface">Book Appointment</h1>
@@ -232,7 +233,7 @@ function Section({ title, icon, children }: { title: string; icon: string; child
   return (
     <div className="px-6 py-5">
       <div className="mb-4 flex items-center gap-2">
-        <span className="material-symbols-outlined text-[18px] text-primary">{icon}</span>
+        <Glyph name={icon} size={18} className="text-primary" />
         <h2 className="text-sm font-semibold text-on-surface" dangerouslySetInnerHTML={{ __html: title }} />
       </div>
       {children}

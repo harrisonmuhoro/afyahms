@@ -106,7 +106,13 @@
     "reports": "Ripoti",
     "settings": "Mipangilio",
     "audit": "Kumbukumbu za Ukaguzi",
-    "messages": "Messages"
+    "messages": "Messages",
+    "section_workspace": "Kazi yangu",
+    "section_frontDesk": "Mapokezi",
+    "section_clinical": "Kliniki",
+    "section_diagnostics": "Uchunguzi na famasia",
+    "section_finance": "Fedha",
+    "section_administration": "Utawala"
   },
   "triage": {
     "title": "Tathmini ya triage",

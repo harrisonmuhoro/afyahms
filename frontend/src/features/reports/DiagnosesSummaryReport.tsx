@@ -113,11 +113,11 @@ export function DiagnosesSummaryReport(): JSX.Element {
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Unique Conditions</h3>
-              <p className="mt-2 text-3xl font-black text-purple-600">{data.kpis.unique_conditions.toLocaleString()}</p>
+              <p className="mt-2 text-3xl font-black text-blue-600">{data.kpis.unique_conditions.toLocaleString()}</p>
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Most Common</h3>
-              <p className="mt-2 text-xl font-black text-rose-600 truncate" title={data.kpis.top_diagnosis}>{data.kpis.top_diagnosis}</p>
+              <p className="mt-2 text-xl font-black text-red-600 truncate" title={data.kpis.top_diagnosis}>{data.kpis.top_diagnosis}</p>
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Patients Diagnosed</h3>

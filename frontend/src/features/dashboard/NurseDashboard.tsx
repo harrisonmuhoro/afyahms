@@ -4,6 +4,8 @@ import { useBoard } from '@/features/queue/api';
 import { usePendingEmarRecords } from '@/features/emr/api';
 import { cn } from '@/lib/cn';
 import type { MtsCategory, QueueTicket } from '@/features/queue/types';
+import { Glyph } from '@/components/icons/Glyph';
+import { ErrorState, SkeletonRows } from '@/components/ui';
 
 const MTS_BAR: Record<MtsCategory, string> = {
   red: 'bg-error',
@@ -32,7 +34,7 @@ export function NurseDashboard(): JSX.Element {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { snapshot, isLoading } = useBoard('TRI');
-  const { data: pendingMeds, isLoading: loadingMeds } = usePendingEmarRecords();
+  const { data: pendingMeds, isLoading: loadingMeds, error: medsError } = usePendingEmarRecords();
 
   const waiting = snapshot?.waiting ?? [];
   const inService = snapshot?.in_service ?? null;
@@ -43,14 +45,14 @@ export function NurseDashboard(): JSX.Element {
   };
 
   return (
-    <div className="p-lg space-y-lg">
+    <div className="space-y-6">
       {/* Header Section */}
       <section className="flex flex-wrap items-end justify-between gap-4">
         <div className="space-y-1">
           <h2 className="font-headline-lg text-headline-lg text-on-background">Nurse Dashboard (Triage)</h2>
           <div className="flex items-center gap-3 text-body-sm text-on-surface-variant">
             <span className="flex items-center gap-1">
-              <span className="material-symbols-outlined text-[16px]">location_on</span>
+              <Glyph name="location_on" size={16} />
               {snapshot?.station.name ?? 'Triage'}
             </span>
             {user !== null && (
@@ -69,9 +71,7 @@ export function NurseDashboard(): JSX.Element {
               : 'bg-surface-container text-on-surface-variant',
           )}
         >
-          <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-            group
-          </span>
+          <Glyph name="group" size={20} />
           <span className="font-bold text-body-md">
             {isLoading && snapshot === null ? 'Loading…' : `${waiting.length} Patients Waiting`}
           </span>
@@ -89,15 +89,15 @@ export function NurseDashboard(): JSX.Element {
             onClick={() => navigate('/queue/board/TRI')}
             className="text-primary text-body-sm font-semibold flex items-center gap-1 hover:underline"
           >
-            Full board <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+            Full board <Glyph name="chevron_right" size={14} />
           </button>
         </div>
 
         {isLoading && snapshot === null ? (
           <p className="py-10 text-center text-body-md text-on-surface-variant">Loading queue…</p>
         ) : queue.length === 0 ? (
-          <div className="bg-white border border-outline-variant rounded-xl py-10 text-center">
-            <span className="material-symbols-outlined text-[32px] text-outline-variant">event_seat</span>
+          <div className="bg-surface border border-outline-variant rounded-xl py-10 text-center">
+            <Glyph name="event_seat" size={28} className="text-outline-variant" />
             <p className="mt-2 text-body-md text-on-surface-variant">No patients waiting for triage.</p>
           </div>
         ) : (
@@ -110,7 +110,7 @@ export function NurseDashboard(): JSX.Element {
                 <div
                   key={ticket.id}
                   className={cn(
-                    'relative overflow-hidden bg-white border rounded-xl p-md flex items-center justify-between gap-4',
+                    'relative overflow-hidden bg-surface border rounded-xl p-md flex items-center justify-between gap-4',
                     serving ? 'border-primary/40 ring-2 ring-primary/10' : 'border-outline-variant',
                   )}
                 >
@@ -132,7 +132,7 @@ export function NurseDashboard(): JSX.Element {
                       )}
                       {ticket.priority === 'emergency' && (
                         <span className="px-2 py-0.5 rounded bg-error text-white text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
-                          <span className="material-symbols-outlined text-[12px]">e911_emergency</span>
+                          <Glyph name="e911_emergency" size={12} />
                           Emergency
                         </span>
                       )}
@@ -148,7 +148,7 @@ export function NurseDashboard(): JSX.Element {
                         longWait ? 'text-error' : 'text-on-surface-variant',
                       )}
                     >
-                      <span className="material-symbols-outlined text-[16px]">schedule</span>
+                      <Glyph name="schedule" size={16} />
                       {mins !== null ? `${mins}m` : '—'}
                       {longWait && <span className="sr-only">(long wait)</span>}
                     </span>
@@ -157,7 +157,7 @@ export function NurseDashboard(): JSX.Element {
                       onClick={() => beginTriage(ticket)}
                       className="bg-primary text-white px-4 py-2 rounded-lg font-semibold text-body-sm hover:opacity-90 active:scale-95 transition-all flex items-center gap-1.5"
                     >
-                      <span className="material-symbols-outlined text-[16px]">stethoscope</span>
+                      <Glyph name="stethoscope" size={16} />
                       {serving ? 'Continue Triage' : 'Begin Triage'}
                     </button>
                   </div>
@@ -174,10 +174,14 @@ export function NurseDashboard(): JSX.Element {
           Medication Administration
         </h3>
         {loadingMeds ? (
-          <p className="py-8 text-center text-body-md text-on-surface-variant">Loading pending medications…</p>
+          <SkeletonRows rows={3} />
+        ) : medsError !== null && medsError !== undefined ? (
+          <div className="card">
+            <ErrorState title="Medication schedule unavailable" error={medsError} />
+          </div>
         ) : pendingMeds.length === 0 ? (
           <div className="bg-surface-container-low border border-dashed border-outline-variant rounded-xl py-8 text-center">
-            <span className="material-symbols-outlined text-[28px] text-outline-variant">medication</span>
+            <Glyph name="medication" size={24} className="text-outline-variant" />
             <p className="mt-2 text-body-md text-on-surface-variant">
               No pending medication administrations for today.
             </p>
@@ -185,7 +189,7 @@ export function NurseDashboard(): JSX.Element {
         ) : (
           <div className="space-y-3">
             {pendingMeds.map((med) => (
-              <div key={med.id} className="bg-white border border-outline-variant rounded-xl p-md flex items-center justify-between gap-4">
+              <div key={med.id} className="bg-surface border border-outline-variant rounded-xl p-md flex items-center justify-between gap-4">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-semibold text-on-surface truncate">{med.medication?.generic_name}</p>
@@ -206,7 +210,7 @@ export function NurseDashboard(): JSX.Element {
                   onClick={() => navigate(`/emr/encounter/${med.visit_id}`)}
                   className="shrink-0 bg-primary/10 text-primary px-4 py-2 rounded-lg font-semibold text-body-sm hover:bg-primary/20 transition-all flex items-center gap-1.5"
                 >
-                  <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                  <Glyph name="check_circle" size={16} />
                   Administer
                 </button>
               </div>

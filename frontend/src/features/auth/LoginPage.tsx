@@ -22,9 +22,9 @@ interface MfaEnrollment {
 /* ─── Feature bullet item (brand panel) ─────────────────────────────────────── */
 function Feature({ icon, text }: { icon: IconName; text: string }): JSX.Element {
   return (
-    <li className="flex items-center gap-4 text-white/90">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/10">
-        <Icon name={icon} size={20} className="text-brand-200" />
+    <li className="flex items-center gap-3 text-white/85">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-white/10">
+        <Icon name={icon} size={16} className="text-brand-200" />
       </span>
       <span className="text-sm font-medium">{text}</span>
     </li>
@@ -128,37 +128,33 @@ export function LoginPage(): JSX.Element {
   return (
     <div className="flex min-h-screen overflow-hidden bg-stone-50 dark:bg-stone-950">
       {/* ── Left panel (~45%): brand & marketing ────────────────────────── */}
-      <section className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-brand-600 to-brand-950 p-10 lg:flex lg:w-[45%]">
-        {/* Decorative elements */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_2px_2px,rgba(255,255,255,0.05)_1px,transparent_0)] bg-[size:40px_40px]" />
-        <div className="pointer-events-none absolute -left-24 -top-24 h-96 w-96 rounded-full bg-brand-500/20 blur-[120px]" />
-        <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-black/20 blur-[100px]" />
-
-        {/* Brand identity */}
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/95 shadow-sm">
-            <Icon name="heartPulse" size={24} className="text-brand-700" />
+      <section className="relative hidden flex-col justify-between bg-inverse-surface p-10 text-inverse-on-surface lg:flex lg:w-[42%] xl:p-14">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-fg">
+            <Icon name="heartPulse" size={22} />
           </div>
-          <span className="text-lg font-semibold tracking-tight text-white">{t('app:name')}</span>
+          <div className="leading-tight">
+            <span className="block text-base font-semibold tracking-tight text-white">{t('app:name')}</span>
+            <span className="block text-xs text-white/60">Hospital information system</span>
+          </div>
         </div>
 
-        {/* Messaging */}
-        <div className="relative z-10 mb-auto mt-auto max-w-md">
-          <h1 className="mb-8 text-[40px] font-semibold leading-tight tracking-tight text-white text-balance">
-            Hospital Management,
-            <br />
-            Simplified.
+        <div className="max-w-md">
+          <h1 className="text-[28px] font-semibold leading-snug tracking-tight text-white text-balance">
+            One record for every patient, from the front desk to the pharmacy.
           </h1>
-          <ul className="space-y-4">
-            <Feature icon="branches" text="Multi-branch Coordination" />
-            <Feature icon="reports" text="Real-time Clinical Insights" />
-            <Feature icon="shield" text="Secure Patient Records" />
+          <p className="mt-3 text-sm leading-relaxed text-white/70">
+            Registration, queues, consultations, laboratory, pharmacy and billing — shared securely across your branches.
+          </p>
+          <ul className="mt-8 space-y-3.5">
+            <Feature icon="branches" text="Works across all your facilities and branches" />
+            <Feature icon="triage" text="Allergies and clinical alerts stay in view" />
+            <Feature icon="shield" text="Role-based access with a full audit trail" />
           </ul>
         </div>
 
-        {/* Copyright */}
-        <p className="relative z-10 text-xs text-white/40">
-          © {new Date().getFullYear()} {t('app:name')}. All rights reserved.
+        <p className="text-xs text-white/50">
+          © {new Date().getFullYear()} {t('app:name')}
         </p>
       </section>
 
@@ -166,7 +162,7 @@ export function LoginPage(): JSX.Element {
       <section className="flex flex-1 flex-col items-center justify-center px-6 py-12 lg:px-16">
         {/* Mobile logo */}
         <div className="mb-8 flex flex-col items-center text-center lg:hidden">
-          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-600 to-brand-900">
+          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600">
             <Icon name="heartPulse" size={26} className="text-white" />
           </div>
           <h1 className="text-2xl font-bold text-brand-700 dark:text-brand-300">{t('app:name')}</h1>

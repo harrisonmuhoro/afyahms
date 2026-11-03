@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { usePortalPatient, usePortalInvoices, usePortalPrescriptions, usePortalResults, usePortalAppointments } from '@/features/portal/api';
+import { Glyph } from '@/components/icons/Glyph';
 
 /**
  * Patient portal bento dashboard wired to the portal API: greeting and
@@ -46,14 +47,14 @@ export function PatientPortal(): JSX.Element {
       {/* Bento Grid Dashboard */}
       <div className="grid grid-cols-12 gap-gutter">
         {/* Upcoming Appointment: Priority Card */}
-        <div className="col-span-12 lg:col-span-8 bg-white border border-outline-variant shadow-sm rounded-[14px] transition-all hover:shadow-md p-lg flex flex-col gap-lg">
+        <div className="col-span-12 lg:col-span-8 bg-surface border border-outline-variant shadow-sm rounded-[14px] transition-all hover:shadow-md p-lg flex flex-col gap-lg">
           <div className="flex items-center gap-2">
             <span className="px-2 py-1 bg-secondary-container text-on-secondary-container rounded text-[10px] font-bold uppercase tracking-wider">
               Appointments
             </span>
           </div>
           <div className="flex-1 flex flex-col items-center justify-center text-center py-6 gap-2">
-            <span className="material-symbols-outlined text-[36px] text-outline-variant">calendar_month</span>
+            <Glyph name="calendar_month" size={28} className="text-outline-variant" />
             <p className="text-body-md text-on-surface-variant max-w-sm">
               {upcomingApt ? (
                 <>
@@ -77,7 +78,7 @@ export function PatientPortal(): JSX.Element {
           <div>
             <div className="flex justify-between items-start mb-md">
               <h3 className="font-headline-md text-headline-md">Outstanding Bills</h3>
-              <span className="material-symbols-outlined text-primary text-[32px]">account_balance_wallet</span>
+              <Glyph name="account_balance_wallet" size={28} className="text-primary" />
             </div>
             <div className="mb-lg">
               <p className="text-body-md text-on-surface-variant py-4">
@@ -93,13 +94,13 @@ export function PatientPortal(): JSX.Element {
             to="/portal/bills"
             className="w-full bg-primary text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
           >
-            <span className="material-symbols-outlined">payments</span>
+            <Glyph name="payments" />
             View Bills
           </Link>
         </div>
 
         {/* Lab Results: Content Card */}
-        <div className="col-span-12 md:col-span-6 bg-white border border-outline-variant shadow-sm rounded-[14px] transition-all hover:shadow-md overflow-hidden flex flex-col">
+        <div className="col-span-12 md:col-span-6 bg-surface border border-outline-variant shadow-sm rounded-[14px] transition-all hover:shadow-md overflow-hidden flex flex-col">
           <div className="px-lg py-md border-b border-outline-variant flex justify-between items-center">
             <h3 className="font-headline-md text-headline-md">My Lab Results</h3>
             <Link to="/portal/results" className="text-primary font-semibold text-body-sm hover:underline">
@@ -107,7 +108,7 @@ export function PatientPortal(): JSX.Element {
             </Link>
           </div>
           <div className="flex-1 flex flex-col items-center justify-center text-center py-10 gap-2">
-            <span className="material-symbols-outlined text-[32px] text-outline-variant">labs</span>
+            <Glyph name="labs" size={28} className="text-outline-variant" />
             <p className="text-body-md text-on-surface-variant max-w-[260px]">
               {latestResult ? (
                 <>Your latest lab result from <strong className="text-stone-900">{new Date(latestResult.updated_at || latestResult.created_at).toLocaleDateString()}</strong> is ready.</>
@@ -119,12 +120,12 @@ export function PatientPortal(): JSX.Element {
         </div>
 
         {/* Prescription Refills */}
-        <div className="col-span-12 md:col-span-6 bg-white border border-outline-variant shadow-sm rounded-[14px] transition-all hover:shadow-md flex flex-col">
+        <div className="col-span-12 md:col-span-6 bg-surface border border-outline-variant shadow-sm rounded-[14px] transition-all hover:shadow-md flex flex-col">
           <div className="px-lg py-md border-b border-outline-variant flex justify-between items-center">
             <h3 className="font-headline-md text-headline-md">Prescription Refills</h3>
           </div>
           <div className="flex-1 flex flex-col items-center justify-center text-center py-8 gap-2">
-            <span className="material-symbols-outlined text-[32px] text-outline-variant">medication</span>
+            <Glyph name="medication" size={28} className="text-outline-variant" />
             <p className="text-body-md text-on-surface-variant max-w-[260px]">
               {activePrescriptions.length > 0 ? (
                 <>You have <strong className="text-stone-900">{activePrescriptions.length}</strong> active prescription(s).</>
@@ -135,7 +136,7 @@ export function PatientPortal(): JSX.Element {
           </div>
           <div className="px-lg py-lg bg-surface-container-lowest mt-auto rounded-b-[14px]">
             <div className="flex items-center gap-3 p-3 bg-tertiary-container/5 rounded-lg border border-dashed border-outline-variant">
-              <span className="material-symbols-outlined text-tertiary">info</span>
+              <Glyph name="info" className="text-tertiary" />
               <p className="text-body-sm text-on-tertiary-fixed-variant">Refill requests usually take 24-48 hours to process.</p>
             </div>
           </div>
@@ -154,7 +155,7 @@ export function PatientPortal(): JSX.Element {
                 </p>
               ) : (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 p-md bg-white/10 rounded-xl border border-white/10 backdrop-blur-sm">
+                  <div className="flex items-center gap-3 p-md bg-white/10 rounded-xl border border-white/10">
                     <div className="w-10 h-10 rounded-full border border-white/20 bg-white/10 flex items-center justify-center font-bold">
                       {patient.first_name[0]}
                       {patient.last_name[0]}
@@ -187,16 +188,16 @@ export function PatientPortal(): JSX.Element {
             </div>
             <Link
               to="/portal/profile"
-              className="w-full bg-primary-fixed text-on-primary-fixed py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform"
+              className="w-full bg-primary-fixed text-on-primary-fixed py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-transform"
             >
-              <span className="material-symbols-outlined">manage_accounts</span>
+              <Glyph name="manage_accounts" />
               Manage Profile
             </Link>
           </div>
         </div>
 
         {/* Visit History */}
-        <div className="col-span-12 lg:col-span-7 bg-white border border-outline-variant shadow-sm rounded-[14px] transition-all hover:shadow-md overflow-hidden flex flex-col">
+        <div className="col-span-12 lg:col-span-7 bg-surface border border-outline-variant shadow-sm rounded-[14px] transition-all hover:shadow-md overflow-hidden flex flex-col">
           <div className="px-lg py-md border-b border-outline-variant flex justify-between items-center">
             <h3 className="font-headline-md text-headline-md">Visit History</h3>
             <Link to="/portal/records" className="text-primary font-semibold text-body-sm hover:underline">
@@ -204,7 +205,7 @@ export function PatientPortal(): JSX.Element {
             </Link>
           </div>
           <div className="flex-1 flex flex-col items-center justify-center text-center py-10 gap-2">
-            <span className="material-symbols-outlined text-[32px] text-outline-variant">history</span>
+            <Glyph name="history" size={28} className="text-outline-variant" />
             <p className="text-body-md text-on-surface-variant max-w-sm">
               Your visit history will appear here after your first completed visit.
             </p>

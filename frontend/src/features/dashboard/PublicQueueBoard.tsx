@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { usePublicBoard } from '@/features/queue/api';
 import type { PublicBoard } from '@/features/queue/types';
+import { Glyph } from '@/components/icons/Glyph';
 
 /** Stations shown on the lobby board, in display order. */
 const BOARD_STATIONS = ['DOC', 'LAB', 'PHA'] as const;
@@ -95,7 +96,7 @@ export function PublicQueueBoard(): JSX.Element {
       <header className="h-[80px] bg-surface flex items-center justify-between px-xl border-b border-outline-variant shadow-sm sticky top-0 z-50 shrink-0">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-on-primary">
-            <span className="material-symbols-outlined text-[32px]">local_hospital</span>
+            <Glyph name="local_hospital" size={28} />
           </div>
           <div>
             <h1 className="font-headline-lg text-headline-lg text-primary uppercase tracking-tighter">Afya HMS</h1>
@@ -112,15 +113,13 @@ export function PublicQueueBoard(): JSX.Element {
         {/* Currently Serving */}
         <section className="w-[65%] p-lg flex flex-col gap-lg bg-surface-container-low">
           <div className="flex items-center gap-2 mb-2">
-            <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
-              campaign
-            </span>
+            <Glyph name="campaign" className="text-primary" />
             <h2 className="font-label-caps text-label-caps text-primary uppercase">Currently Serving</h2>
           </div>
           <div className="grid grid-cols-1 gap-lg flex-1">
             {/* Hero Ticket */}
             <div
-              className={`bg-white border-2 border-primary rounded-[24px] p-xl flex items-center justify-between shadow-xl relative overflow-hidden transition-all duration-300 ${
+              className={`bg-surface border-2 border-primary rounded-[24px] p-xl flex items-center justify-between shadow-xl relative overflow-hidden transition-all duration-300 ${
                 heroTicketAlert ? 'bg-primary-container/20 animate-pulse' : ''
               }`}
             >
@@ -142,9 +141,7 @@ export function PublicQueueBoard(): JSX.Element {
                     {stationName(hero)}
                   </span>
                   <div className="w-20 h-20 bg-secondary-container rounded-full flex items-center justify-center">
-                    <span className="material-symbols-outlined text-on-secondary-container text-[40px]">
-                      arrow_forward
-                    </span>
+                    <Glyph name="arrow_forward" size={32} className="text-on-secondary-container" />
                   </div>
                 </div>
               </div>
@@ -154,7 +151,7 @@ export function PublicQueueBoard(): JSX.Element {
               {secondary.map((b) => (
                 <div
                   key={b.code}
-                  className="bg-white border border-outline-variant rounded-[24px] p-lg flex items-center justify-between shadow-sm"
+                  className="bg-surface border border-outline-variant rounded-[24px] p-lg flex items-center justify-between shadow-sm"
                 >
                   <div className="flex flex-col">
                     <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Ticket</span>
@@ -175,10 +172,10 @@ export function PublicQueueBoard(): JSX.Element {
         </section>
 
         {/* Next Up */}
-        <aside className="w-[35%] bg-white border-l border-outline-variant p-lg flex flex-col gap-lg">
+        <aside className="w-[35%] bg-surface border-l border-outline-variant p-lg flex flex-col gap-lg">
           <div className="flex items-center justify-between border-b border-outline-variant pb-md">
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-tertiary">hourglass_top</span>
+              <Glyph name="hourglass_top" className="text-tertiary" />
               <h2 className="font-label-caps text-label-caps text-on-surface-variant uppercase">Next Up</h2>
             </div>
             <span className="bg-surface-container-high px-3 py-1 rounded-full font-label-caps text-[11px] text-on-surface">
@@ -188,7 +185,7 @@ export function PublicQueueBoard(): JSX.Element {
           <div className="flex-1 flex flex-col gap-4 overflow-hidden">
             {nextUp.length === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center text-center">
-                <span className="material-symbols-outlined text-[48px] text-outline-variant">event_seat</span>
+                <Glyph name="event_seat" size={36} className="text-outline-variant" />
                 <p className="mt-2 font-body-md text-on-surface-variant">No patients waiting.</p>
               </div>
             ) : (
@@ -238,7 +235,7 @@ export function PublicQueueBoard(): JSX.Element {
           />
           {TICKER_MESSAGES.map((msg) => (
             <span key={msg} className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary-fixed">info</span> {msg}
+              <Glyph name="info" className="text-primary-fixed" /> {msg}
             </span>
           ))}
         </div>

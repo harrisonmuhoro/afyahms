@@ -109,7 +109,7 @@ export function BranchModal({ isOpen, onClose, branchToEdit }: BranchModalProps)
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 animate-in fade-in duration-200">
       <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between p-5 border-b border-stone-200 dark:border-stone-800">
           <h2 className="text-xl font-bold text-stone-900 dark:text-white">
@@ -125,7 +125,7 @@ export function BranchModal({ isOpen, onClose, branchToEdit }: BranchModalProps)
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
           {serverError && (
-            <div className="p-3 text-sm text-rose-600 bg-rose-50 dark:bg-rose-900/20 rounded-lg border border-rose-200 dark:border-rose-800">
+            <div className="p-3 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
               {serverError}
             </div>
           )}
@@ -138,7 +138,7 @@ export function BranchModal({ isOpen, onClose, branchToEdit }: BranchModalProps)
                 className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-white"
                 placeholder="e.g. NAI"
               />
-              {errors.code && <p className="text-xs text-rose-500">{errors.code.message}</p>}
+              {errors.code && <p className="text-xs text-red-500">{errors.code.message}</p>}
             </div>
 
             <div className="space-y-1">
@@ -148,7 +148,7 @@ export function BranchModal({ isOpen, onClose, branchToEdit }: BranchModalProps)
                 className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-white"
                 placeholder="e.g. Nairobi HQ"
               />
-              {errors.name && <p className="text-xs text-rose-500">{errors.name.message}</p>}
+              {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
             </div>
           </div>
 
@@ -159,7 +159,7 @@ export function BranchModal({ isOpen, onClose, branchToEdit }: BranchModalProps)
               className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-900 dark:text-white"
               placeholder="e.g. info@nairobi-branch.com"
             />
-            {errors.email && <p className="text-xs text-rose-500">{errors.email.message}</p>}
+            {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
           </div>
 
           <div className="space-y-1">

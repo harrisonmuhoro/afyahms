@@ -46,6 +46,8 @@ import {
   Info,
   Send,
   FileText,
+  HelpCircle,
+  ChevronsUpDown,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -106,6 +108,8 @@ const REGISTRY = {
   info: Info,
   send: Send,
   fileText: FileText,
+  help: HelpCircle,
+  chevronsUpDown: ChevronsUpDown,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof REGISTRY;

@@ -64,3 +64,17 @@ export interface PaginatedPatients {
     };
   };
 }
+
+export interface PatientAllergy {
+  id: number;
+  patient_uuid: string | null;
+  allergen: string;
+  allergen_type: string | null;
+  reaction: string | null;
+  severity: string | null;
+  onset_date: string | null;
+  is_active: boolean;
+  recorded_by: number | null;
+  created_at: string | null;
+  updated_at: string | null;
+}

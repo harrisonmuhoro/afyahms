@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useInventoryItems, useInventoryKpis, useExpiringBatches, useSuppliers, usePurchaseOrders } from '@/features/inventory/api';
 import { stockStatus } from '@/features/inventory/types';
 import type { InventoryItem, PurchaseOrderStatus } from '@/features/inventory/types';
+import { Glyph } from '@/components/icons/Glyph';
 
 const CATEGORY_FILTERS = ['All Items', 'Medication', 'Consumables', 'Lab Reagents'] as const;
 
@@ -48,7 +49,7 @@ function StockRow({ item }: { item: InventoryItem }): JSX.Element {
               low ? 'bg-error-container/10 text-error' : 'bg-primary-container/10 text-primary'
             }`}
           >
-            <span className="material-symbols-outlined text-[20px]">{itemIcon(item.category)}</span>
+            <Glyph name={itemIcon(item.category)} size={20} />
           </div>
           <div>
             <p className="text-body-md font-semibold text-on-surface">{item.name}</p>
@@ -70,17 +71,17 @@ function StockRow({ item }: { item: InventoryItem }): JSX.Element {
       <td className="px-md py-4 text-center">
         {status === 'out' ? (
           <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-error-container/40 text-error border border-error/20 inline-flex items-center gap-1">
-            <span className="material-symbols-outlined text-[13px]">block</span>
+            <Glyph name="block" size={13} />
             Out of Stock
           </span>
         ) : status === 'low' ? (
           <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-error-container/20 text-error border border-error/10 inline-flex items-center gap-1">
-            <span className="material-symbols-outlined text-[13px]">warning</span>
+            <Glyph name="warning" size={13} />
             Low Stock
           </span>
         ) : (
           <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-secondary-container/20 text-secondary border border-secondary/10 inline-flex items-center gap-1">
-            <span className="material-symbols-outlined text-[13px]">check</span>
+            <Glyph name="check" size={13} />
             In Stock
           </span>
         )}
@@ -134,9 +135,7 @@ export function InventoryDashboard(): JSX.Element {
           </p>
         </div>
         <div className="relative">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px] pointer-events-none">
-            search
-          </span>
+          <Glyph name="search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" />
           <input
             type="search"
             value={search}
@@ -150,10 +149,10 @@ export function InventoryDashboard(): JSX.Element {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter">
-        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-card">
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-primary-container/10 rounded-lg text-primary">
-              <span className="material-symbols-outlined">payments</span>
+              <Glyph name="payments" />
             </div>
           </div>
           <p className="text-body-sm text-on-surface-variant font-medium">Total Inventory Value</p>
@@ -161,10 +160,10 @@ export function InventoryDashboard(): JSX.Element {
             {kpisLoading ? '…' : formatMoney(kpis?.total_inventory_value ?? 0)}
           </h3>
         </div>
-        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-card">
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-error-container/20 rounded-lg text-error">
-              <span className="material-symbols-outlined">warning</span>
+              <Glyph name="warning" />
             </div>
             {(kpis?.low_stock_count ?? 0) > 0 && (
               <span className="text-[12px] font-bold text-error px-2 py-0.5 bg-error-container/10 rounded-full">
@@ -177,10 +176,10 @@ export function InventoryDashboard(): JSX.Element {
             {kpisLoading ? '…' : `${kpis?.low_stock_count ?? 0} Items`}
           </h3>
         </div>
-        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-card">
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-tertiary-container/10 rounded-lg text-tertiary">
-              <span className="material-symbols-outlined">event_busy</span>
+              <Glyph name="event_busy" />
             </div>
             <span className="text-[12px] font-bold text-tertiary px-2 py-0.5 bg-tertiary-container/5 rounded-full">
               30 Days
@@ -191,10 +190,10 @@ export function InventoryDashboard(): JSX.Element {
             {kpisLoading ? '…' : `${kpis?.expiring_soon_count ?? 0} Batches`}
           </h3>
         </div>
-        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-card">
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-secondary-container/20 rounded-lg text-secondary">
-              <span className="material-symbols-outlined">shopping_cart</span>
+              <Glyph name="shopping_cart" />
             </div>
             {(kpis?.active_po_count ?? 0) > 0 && (
               <span className="text-[12px] font-bold text-secondary px-2 py-0.5 bg-secondary-container/10 rounded-full">
@@ -213,7 +212,7 @@ export function InventoryDashboard(): JSX.Element {
       <div className="grid grid-cols-12 gap-gutter">
         {/* Stock Management Table Section */}
         <div className="col-span-12 lg:col-span-9 space-y-gutter">
-          <div className="bg-surface rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
+          <div className="bg-surface rounded-xl border border-outline-variant shadow-card overflow-hidden">
             <div className="p-md border-b border-outline-variant flex items-center justify-between bg-surface-container-lowest">
               <div className="flex items-center gap-4">
                 <h4 className="font-headline-md text-headline-md">Stock Inventory</h4>
@@ -267,9 +266,7 @@ export function InventoryDashboard(): JSX.Element {
                   ) : itemsError !== null || filteredItems.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="px-md py-10 text-center">
-                        <span className="material-symbols-outlined text-[32px] text-outline-variant">
-                          inventory_2
-                        </span>
+                        <Glyph name="inventory_2" size={28} className="text-outline-variant" />
                         <p className="mt-2 text-body-md text-on-surface-variant">
                           {itemsError !== null
                             ? 'Inventory service unavailable.'
@@ -293,12 +290,10 @@ export function InventoryDashboard(): JSX.Element {
           </div>
 
           {/* Expiry Watchlist Section */}
-          <div className="bg-surface rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
+          <div className="bg-surface rounded-xl border border-outline-variant shadow-card overflow-hidden">
             <div className="p-md border-b border-outline-variant bg-surface-container-lowest">
               <h4 className="font-headline-md text-headline-md flex items-center gap-2">
-                <span className="material-symbols-outlined text-error" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  timer
-                </span>
+                <Glyph name="timer" className="text-error" />
                 Expiry Watchlist
               </h4>
             </div>
@@ -350,7 +345,7 @@ export function InventoryDashboard(): JSX.Element {
         {/* Right Sidebar: Supplier & Procurement */}
         <div className="col-span-12 lg:col-span-3 space-y-gutter">
           {/* Active Purchase Orders */}
-          <div className="bg-surface rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] flex flex-col h-fit">
+          <div className="bg-surface rounded-xl border border-outline-variant shadow-card flex flex-col h-fit">
             <div className="p-md border-b border-outline-variant flex items-center justify-between">
               <h4 className="font-headline-md text-headline-md">Recent POs</h4>
             </div>
@@ -372,9 +367,7 @@ export function InventoryDashboard(): JSX.Element {
                       </div>
                       <div className="flex gap-3 items-center">
                         <div className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
-                          <span className="material-symbols-outlined text-[18px]">
-                            {po.status === 'shipped' ? 'local_shipping' : 'description'}
-                          </span>
+                          <Glyph name={po.status === 'shipped' ? 'local_shipping' : 'description'} size={18} />
                         </div>
                         <div>
                           <p className="text-body-sm font-medium">{po.supplier?.name ?? '—'}</p>
@@ -393,7 +386,7 @@ export function InventoryDashboard(): JSX.Element {
           </div>
 
           {/* Top Suppliers */}
-          <div className="bg-surface rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)] h-fit">
+          <div className="bg-surface rounded-xl border border-outline-variant shadow-card h-fit">
             <div className="p-md border-b border-outline-variant">
               <h4 className="font-headline-md text-headline-md">Top Suppliers</h4>
             </div>
@@ -404,19 +397,14 @@ export function InventoryDashboard(): JSX.Element {
                 topSuppliers.map((supplier) => (
                   <div key={supplier.id} className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg border border-outline-variant bg-surface-container-low flex items-center justify-center text-on-surface-variant">
-                      <span className="material-symbols-outlined text-[20px]">storefront</span>
+                      <Glyph name="storefront" size={20} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-body-md font-semibold truncate">{supplier.name}</p>
                       <div className="flex items-center gap-1">
                         {supplier.rating !== null && (
                           <>
-                            <span
-                              className="material-symbols-outlined text-primary text-[14px]"
-                              style={{ fontVariationSettings: "'FILL' 1" }}
-                            >
-                              star
-                            </span>
+                            <Glyph name="star" size={14} className="text-primary" />
                             <span className="text-[11px] font-bold text-on-surface-variant">
                               {supplier.rating.toFixed(1)}
                               {supplier.category !== null ? ` • ${supplier.category}` : ''}
@@ -438,7 +426,7 @@ export function InventoryDashboard(): JSX.Element {
           <div className="bg-primary/5 rounded-xl border border-primary/20 p-md relative overflow-hidden group">
             <div className="relative z-10">
               <h4 className="text-body-sm font-bold text-primary flex items-center gap-2">
-                <span className="material-symbols-outlined text-[18px]">trending_up</span>
+                <Glyph name="trending_up" size={18} />
                 Supply Forecast
               </h4>
               <p className="text-[11px] text-primary/70 mt-1">

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useBranches } from '@/features/branches/BranchProvider';
 import { useAdminStaff } from '@/features/admin-staff/api';
+import { Glyph } from '@/components/icons/Glyph';
 
 const TABS = [
   { id: 'Branch Management', icon: 'domain' },
@@ -56,26 +57,19 @@ export function SystemSettings(): JSX.Element {
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <span
-                    className={`material-symbols-outlined ${activeTab === tab.id ? 'text-primary' : 'text-on-surface-variant group-hover:text-primary'}`}
-                    style={activeTab === tab.id ? { fontVariationSettings: "'FILL' 1" } : {}}
-                  >
-                    {tab.icon}
-                  </span>
+                  <Glyph name={tab.icon} className={`${activeTab === tab.id ? 'text-primary' : 'text-on-surface-variant group-hover:text-primary'}`} />
                   <span className={`text-body-md font-semibold ${activeTab === tab.id ? 'text-primary' : 'text-on-surface-variant'}`}>
                     {tab.id}
                   </span>
                 </div>
-                <span className={`material-symbols-outlined text-body-sm ${activeTab === tab.id ? 'text-primary' : 'text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity'}`}>
-                  chevron_right
-                </span>
+                <Glyph name="chevron_right" size={14} className={`${activeTab === tab.id ? 'text-primary' : 'text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity'}`} />
               </button>
             ))}
             <div className="mt-lg p-md bg-primary-container/5 rounded-xl border border-primary/10">
               <h4 className="text-label-caps font-label-caps text-primary mb-2 uppercase">Current Branch</h4>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded bg-surface border border-outline-variant flex items-center justify-center">
-                  <span className="material-symbols-outlined text-primary">local_hospital</span>
+                  <Glyph name="local_hospital" className="text-primary" />
                 </div>
                 <div>
                   <p className="text-body-md font-bold leading-none">
@@ -93,7 +87,7 @@ export function SystemSettings(): JSX.Element {
             {activeTab === 'Branch Management' && (
               <>
                 {/* Branch Details Card */}
-                <section className="bg-white rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+                <section className="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden">
                   <div className="p-md border-b border-outline-variant flex justify-between items-center">
                     <h3 className="font-headline-md text-headline-md">Branch Operations</h3>
                     <Link
@@ -107,7 +101,7 @@ export function SystemSettings(): JSX.Element {
                     <p className="p-lg text-body-md text-on-surface-variant">Loading branch details…</p>
                   ) : activeBranch === null ? (
                     <div className="p-lg text-center">
-                      <span className="material-symbols-outlined text-[32px] text-outline-variant">domain_disabled</span>
+                      <Glyph name="domain_disabled" size={28} className="text-outline-variant" />
                       <p className="mt-2 text-body-md text-on-surface-variant">No active branch selected.</p>
                     </div>
                   ) : (
@@ -128,9 +122,7 @@ export function SystemSettings(): JSX.Element {
                         <div className="space-y-base">
                           <p className="text-body-sm font-semibold text-on-surface-variant">Contact Line</p>
                           <div className="relative">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 material-symbols-outlined text-[18px]">
-                              call
-                            </span>
+                            <Glyph name="call" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40" />
                             <p className="w-full h-[38px] border border-outline-variant rounded-lg pl-10 pr-3 text-body-md flex items-center bg-surface-container-lowest">
                               {activeBranch.phone ?? '—'}
                             </p>
@@ -155,7 +147,7 @@ export function SystemSettings(): JSX.Element {
                 {/* Advanced Settings Grid */}
                 <div className="grid grid-cols-2 gap-lg">
                   {/* All Branches */}
-                  <div className="bg-white rounded-xl border border-outline-variant shadow-sm p-lg">
+                  <div className="bg-surface rounded-xl border border-outline-variant shadow-sm p-lg">
                     <h3 className="font-headline-md text-headline-md mb-md">All Branches</h3>
                     {branchesLoading ? (
                       <p className="text-body-sm text-on-surface-variant">Loading…</p>
@@ -170,7 +162,7 @@ export function SystemSettings(): JSX.Element {
                           >
                             <div className="flex items-center gap-3">
                               <div className="w-9 h-9 rounded bg-surface-container flex items-center justify-center text-primary">
-                                <span className="material-symbols-outlined text-[20px]">domain</span>
+                                <Glyph name="domain" size={20} />
                               </div>
                               <div>
                                 <p className="text-body-md font-semibold">{branch.name}</p>
@@ -193,7 +185,7 @@ export function SystemSettings(): JSX.Element {
                     </Link>
                   </div>
                   {/* Active Staff */}
-                  <div className="bg-white rounded-xl border border-outline-variant shadow-sm p-lg">
+                  <div className="bg-surface rounded-xl border border-outline-variant shadow-sm p-lg">
                     <h3 className="font-headline-md text-headline-md mb-md">Active Staff</h3>
                     {staffLoading ? (
                       <p className="text-body-sm text-on-surface-variant">Loading staff…</p>
@@ -232,12 +224,12 @@ export function SystemSettings(): JSX.Element {
                   </div>
                 </div>
                 {/* Insurance tiers — no backend yet */}
-                <section className="bg-white rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+                <section className="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden">
                   <div className="p-md bg-surface-container-low border-b border-outline-variant">
                     <h3 className="font-headline-md text-headline-md">Finance &amp; Insurance Tiers</h3>
                   </div>
                   <div className="py-10 text-center">
-                    <span className="material-symbols-outlined text-[32px] text-outline-variant">payments</span>
+                    <Glyph name="payments" size={28} className="text-outline-variant" />
                     <p className="mt-2 text-body-md text-on-surface-variant">
                       Insurance scheme configuration will appear here once the finance module is enabled.
                     </p>
@@ -246,8 +238,8 @@ export function SystemSettings(): JSX.Element {
               </>
             )}
             {activeTab !== 'Branch Management' && (
-              <div className="bg-white rounded-xl border border-dashed border-outline-variant flex flex-col items-center justify-center h-64 text-on-surface-variant gap-2">
-                <span className="material-symbols-outlined text-[32px] text-outline-variant">construction</span>
+              <div className="bg-surface rounded-xl border border-dashed border-outline-variant flex flex-col items-center justify-center h-64 text-on-surface-variant gap-2">
+                <Glyph name="construction" size={28} className="text-outline-variant" />
                 <p className="text-body-md">{activeTab} configuration will appear here once its backend module is enabled.</p>
               </div>
             )}

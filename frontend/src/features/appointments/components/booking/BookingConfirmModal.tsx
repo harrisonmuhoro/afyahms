@@ -1,6 +1,7 @@
 import { format, parse } from 'date-fns';
 import type { AvailableSlot } from '../../types';
 import { APPOINTMENT_TYPES } from './AppointmentTypeSelect';
+import { Glyph } from '@/components/icons/Glyph';
 
 interface BookingConfirmModalProps {
   open: boolean;
@@ -57,7 +58,7 @@ export function BookingConfirmModal({
     >
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/50"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -68,7 +69,7 @@ export function BookingConfirmModal({
         <div className="flex items-center justify-between border-b border-outline-variant/40 px-6 py-4">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
-              <span className="material-symbols-outlined text-[20px] text-primary">event_available</span>
+              <Glyph name="event_available" size={20} className="text-primary" />
             </div>
             <h2 id="booking-confirm-title" className="text-base font-semibold text-on-surface">
               Confirm Booking
@@ -80,7 +81,7 @@ export function BookingConfirmModal({
             className="rounded-full p-1.5 text-on-surface-variant hover:bg-surface-container transition-colors"
             aria-label="Close"
           >
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <Glyph name="close" size={20} />
           </button>
         </div>
 
@@ -161,7 +162,7 @@ function Row({
 }): JSX.Element {
   return (
     <div className="flex items-start gap-3 py-3">
-      <span className="material-symbols-outlined mt-0.5 text-[18px] text-on-surface-variant shrink-0">{icon}</span>
+      <Glyph name={icon} size={18} className="mt-0.5 text-on-surface-variant shrink-0" />
       <div className="flex-1 min-w-0">
         <p className="mb-0.5 text-[11px] font-medium uppercase tracking-wide text-on-surface-variant/70">
           {label}

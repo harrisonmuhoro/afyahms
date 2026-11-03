@@ -79,7 +79,7 @@ function CreateStaffModal({ branches, activeBranchId, isSuperadmin, onClose, onC
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="w-full max-w-lg animate-fade-in rounded-2xl border border-stone-200 bg-white p-6 shadow-xl dark:border-stone-700 dark:bg-stone-900">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-stone-900 dark:text-stone-100">Add New Staff Member</h2>
@@ -179,7 +179,7 @@ function CreateAdminModal({ onClose, onCreated }: CreateAdminModalProps): JSX.El
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
       <div className="w-full max-w-lg animate-fade-in rounded-2xl border border-red-200 bg-white p-6 shadow-xl dark:border-red-900/40 dark:bg-stone-900">
         <div className="mb-2 flex items-center justify-between">
           <div>
@@ -573,7 +573,7 @@ export function AdminStaffPage(): JSX.Element {
                   <h2 className="text-base font-semibold text-stone-900 dark:text-stone-100">{selected.name}</h2>
                   <p className="mt-1 text-sm text-stone-500">{selected.email}</p>
                 </div>
-                <span className={`chip ${selected.is_active ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-700 dark:text-rose-300'}`}>
+                <span className={`chip ${selected.is_active ? 'text-emerald-700 dark:text-emerald-300' : 'text-red-700 dark:text-red-300'}`}>
                   {selected.is_active ? 'Active' : 'Inactive'}
                 </span>
               </div>

@@ -5,6 +5,9 @@ import { useBranches } from '@/features/branches/BranchProvider';
 import { useBoard, useStartTicket } from '@/features/queue/api';
 import type { MtsCategory, QueueTicket } from '@/features/queue/types';
 import { cn } from '@/lib/cn';
+import { Glyph } from '@/components/icons/Glyph';
+import { Clock, Stethoscope, Users } from 'lucide-react';
+import { StatTile } from '@/components/ui';
 
 const MTS_BAR: Record<MtsCategory, string> = {
   red:    'bg-red-600',
@@ -55,115 +58,78 @@ export function DoctorDashboard(): JSX.Element {
 
   const tabTickets = tab === 'waiting' ? waiting : tab === 'in_service' && inService ? [inService] : [];
 
+  const longestWait = waiting.reduce<number | null>((max, t) => {
+    const m = waitMinutes(t);
+    return m === null ? max : max === null || m > max ? m : max;
+  }, null);
+  const boardLoading = isLoading && snapshot === null;
+
   return (
-    <div className="p-lg space-y-lg max-w-[1600px] mx-auto w-full">
-      {/* ── Greeting Header ──────────────────────────────────────────────── */}
-      <section className="flex flex-col md:flex-row md:items-end justify-between gap-md">
+    <div className="mx-auto w-full max-w-[1600px] space-y-6">
+      {/* ── Header ───────────────────────────────────────────────────────── */}
+      <section className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div>
-          <h2 className="font-headline-lg text-headline-lg text-on-surface">{greeting}</h2>
-          <div className="flex items-center gap-md mt-1 flex-wrap">
-            <div className="flex items-center gap-1.5 text-tertiary">
-              <span className="material-symbols-outlined text-[18px]">calendar_today</span>
-              <span className="text-body-md">{today}</span>
-            </div>
-            {activeBranch !== null && (
-              <div className="flex items-center gap-1.5 text-primary bg-primary-container/10 px-2 py-0.5 rounded">
-                <span className="material-symbols-outlined text-[18px]">door_open</span>
-                <span className="text-body-md font-medium">{activeBranch.name}</span>
-              </div>
-            )}
-          </div>
+          <h1 className="text-xl font-semibold tracking-tight text-ink sm:text-2xl">{greeting}</h1>
+          <p className="mt-1 text-sm text-ink-secondary">
+            {today}
+            {activeBranch !== null && <> · {activeBranch.name}</>}
+          </p>
         </div>
 
-        {/* Availability Toggle */}
-        <div className="flex items-center gap-3 bg-white p-1 rounded-lg border border-outline-variant shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
-          <button
-            onClick={() => setStatus('active')}
-            className={cn(
-              'px-4 py-1.5 rounded-md text-body-sm font-semibold flex items-center gap-2 transition-all',
-              status === 'active'
-                ? 'bg-primary text-on-primary shadow-sm'
-                : 'text-on-surface-variant hover:bg-surface-container',
-            )}
-          >
-            <span className={cn('w-2 h-2 rounded-full', status === 'active' ? 'bg-white animate-pulse' : 'bg-outline-variant')} />
-            Active
-          </button>
-          <button
-            onClick={() => setStatus('break')}
-            className={cn(
-              'px-4 py-1.5 rounded-md text-body-sm font-semibold flex items-center gap-2 transition-all',
-              status === 'break'
-                ? 'bg-tertiary text-on-primary shadow-sm'
-                : 'text-on-surface-variant hover:bg-surface-container',
-            )}
-          >
-            <span className={cn('w-2 h-2 rounded-full', status === 'break' ? 'bg-white animate-pulse' : 'bg-outline-variant')} />
-            On Break
-          </button>
+        <div role="group" aria-label="Availability" className="inline-flex self-start rounded-lg border border-line bg-surface p-1 md:self-auto">
+          {(['active', 'break'] as const).map((s) => (
+            <button
+              key={s}
+              type="button"
+              aria-pressed={status === s}
+              onClick={() => setStatus(s)}
+              className={cn(
+                'flex min-h-[36px] items-center gap-2 rounded-md px-3 text-sm font-medium transition-colors',
+                status === s
+                  ? s === 'active' ? 'bg-primary text-primary-fg' : 'bg-warning-soft text-warning'
+                  : 'text-ink-secondary hover:bg-surface-muted',
+              )}
+            >
+              <span aria-hidden className={cn('h-2 w-2 rounded-full', status === s ? (s === 'active' ? 'bg-surface' : 'bg-warning') : 'bg-line-strong')} />
+              {s === 'active' ? 'Available' : 'On break'}
+            </button>
+          ))}
         </div>
       </section>
 
-      {/* ── KPI Row ────────────────────────────────────────────────────────── */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
-        {/* KPI 1: Queue */}
-        <div className="bg-white border border-outline-variant rounded-xl p-md shadow-[0px_1px_3px_rgba(0,0,0,0.05)] hover:border-primary/30 transition-colors">
-          <div className="flex justify-between items-start">
-            <span className="text-label-caps text-tertiary">Patients in My Queue</span>
-            <span className="material-symbols-outlined text-primary">groups</span>
-          </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-[32px] font-bold text-on-surface">
-              {isLoading && snapshot === null ? '…' : waiting.length}
-            </span>
-            {waiting.length > 0 && (
-              <span className="text-body-sm text-primary font-medium">in queue</span>
-            )}
-          </div>
-        </div>
-
-        {/* KPI 2: Seen Today */}
-        <div className="bg-white border border-outline-variant rounded-xl p-md shadow-[0px_1px_3px_rgba(0,0,0,0.05)] hover:border-primary/30 transition-colors">
-          <div className="flex justify-between items-start">
-            <span className="text-label-caps text-tertiary">Seen Today</span>
-            <span className="material-symbols-outlined text-secondary">check_circle</span>
-          </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-[32px] font-bold text-on-surface">—</span>
-            <span className="text-body-sm text-tertiary">seen today</span>
-          </div>
-        </div>
-
-        {/* KPI 3: Pending Lab Results */}
-        <div className="bg-white border border-outline-variant rounded-xl p-md shadow-[0px_1px_3px_rgba(0,0,0,0.05)] hover:border-primary/30 transition-colors">
-          <div className="flex justify-between items-start">
-            <span className="text-label-caps text-tertiary">Pending Lab Results</span>
-            <span className="material-symbols-outlined text-amber-500" style={{ fontVariationSettings: "'FILL' 1" }}>warning</span>
-          </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-[32px] font-bold text-on-surface">—</span>
-            <span className="text-body-sm text-tertiary font-medium">no pending</span>
-          </div>
-        </div>
-
-        {/* KPI 4: Prescriptions Pending */}
-        <div className="bg-white border border-outline-variant rounded-xl p-md shadow-[0px_1px_3px_rgba(0,0,0,0.05)] hover:border-primary/30 transition-colors">
-          <div className="flex justify-between items-start">
-            <span className="text-label-caps text-tertiary">Prescriptions Pending</span>
-            <span className="material-symbols-outlined text-tertiary">pill</span>
-          </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-[32px] font-bold text-on-surface">—</span>
-            <span className="text-body-sm text-tertiary">none pending</span>
-          </div>
-        </div>
+      {/* ── Today at a glance ───────────────────────────────────────────── */}
+      <section aria-label="Today at a glance" className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <StatTile
+          label="Waiting for you"
+          value={waiting.length}
+          hint={waiting.length === 0 ? 'No patients waiting' : 'In the consultation queue'}
+          icon={Users}
+          tone={waiting.length > 0 ? 'primary' : 'neutral'}
+          loading={boardLoading}
+        />
+        <StatTile
+          label="Now seeing"
+          value={inService !== null ? inService.ticket_number : '—'}
+          hint={inService !== null ? (inService.patient_name ?? 'Consultation in progress') : 'No active consultation'}
+          icon={Stethoscope}
+          tone={inService !== null ? 'info' : 'neutral'}
+          loading={boardLoading}
+        />
+        <StatTile
+          label="Longest wait"
+          value={longestWait === null ? '—' : `${longestWait} min`}
+          hint={longestWait !== null && longestWait >= 30 ? 'Above the 30-minute target' : 'Across waiting patients'}
+          icon={Clock}
+          tone={longestWait !== null && longestWait >= 30 ? 'warning' : 'neutral'}
+          loading={boardLoading}
+        />
       </section>
 
       {/* ── Main Content Split ─────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start">
         {/* Left Column: My Queue */}
         <section className="lg:col-span-8 space-y-md">
-          <div className="bg-white border border-outline-variant rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
+          <div className="bg-surface border border-outline-variant rounded-xl shadow-card overflow-hidden">
             {/* Tab header */}
             <div className="px-md pt-md flex items-center justify-between border-b border-outline-variant">
               <div className="flex gap-lg">
@@ -193,7 +159,7 @@ export function DoctorDashboard(): JSX.Element {
                 onClick={() => navigate('/queue/board/DOC')}
                 className="mb-3 text-primary text-body-sm font-semibold flex items-center gap-1 hover:underline"
               >
-                <span className="material-symbols-outlined text-sm">history</span>
+                <Glyph name="history" size={14} />
                 Queue Logs
               </button>
             </div>
@@ -218,7 +184,7 @@ export function DoctorDashboard(): JSX.Element {
                     <div className="text-right">
                       <p className="text-label-caps text-tertiary mb-1">Wait Time</p>
                       <span className="text-amber-600 font-data-mono font-bold text-body-md flex items-center gap-1">
-                        <span className="material-symbols-outlined text-sm">schedule</span>
+                        <Glyph name="schedule" size={14} />
                         {waitMinutes(inService) ?? '—'}m
                       </span>
                     </div>
@@ -230,7 +196,7 @@ export function DoctorDashboard(): JSX.Element {
                       disabled={startTicket.isPending}
                       className="bg-primary text-on-primary px-6 py-2 rounded-lg font-semibold text-body-md hover:brightness-110 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-50"
                     >
-                      <span className="material-symbols-outlined text-sm">play_arrow</span>
+                      <Glyph name="play_arrow" size={14} />
                       Start Encounter
                     </button>
                     <button className="border border-outline-variant text-on-surface px-4 py-2 rounded-lg font-semibold text-body-md hover:bg-surface-container transition-all">
@@ -248,7 +214,7 @@ export function DoctorDashboard(): JSX.Element {
               {/* Empty state */}
               {snapshot !== null && tabTickets.length === 0 && (tab !== 'waiting' || inService === null) && (
                 <div className="py-10 text-center">
-                  <span className="material-symbols-outlined text-[32px] text-outline-variant">inbox</span>
+                  <Glyph name="inbox" size={28} className="text-outline-variant" />
                   <p className="mt-2 text-body-sm font-medium text-outline">Queue is empty</p>
                 </div>
               )}
@@ -259,7 +225,7 @@ export function DoctorDashboard(): JSX.Element {
                 return (
                   <div
                     key={ticket.id}
-                    className="bg-white border border-outline-variant rounded-lg p-md hover:bg-surface-container/30 transition-all cursor-pointer group"
+                    className="bg-surface border border-outline-variant rounded-lg p-md hover:bg-surface-container/30 transition-all cursor-pointer group"
                   >
                     <div className="flex gap-md relative">
                       <div className={cn('w-1 rounded-full shrink-0', ticket.mts_category ? MTS_BAR[ticket.mts_category] : 'bg-outline-variant')} />
@@ -294,9 +260,9 @@ export function DoctorDashboard(): JSX.Element {
         {/* Right Column: Side Panels */}
         <section className="lg:col-span-4 space-y-lg">
           {/* Quick Actions */}
-          <div className="bg-white border border-outline-variant rounded-xl p-md shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+          <div className="bg-surface border border-outline-variant rounded-xl p-md shadow-card">
             <h3 className="text-label-caps text-tertiary mb-md flex items-center gap-2">
-              <span className="material-symbols-outlined text-[16px]">bolt</span> Quick Actions
+              <Glyph name="bolt" size={16} /> Quick Actions
             </h3>
             <div className="grid grid-cols-2 gap-sm">
               {[
@@ -310,7 +276,7 @@ export function DoctorDashboard(): JSX.Element {
                   onClick={() => navigate(to)}
                   className="flex flex-col items-center justify-center gap-2 p-3 border border-outline-variant rounded-lg hover:bg-primary-container/10 hover:border-primary/30 transition-all group"
                 >
-                  <span className="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">{icon}</span>
+                  <Glyph name={icon} className="text-primary transition-transform" />
                   <span className="text-[11px] font-semibold">{label}</span>
                 </button>
               ))}
@@ -318,18 +284,18 @@ export function DoctorDashboard(): JSX.Element {
           </div>
 
           {/* Results Ready */}
-          <div className="bg-white border border-outline-variant rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
+          <div className="bg-surface border border-outline-variant rounded-xl shadow-card overflow-hidden">
             <div className="px-md py-3 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
               <h3 className="text-label-caps text-on-surface">Results Ready</h3>
             </div>
             <div className="p-md text-center py-8">
-              <span className="material-symbols-outlined text-[32px] text-outline-variant block mb-2">biotech</span>
+              <Glyph name="biotech" size={28} className="text-outline-variant block mb-2" />
               <p className="text-body-sm text-outline">No pending results</p>
             </div>
           </div>
 
           {/* Today's Schedule */}
-          <div className="bg-white border border-outline-variant rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
+          <div className="bg-surface border border-outline-variant rounded-xl shadow-card overflow-hidden">
             <div className="px-md py-3 border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
               <h3 className="text-label-caps text-on-surface">Today's Schedule</h3>
               <button
@@ -340,7 +306,7 @@ export function DoctorDashboard(): JSX.Element {
               </button>
             </div>
             <div className="p-md text-center py-8">
-              <span className="material-symbols-outlined text-[32px] text-outline-variant block mb-2">calendar_month</span>
+              <Glyph name="calendar_month" size={28} className="text-outline-variant block mb-2" />
               <p className="text-body-sm text-outline">No appointments today</p>
             </div>
           </div>

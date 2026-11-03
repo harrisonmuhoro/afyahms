@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { usePatientSearch } from '@/features/patients/api';
+import { Glyph } from '@/components/icons/Glyph';
 
 interface PatientHit {
   id: string;
@@ -73,13 +74,13 @@ export function PatientSearch({
             aria-label="Clear patient selection"
             className="shrink-0 rounded-full p-0.5 text-on-surface-variant hover:bg-surface-container"
           >
-            <span className="material-symbols-outlined text-[16px]">close</span>
+            <Glyph name="close" size={16} />
           </button>
         </div>
       ) : (
         <div className="relative">
           <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-            <span className="material-symbols-outlined text-[16px] text-on-surface-variant">search</span>
+            <Glyph name="search" size={16} className="text-on-surface-variant" />
           </span>
           <input
             id="patient-search-input"

@@ -29,42 +29,49 @@ export interface NavItem {
   onlyRoles?: string[];
   /** Exact-match active state (used for the root dashboard link). */
   end?: boolean;
+  /** Sidebar group this item belongs to. */
+  section: NavSection;
 }
+
+export type NavSection = 'workspace' | 'frontDesk' | 'clinical' | 'diagnostics' | 'finance' | 'administration';
+
+/** Sidebar groups in display order; labels live under `nav:section_<id>`. */
+export const NAV_SECTIONS: NavSection[] = ['workspace', 'frontDesk', 'clinical', 'diagnostics', 'finance', 'administration'];
 
 /**
  * Primary navigation, ordered along the patient journey:
  * intake -> clinical -> diagnostics -> dispensing -> money -> back-office.
  */
 export const NAV_ITEMS: NavItem[] = [
-  { to: '/', key: 'nav:dashboard', icon: 'dashboard', end: true },
-  { to: '/profile', key: 'nav:profile', icon: 'user', hiddenForRoles: ['patient'] },
+  { to: '/', key: 'nav:dashboard', icon: 'dashboard', end: true, section: 'workspace' },
+  { to: '/profile', key: 'nav:profile', icon: 'user', hiddenForRoles: ['patient'], section: 'workspace' },
 
   // Intake / front desk
-  { to: '/queue/check-in', key: 'nav:checkIn', icon: 'plus', permission: 'visits.create', hiddenForRoles: ['superadmin'] },
-  { to: '/queue', key: 'nav:queue', icon: 'queue', permission: 'queue.read', hiddenForRoles: ['superadmin'] },
-  { to: '/queue/board/TRI', key: 'nav:triage', icon: 'triage', permission: 'triage.create', hiddenForRoles: ['superadmin'] },
-  { to: '/patients', key: 'nav:patients', icon: 'patients', permission: 'patients.read', hiddenForRoles: ['superadmin'] },
-  { to: '/appointments', key: 'nav:appointments', icon: 'calendar', permission: 'appointments.list', hiddenForRoles: ['superadmin'] },
-  { to: '/messages', key: 'nav:messages', icon: 'message', onlyRoles: ['hospital-admin', 'receptionist', 'doctor'] },
+  { to: '/queue/check-in', key: 'nav:checkIn', icon: 'plus', permission: 'visits.create', hiddenForRoles: ['superadmin'], section: 'frontDesk' },
+  { to: '/queue', key: 'nav:queue', icon: 'queue', permission: 'queue.read', hiddenForRoles: ['superadmin'], section: 'frontDesk' },
+  { to: '/queue/board/TRI', key: 'nav:triage', icon: 'triage', permission: 'triage.create', hiddenForRoles: ['superadmin'], section: 'clinical' },
+  { to: '/patients', key: 'nav:patients', icon: 'patients', permission: 'patients.read', hiddenForRoles: ['superadmin'], section: 'frontDesk' },
+  { to: '/appointments', key: 'nav:appointments', icon: 'calendar', permission: 'appointments.list', hiddenForRoles: ['superadmin'], section: 'frontDesk' },
+  { to: '/messages', key: 'nav:messages', icon: 'message', onlyRoles: ['hospital-admin', 'receptionist', 'doctor'], section: 'workspace' },
 
   // Clinical
-  { to: '/queue/board/DOC', key: 'nav:emr', icon: 'emr', permission: 'emr.read', hiddenForRoles: ['superadmin'] },
+  { to: '/queue/board/DOC', key: 'nav:emr', icon: 'emr', permission: 'emr.read', hiddenForRoles: ['superadmin'], section: 'clinical' },
 
   // Diagnostics & dispensing
-  { to: '/queue/board/LAB', key: 'nav:laboratory', icon: 'laboratory', permission: 'lab.read', hiddenForRoles: ['superadmin'] },
-  { to: '/queue/board/RAD', key: 'nav:radiology', icon: 'radiology', permission: 'radiology.read', hiddenForRoles: ['superadmin'] },
-  { to: '/queue/board/PHA', key: 'nav:pharmacy', icon: 'pharmacy', permission: 'pharmacy.read', hiddenForRoles: ['superadmin'] },
+  { to: '/queue/board/LAB', key: 'nav:laboratory', icon: 'laboratory', permission: 'lab.read', hiddenForRoles: ['superadmin'], section: 'diagnostics' },
+  { to: '/queue/board/RAD', key: 'nav:radiology', icon: 'radiology', permission: 'radiology.read', hiddenForRoles: ['superadmin'], section: 'diagnostics' },
+  { to: '/queue/board/PHA', key: 'nav:pharmacy', icon: 'pharmacy', permission: 'pharmacy.read', hiddenForRoles: ['superadmin'], section: 'diagnostics' },
 
   // Money
-  { to: '/queue/board/BIL', key: 'nav:billing', icon: 'billing', permission: 'invoices.read', hiddenForRoles: ['superadmin'] },
+  { to: '/queue/board/BIL', key: 'nav:billing', icon: 'billing', permission: 'invoices.read', hiddenForRoles: ['superadmin'], section: 'finance' },
 
   // Back office
-  { to: '/inventory', key: 'nav:inventory', icon: 'inventory', permission: 'inventory.read', hiddenForRoles: ['superadmin'] },
-  { to: '/admin/staff', key: 'nav:staff', icon: 'users', permission: 'staff.update' },
-  { to: '/reports', key: 'nav:reports', icon: 'reports', permission: 'reporting.read' },
-  { to: '/branches', key: 'nav:branches', icon: 'branches', permission: 'branches.read' },
-  { to: '/audit', key: 'nav:audit', icon: 'audit', permission: 'audit.read' },
-  { to: '/settings', key: 'nav:settings', icon: 'settings', permission: 'settings.read' },
+  { to: '/inventory', key: 'nav:inventory', icon: 'inventory', permission: 'inventory.read', hiddenForRoles: ['superadmin'], section: 'administration' },
+  { to: '/admin/staff', key: 'nav:staff', icon: 'users', permission: 'staff.update', section: 'administration' },
+  { to: '/reports', key: 'nav:reports', icon: 'reports', permission: 'reporting.read', section: 'administration' },
+  { to: '/branches', key: 'nav:branches', icon: 'branches', permission: 'branches.read', section: 'administration' },
+  { to: '/audit', key: 'nav:audit', icon: 'audit', permission: 'audit.read', section: 'administration' },
+  { to: '/settings', key: 'nav:settings', icon: 'settings', permission: 'settings.read', section: 'administration' },
 ];
 
 /**

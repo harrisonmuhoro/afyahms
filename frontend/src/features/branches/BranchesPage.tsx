@@ -32,7 +32,7 @@ export function BranchesPage(): JSX.Element {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-12">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-stone-900 to-stone-500 dark:from-stone-100 dark:to-stone-400">
+          <h1 className="text-3xl font-black bg-clip-text text-transparent bg-stone-900 dark:bg-stone-100">
             {t('branches:title')}
           </h1>
           <p className="mt-2 text-sm text-stone-500 font-medium">Manage hospital locations and clinics</p>
@@ -40,7 +40,7 @@ export function BranchesPage(): JSX.Element {
         {canCreate && (
           <button 
             onClick={openAddModal}
-            className="px-4 py-2 bg-stone-900 dark:bg-white text-white dark:text-stone-900 rounded-xl font-medium shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+            className="px-4 py-2 bg-stone-900 dark:bg-white text-white dark:text-stone-900 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300"
           >
             + Add Branch
           </button>
@@ -48,7 +48,7 @@ export function BranchesPage(): JSX.Element {
       </div>
 
       {error !== null && (
-        <div role="alert" className="p-4 rounded-xl bg-rose-50/80 text-rose-600 border border-rose-200 backdrop-blur-sm flex items-center gap-3">
+        <div role="alert" className="p-4 rounded-xl bg-red-50/80 text-red-600 border border-red-200 flex items-center gap-3">
           <Icon name="close" size={20} />
           <span className="text-sm font-medium">{t('common:loading', 'Failed to load branches.')}</span>
         </div>
@@ -74,7 +74,7 @@ export function BranchesPage(): JSX.Element {
         {branches.map((branch, idx) => (
           <div 
             key={branch.id} 
-            className="group relative bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+            className="group relative bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
             style={{ animationDelay: `${idx * 100}ms` }}
           >
             {/* Background glowing orb */}

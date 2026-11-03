@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBoard } from '@/features/queue/api';
 import { usePatients, usePatientSearch } from '@/features/patients/api';
 import type { QueueTicket, TicketState } from '@/features/queue/types';
+import { Glyph } from '@/components/icons/Glyph';
 
 const STATE_CHIP: Partial<Record<TicketState, { label: string; className: string }>> = {
   waiting: { label: 'Waiting', className: 'bg-secondary/10 text-secondary' },
@@ -39,13 +40,11 @@ export function ReceptionistDashboard(): JSX.Element {
   const priorityCount = waiting.filter((t) => t.priority !== 'normal').length;
 
   return (
-    <div className="p-lg space-y-lg">
+    <div className="space-y-6">
       {/* Search and Chips Row */}
       <div className="space-y-md">
         <div className="relative max-w-2xl group">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">
-            search
-          </span>
+          <Glyph name="search" className="absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors" />
           <input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -54,7 +53,7 @@ export function ReceptionistDashboard(): JSX.Element {
             type="text"
           />
           {searchQuery.trim().length >= 2 && (
-            <div className="absolute z-20 mt-2 w-full bg-white border border-outline-variant rounded-2xl shadow-lg overflow-hidden">
+            <div className="absolute z-20 mt-2 w-full bg-surface border border-outline-variant rounded-2xl shadow-lg overflow-hidden">
               {searching ? (
                 <p className="px-4 py-3 text-body-sm text-on-surface-variant">Searching…</p>
               ) : hits.length === 0 ? (
@@ -83,9 +82,7 @@ export function ReceptionistDashboard(): JSX.Element {
                         {hit.phone !== null && ` · ${hit.phone}`}
                       </p>
                     </div>
-                    <span className="material-symbols-outlined text-outline text-[18px] shrink-0">
-                      chevron_right
-                    </span>
+                    <Glyph name="chevron_right" size={18} className="text-outline shrink-0" />
                   </button>
                 ))
               )}
@@ -103,7 +100,7 @@ export function ReceptionistDashboard(): JSX.Element {
                 onClick={() => navigate(`/patients/${patient.id}`)}
                 className="flex items-center gap-1 px-3 py-1 bg-surface-container border border-outline-variant rounded-full text-body-sm hover:border-primary transition-colors"
               >
-                <span className="material-symbols-outlined text-[16px]">history</span>
+                <Glyph name="history" size={16} />
                 {patient.full_name}
               </button>
             ))
@@ -124,9 +121,7 @@ export function ReceptionistDashboard(): JSX.Element {
           className="group flex items-center gap-lg p-lg bg-primary text-on-primary rounded-2xl text-left shadow-lg hover:bg-primary-container transition-all active:scale-[0.98]"
         >
           <div className="bg-primary-container/20 p-md rounded-xl">
-            <span className="material-symbols-outlined text-[40px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-              person_add
-            </span>
+            <Glyph name="person_add" size={32} />
           </div>
           <div>
             <h3 className="font-headline-md text-headline-md mb-1">Register New Patient</h3>
@@ -134,17 +129,15 @@ export function ReceptionistDashboard(): JSX.Element {
               Onboard a new visitor and create a medical file instantly.
             </p>
           </div>
-          <span className="material-symbols-outlined ml-auto group-hover:translate-x-1 transition-transform">
-            arrow_forward_ios
-          </span>
+          <Glyph name="arrow_forward_ios" className="ml-auto group-hover:translate-x-1 transition-transform" />
         </button>
 
         <button
           onClick={() => navigate('/queue/check-in')}
-          className="group flex items-center gap-lg p-lg bg-white border border-outline-variant rounded-2xl text-left shadow-sm hover:bg-surface-container-low transition-all active:scale-[0.98]"
+          className="group flex items-center gap-lg p-lg bg-surface border border-outline-variant rounded-2xl text-left shadow-sm hover:bg-surface-container-low transition-all active:scale-[0.98]"
         >
           <div className="bg-surface-container p-md rounded-xl">
-            <span className="material-symbols-outlined text-[40px] text-primary">confirmation_number</span>
+            <Glyph name="confirmation_number" size={32} className="text-primary" />
           </div>
           <div>
             <h3 className="font-headline-md text-headline-md mb-1 text-on-surface">Check-in / Issue Ticket</h3>
@@ -152,15 +145,13 @@ export function ReceptionistDashboard(): JSX.Element {
               Assign a queue number to a registered patient for today's visit.
             </p>
           </div>
-          <span className="material-symbols-outlined ml-auto text-outline group-hover:translate-x-1 transition-transform">
-            arrow_forward_ios
-          </span>
+          <Glyph name="arrow_forward_ios" className="ml-auto text-outline group-hover:translate-x-1 transition-transform" />
         </button>
       </div>
 
       {/* KPI Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-md">
-        <div className="bg-white p-lg border border-outline-variant rounded-2xl shadow-sm">
+        <div className="bg-surface p-lg border border-outline-variant rounded-2xl shadow-sm">
           <p className="font-label-caps text-label-caps text-outline uppercase mb-2">Waiting Now</p>
           <div className="flex items-end gap-2">
             <h4 className="text-headline-lg font-headline-lg text-on-surface">
@@ -171,7 +162,7 @@ export function ReceptionistDashboard(): JSX.Element {
             </span>
           </div>
         </div>
-        <div className="bg-white p-lg border border-outline-variant rounded-2xl shadow-sm">
+        <div className="bg-surface p-lg border border-outline-variant rounded-2xl shadow-sm">
           <p className="font-label-caps text-label-caps text-outline uppercase mb-2">In Service</p>
           <div className="flex items-end gap-2">
             <h4 className="text-headline-lg font-headline-lg text-on-surface">
@@ -182,16 +173,16 @@ export function ReceptionistDashboard(): JSX.Element {
             </span>
           </div>
         </div>
-        <div className="bg-white p-lg border border-outline-variant rounded-2xl shadow-sm">
+        <div className="bg-surface p-lg border border-outline-variant rounded-2xl shadow-sm">
           <p className="font-label-caps text-label-caps text-outline uppercase mb-2">Priority Cases</p>
           <div className="flex items-end gap-2">
             <h4 className={`text-headline-lg font-headline-lg ${priorityCount > 0 ? 'text-error' : 'text-on-surface'}`}>
-              {boardLoading && snapshot === null ? '…' : String(priorityCount).padStart(2, '0')}
+              {boardLoading && snapshot === null ? '…' : priorityCount}
             </h4>
             {priorityCount > 0 && <span className="text-error/60 text-[12px] pb-1">Fast-track</span>}
           </div>
         </div>
-        <div className="bg-white p-lg border border-outline-variant rounded-2xl shadow-sm">
+        <div className="bg-surface p-lg border border-outline-variant rounded-2xl shadow-sm">
           <p className="font-label-caps text-label-caps text-outline uppercase mb-2">Desk Status</p>
           <div className="flex items-end gap-2">
             <h4 className="text-headline-lg font-headline-lg text-on-surface capitalize">
@@ -204,17 +195,17 @@ export function ReceptionistDashboard(): JSX.Element {
       {/* Main Area Split */}
       <div className="grid grid-cols-1 xl:grid-cols-10 gap-lg">
         {/* Left: Active Waiting Queue */}
-        <div className="xl:col-span-6 bg-white border border-outline-variant rounded-2xl shadow-sm flex flex-col min-h-[500px]">
+        <div className="xl:col-span-6 bg-surface border border-outline-variant rounded-2xl shadow-sm flex flex-col min-h-[500px]">
           <div className="p-md border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest rounded-t-2xl">
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">groups</span>
+              <Glyph name="groups" className="text-primary" />
               <h3 className="font-headline-md text-headline-md">Active Waiting Queue</h3>
             </div>
             <button
               onClick={() => navigate('/queue/board/REC')}
               className="text-primary font-label-caps text-label-caps flex items-center gap-1 hover:underline"
             >
-              Full board <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+              Full board <Glyph name="chevron_right" size={16} />
             </button>
           </div>
           <div className="overflow-x-auto flex-1">
@@ -238,7 +229,7 @@ export function ReceptionistDashboard(): JSX.Element {
                 ) : queue.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-md py-10 text-center">
-                      <span className="material-symbols-outlined text-[32px] text-outline-variant">event_seat</span>
+                      <Glyph name="event_seat" size={28} className="text-outline-variant" />
                       <p className="mt-2 text-body-md text-on-surface-variant">No patients in the reception queue.</p>
                     </td>
                   </tr>
@@ -285,13 +276,13 @@ export function ReceptionistDashboard(): JSX.Element {
         </div>
 
         {/* Right: Today's Schedule — no staff appointments backend yet */}
-        <div className="xl:col-span-4 bg-white border border-outline-variant rounded-2xl shadow-sm flex flex-col">
+        <div className="xl:col-span-4 bg-surface border border-outline-variant rounded-2xl shadow-sm flex flex-col">
           <div className="p-md border-b border-outline-variant flex items-center gap-2 bg-surface-container-lowest rounded-t-2xl">
-            <span className="material-symbols-outlined text-primary">event</span>
+            <Glyph name="event" className="text-primary" />
             <h3 className="font-headline-md text-headline-md">Today's Schedule</h3>
           </div>
           <div className="flex-1 flex flex-col items-center justify-center text-center p-lg gap-2">
-            <span className="material-symbols-outlined text-[32px] text-outline-variant">calendar_month</span>
+            <Glyph name="calendar_month" size={28} className="text-outline-variant" />
             <p className="text-body-md text-on-surface-variant max-w-[240px]">
               Appointment scheduling will appear here once the appointments module is enabled.
             </p>
@@ -302,10 +293,10 @@ export function ReceptionistDashboard(): JSX.Element {
       {/* Emergency FAB */}
       <button
         onClick={() => navigate('/queue/check-in?priority=emergency')}
-        className="fixed bottom-lg right-lg w-14 h-14 bg-error text-on-error rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50"
+        className="fixed bottom-lg right-lg w-14 h-14 bg-error text-on-error rounded-full shadow-2xl flex items-center justify-center active:scale-95 transition-all z-50"
         title="Emergency check-in"
       >
-        <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>emergency</span>
+        <Glyph name="emergency" />
       </button>
     </div>
   );

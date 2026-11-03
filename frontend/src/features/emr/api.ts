@@ -224,6 +224,7 @@ export function useEmarRecords(visitId: number): {
 export function usePendingEmarRecords(): {
   data: import('./types').EmarRecord[];
   isLoading: boolean;
+  error: unknown;
 } {
   const query = useQuery({
     queryKey: ['emr', 'emar', 'pending'],
@@ -236,7 +237,8 @@ export function usePendingEmarRecords(): {
 
   return {
     data: query.data ?? [],
-    isLoading: query.isFetching,
+    isLoading: query.isLoading,
+    error: query.error,
   };
 }
 

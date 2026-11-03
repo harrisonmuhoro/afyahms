@@ -118,7 +118,7 @@ export function StockConsumptionReport(): JSX.Element {
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Highest Item</h3>
-              <p className="mt-2 text-xl font-black text-purple-600 truncate" title={data.kpis.highest_item}>{data.kpis.highest_item}</p>
+              <p className="mt-2 text-xl font-black text-blue-600 truncate" title={data.kpis.highest_item}>{data.kpis.highest_item}</p>
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Total Value</h3>
@@ -173,7 +173,7 @@ export function StockConsumptionReport(): JSX.Element {
                         <td className="px-6 py-4 text-right tabular-nums">{row.consumption_rate}</td>
                         <td className="px-6 py-4 text-right tabular-nums">{row.current_stock.toLocaleString()}</td>
                         <td className="px-6 py-4 text-right tabular-nums">
-                          <span className={`font-medium ${row.days_remaining < 30 ? 'text-rose-600' : row.days_remaining < 90 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                          <span className={`font-medium ${row.days_remaining < 30 ? 'text-red-600' : row.days_remaining < 90 ? 'text-amber-600' : 'text-emerald-600'}`}>
                             {row.days_remaining >= 999 ? '∞' : row.days_remaining}
                           </span>
                         </td>

@@ -133,7 +133,7 @@ export function LabResultsReport(): JSX.Element {
             </div>
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-bold text-stone-500 uppercase tracking-wide">Avg TAT</h3>
-              <p className="mt-2 text-3xl font-black text-purple-600">{formatTat(data.kpis.avg_tat_minutes)}</p>
+              <p className="mt-2 text-3xl font-black text-blue-600">{formatTat(data.kpis.avg_tat_minutes)}</p>
             </div>
           </div>
 

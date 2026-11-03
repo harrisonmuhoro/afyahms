@@ -106,7 +106,13 @@
     "reports": "Reports",
     "settings": "Settings",
     "audit": "Audit log",
-    "messages": "Messages"
+    "messages": "Messages",
+    "section_workspace": "Workspace",
+    "section_frontDesk": "Front desk",
+    "section_clinical": "Clinical",
+    "section_diagnostics": "Diagnostics & pharmacy",
+    "section_finance": "Finance",
+    "section_administration": "Administration"
   },
   "triage": {
     "title": "Triage assessment",

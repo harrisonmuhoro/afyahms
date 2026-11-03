@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useLabWorklist, useCollectSample, useStartProcessing, useRecordResult, useVerifyResult } from '@/features/lab/api';
 import type { LabInterpretation, LabOrder, LabOrderStatus, LabPriority } from '@/features/lab/types';
+import { Glyph } from '@/components/icons/Glyph';
 
 const STATUS_CHIP: Record<LabOrderStatus, { label: string; className: string }> = {
   pending: { label: 'Pending', className: 'bg-surface-container-highest text-outline' },
@@ -14,9 +15,7 @@ function PriorityBadge({ priority }: { priority: LabPriority }): JSX.Element {
   if (priority === 'stat') {
     return (
       <span className="flex items-center gap-1.5 text-error font-bold text-xs animate-pulse">
-        <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-          error
-        </span>
+        <Glyph name="error" size={14} />
         STAT
       </span>
     );
@@ -24,13 +23,13 @@ function PriorityBadge({ priority }: { priority: LabPriority }): JSX.Element {
   if (priority === 'urgent') {
     return (
       <span className="flex items-center gap-1.5 text-orange-600 font-bold text-xs">
-        <span className="material-symbols-outlined text-[14px]">warning</span> Urgent
+        <Glyph name="warning" size={14} /> Urgent
       </span>
     );
   }
   return (
     <span className="flex items-center gap-1.5 text-outline font-bold text-xs">
-      <span className="material-symbols-outlined text-[14px]">schedule</span> Routine
+      <Glyph name="schedule" size={14} /> Routine
     </span>
   );
 }
@@ -139,19 +138,25 @@ export function LabDashboard(): JSX.Element {
   const advanceLabel = (o: LabOrder): string => (o.status === 'pending' ? 'Collect' : 'Analyse');
 
   return (
-    <div className="p-lg space-y-lg min-h-screen">
+    <div className="space-y-lg">
+      <div>
+        <h2 className="text-headline-lg font-headline-lg text-on-surface">Laboratory worklist</h2>
+        <p className="text-body-md text-on-surface-variant">
+          Collect samples, run analyses and verify results for this branch.
+        </p>
+      </div>
       {/* Dashboard Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter">
-        <div className="bg-white border border-outline-variant p-md rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface border border-outline-variant p-md rounded-xl shadow-card">
           <p className="text-label-caps text-outline uppercase">Awaiting Collection</p>
           <div className="flex items-end justify-between mt-2">
             <span className="text-headline-lg font-headline-lg text-on-surface">
               {isLoading ? '…' : awaitingCollection}
             </span>
-            <span className="material-symbols-outlined text-tertiary">colorize</span>
+            <Glyph name="colorize" className="text-tertiary" />
           </div>
         </div>
-        <div className="bg-white border border-outline-variant p-md rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface border border-outline-variant p-md rounded-xl shadow-card">
           <p className="text-label-caps text-outline uppercase">STAT Pending</p>
           <div className="flex items-end justify-between mt-2">
             <span className={`text-headline-lg font-headline-lg ${statPending > 0 ? 'text-error' : 'text-on-surface'}`}>
@@ -164,23 +169,18 @@ export function LabDashboard(): JSX.Element {
             )}
           </div>
         </div>
-        <div className="bg-white border border-outline-variant p-md rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface border border-outline-variant p-md rounded-xl shadow-card">
           <p className="text-label-caps text-outline uppercase">In Analysis</p>
           <div className="flex items-end justify-between mt-2">
             <span className="text-headline-lg font-headline-lg text-on-surface">{isLoading ? '…' : inAnalysis}</span>
-            <span className="material-symbols-outlined text-primary">biotech</span>
+            <Glyph name="biotech" className="text-primary" />
           </div>
         </div>
-        <div className="bg-white border border-outline-variant p-md rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05)]">
+        <div className="bg-surface border border-outline-variant p-md rounded-xl shadow-card">
           <p className="text-label-caps text-outline uppercase">Pending Verification</p>
           <div className="flex items-end justify-between mt-2">
             <span className="text-headline-lg font-headline-lg text-on-surface">{isLoading ? '…' : awaitingVerify}</span>
-            <span
-              className="material-symbols-outlined text-secondary"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              verified
-            </span>
+            <Glyph name="verified" className="text-secondary" />
           </div>
         </div>
       </div>
@@ -194,10 +194,10 @@ export function LabDashboard(): JSX.Element {
       {/* Main Work Area */}
       <div className="grid grid-cols-12 gap-gutter">
         {/* Lab Worklist */}
-        <section className="col-span-12 xl:col-span-8 bg-white border border-outline-variant rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
+        <section className="col-span-12 xl:col-span-8 bg-surface border border-outline-variant rounded-xl shadow-card overflow-hidden">
           <div className="p-md border-b border-outline-variant flex justify-between items-center">
             <h2 className="text-headline-md font-headline-md text-on-surface flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">format_list_bulleted</span> Lab Worklist
+              <Glyph name="format_list_bulleted" className="text-primary" /> Lab Worklist
             </h2>
           </div>
           <div className="overflow-x-auto">
@@ -229,7 +229,7 @@ export function LabDashboard(): JSX.Element {
                 ) : orders.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-md py-10 text-center">
-                      <span className="material-symbols-outlined text-[32px] text-outline-variant">labs</span>
+                      <Glyph name="labs" size={28} className="text-outline-variant" />
                       <p className="mt-2 text-body-md text-outline">No active lab orders.</p>
                     </td>
                   </tr>
@@ -258,9 +258,7 @@ export function LabDashboard(): JSX.Element {
                           {order.test?.name ?? '—'}
                           {order.result?.is_critical === true && (
                             <span className="ml-2 inline-flex items-center gap-1 text-error text-[11px] font-bold uppercase">
-                              <span className="material-symbols-outlined text-[13px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                                emergency_home
-                              </span>
+                              <Glyph name="emergency_home" size={13} />
                               Critical
                             </span>
                           )}
@@ -298,7 +296,7 @@ export function LabDashboard(): JSX.Element {
 
         {/* Results Entry Form */}
         <section className="col-span-12 xl:col-span-4 space-y-gutter">
-          <div className="bg-white border border-outline-variant rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05)] p-md">
+          <div className="bg-surface border border-outline-variant rounded-xl shadow-card p-md">
             <div className="flex justify-between items-center mb-md">
               <h2 className="text-headline-md font-headline-md text-on-surface">Result Entry</h2>
               {selected !== null && (
@@ -310,7 +308,7 @@ export function LabDashboard(): JSX.Element {
 
             {selected === null ? (
               <div className="py-10 text-center">
-                <span className="material-symbols-outlined text-[32px] text-outline-variant">lab_profile</span>
+                <Glyph name="lab_profile" size={28} className="text-outline-variant" />
                 <p className="mt-2 text-body-md text-outline">Select an order from the worklist.</p>
               </div>
             ) : selected.status === 'resulted' && selected.result !== null ? (
@@ -331,9 +329,7 @@ export function LabDashboard(): JSX.Element {
                 {selected.result.is_critical && (
                   <div className="p-3 bg-error-container/10 border border-error/20 rounded-lg">
                     <span className="text-[11px] font-bold text-error uppercase flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                        emergency_home
-                      </span>
+                      <Glyph name="emergency_home" size={14} />
                       Critical value — notify ordering doctor immediately
                     </span>
                   </div>
@@ -345,14 +341,12 @@ export function LabDashboard(): JSX.Element {
                     disabled={verifyResult.isPending}
                     className="w-full bg-primary text-white py-2.5 rounded-lg font-semibold active:scale-95 transition-transform disabled:opacity-50 flex items-center justify-center gap-2"
                   >
-                    <span className="material-symbols-outlined text-[18px]">verified</span>
+                    <Glyph name="verified" size={18} />
                     Verify &amp; Release to Doctor
                   </button>
                 ) : (
                   <p className="text-body-sm text-secondary font-semibold flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                      check_circle
-                    </span>
+                    <Glyph name="check_circle" size={16} />
                     Verified {selected.result.verified_by !== null ? `by ${selected.result.verified_by.name}` : ''}
                   </p>
                 )}
@@ -475,12 +469,12 @@ export function LabDashboard(): JSX.Element {
           </div>
 
           {/* Visual QC Status — no QC backend yet */}
-          <div className="bg-white border border-outline-variant rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
+          <div className="bg-surface border border-outline-variant rounded-xl shadow-card overflow-hidden">
             <div className="p-md bg-surface-container-low border-b border-outline-variant">
               <h3 className="text-label-caps font-label-caps text-outline uppercase">DAILY QC TRENDS</h3>
             </div>
             <div className="p-md py-8 text-center">
-              <span className="material-symbols-outlined text-[28px] text-outline-variant">monitoring</span>
+              <Glyph name="monitoring" size={24} className="text-outline-variant" />
               <p className="mt-2 text-body-sm text-outline">
                 Quality-control trends will appear here once analyzer QC data is connected.
               </p>

@@ -176,7 +176,7 @@ export function ShaClaimsReport(): JSX.Element {
                         <td className="px-6 py-4">
                           <span className={`inline-flex px-2 py-1 text-[10px] font-bold uppercase rounded-md ${
                             row.status === 'Approved' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400'
-                            : row.status === 'Rejected' ? 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400'
+                            : row.status === 'Rejected' ? 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400'
                             : 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400'
                           }`}>{row.status}</span>
                         </td>

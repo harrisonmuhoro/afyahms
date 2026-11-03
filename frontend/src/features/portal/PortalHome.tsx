@@ -122,7 +122,7 @@ export function PortalHome(): JSX.Element {
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
             {prescriptionRefills.length > 0 ? (
                <>
-                 <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-3">
+                 <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-3">
                    <Icon name="pharmacy" size={24} />
                  </div>
                  <p className="font-bold text-on-surface dark:text-stone-100">{prescriptionRefills.length} Active Prescriptions</p>
@@ -143,7 +143,7 @@ export function PortalHome(): JSX.Element {
               <h3 className="text-headline-md font-headline-md mb-4 text-inverse-on-surface">Secure Messaging</h3>
               <p className="text-body-md text-surface-variant mb-lg">Send a direct, encrypted message to your care team. Average response time is 4 hours.</p>
             </div>
-            <Link to="/portal/messages" className="w-full bg-primary-fixed text-on-primary-fixed py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform">
+            <Link to="/portal/messages" className="w-full bg-primary-fixed text-on-primary-fixed py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-transform">
               <Icon name="send" size={20} />
               Start New Message
             </Link>
@@ -176,7 +176,7 @@ export function PortalHome(): JSX.Element {
       </div>
 
       {/* Floating Action Button */}
-      <Link to="/portal/appointments" className="fixed bottom-lg right-lg w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 group">
+      <Link to="/portal/appointments" className="fixed bottom-lg right-lg w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-all z-50 group">
         <Icon name="plus" size={28} />
         <span className="absolute right-full mr-4 px-3 py-1.5 bg-inverse-surface text-inverse-on-surface rounded-lg text-body-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Schedule Appointment</span>
       </Link>

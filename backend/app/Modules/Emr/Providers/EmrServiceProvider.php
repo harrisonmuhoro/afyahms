@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Modules\Emr\Providers;
 
+use App\Modules\Emr\Models\EmarRecord;
+use App\Modules\Emr\Policies\EmarRecordPolicy;
 use App\Modules\Emr\Repositories\Contracts\DiagnosisCatalogRepository;
 use App\Modules\Emr\Repositories\Contracts\EncounterRepository;
 use App\Modules\Emr\Repositories\Eloquent\EloquentDiagnosisCatalogRepository;
 use App\Modules\Emr\Repositories\Eloquent\EloquentEncounterRepository;
 use App\Modules\Emr\Services\EmrService;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,6 +26,7 @@ final class EmrServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Gate::policy(EmarRecord::class, EmarRecordPolicy::class);
         $this->bootRoutes();
     }
 

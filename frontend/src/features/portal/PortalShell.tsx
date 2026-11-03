@@ -113,7 +113,7 @@ export function PortalShell(): JSX.Element {
       {mobileMenuOpen && (
         <div className="lg:hidden">
           <div 
-            className="fixed inset-0 z-40 bg-stone-900/50 backdrop-blur-sm"
+            className="fixed inset-0 z-40 bg-stone-900/50"
             onClick={() => setMobileMenuOpen(false)}
           />
           <aside className="fixed inset-y-0 left-0 z-50 w-[260px] flex flex-col bg-surface dark:bg-inverse-surface shadow-xl">
