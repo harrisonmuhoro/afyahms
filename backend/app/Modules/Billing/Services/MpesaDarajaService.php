@@ -15,6 +15,7 @@ final class MpesaDarajaService
     public function initiateStkPush(Bill $bill, string $phone, float $amount): array
     {
         $gateway = config('mpesa.gateways.mpesa_daraja');
+        $http = $this->httpClient($gateway);
         $shortcode = (string) ($gateway['lipa_na_mpesa_online_shortcode'] ?: $gateway['shortcode']);
         $passkey = (string) ($gateway['lipa_na_mpesa_online_passkey'] ?: $gateway['passkey']);
         $callbackUrl = (string) ($gateway['callback_urls']['stk'] ?? '');
@@ -28,7 +29,7 @@ final class MpesaDarajaService
         $password = base64_encode($shortcode.$passkey.$timestamp);
         $token = $this->accessToken($gateway);
 
-        $response = Http::withToken($token)
+        $response = $http->withToken($token)
             ->acceptJson()
             ->timeout((int) $gateway['timeout'])
             ->retry((int) $gateway['retry']['times'], fn (int $attempt): int => (int) $gateway['retry']['backoff_ms'][$attempt - 1] ?? 1500)
@@ -61,6 +62,7 @@ final class MpesaDarajaService
     public function queryStkPush(string $checkoutRequestId): array
     {
         $gateway = config('mpesa.gateways.mpesa_daraja');
+        $http = $this->httpClient($gateway);
         $shortcode = (string) ($gateway['lipa_na_mpesa_online_shortcode'] ?: $gateway['shortcode']);
         $passkey = (string) ($gateway['lipa_na_mpesa_online_passkey'] ?: $gateway['passkey']);
         if ($checkoutRequestId === '' || $passkey === '') {
@@ -68,7 +70,7 @@ final class MpesaDarajaService
         }
 
         $timestamp = now()->format('YmdHis');
-        $response = Http::withToken($this->accessToken($gateway))
+        $response = $http->withToken($this->accessToken($gateway))
             ->acceptJson()
             ->timeout((int) $gateway['timeout'])
             ->post(rtrim((string) $gateway['base_url'], '/').'/mpesa/stkpushquery/v1/query', [
@@ -89,7 +91,8 @@ final class MpesaDarajaService
     private function accessToken(array $gateway): string
     {
         return Cache::remember('mpesa.daraja.access_token', now()->addMinutes(50), function () use ($gateway): string {
-            $response = Http::withBasicAuth((string) $gateway['consumer_key'], (string) $gateway['consumer_secret'])
+            $response = $this->httpClient($gateway)
+                ->withBasicAuth((string) $gateway['consumer_key'], (string) $gateway['consumer_secret'])
                 ->acceptJson()
                 ->timeout((int) $gateway['timeout'])
                 ->get(rtrim((string) $gateway['base_url'], '/').'/oauth/v1/generate', ['grant_type' => 'client_credentials']);
@@ -100,6 +103,16 @@ final class MpesaDarajaService
 
             return (string) $response->json('access_token');
         });
+    }
+
+    /** @param array<string, mixed> $gateway */
+    private function httpClient(array $gateway): \Illuminate\Http\Client\PendingRequest
+    {
+        $caBundle = $gateway['ca_bundle'] ?? null;
+
+        return is_string($caBundle) && $caBundle !== '' && is_file($caBundle)
+            ? Http::withOptions(['verify' => $caBundle])
+            : Http::acceptJson();
     }
 
     private function normalizePhone(string $phone): string

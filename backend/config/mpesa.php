@@ -32,6 +32,10 @@ return [
             ],
 
             'timeout' => 30,
+            // WAMP's PHP build does not always expose a system CA store to
+            // Guzzle. Reuse the configured bundle used by other outbound
+            // integrations unless M-Pesa has an explicit override.
+            'ca_bundle' => env('MPESA_CA_BUNDLE', env('RESEND_CA_BUNDLE')),
             'retry'   => [
                 'times' => 3,
                 'backoff_ms' => [500, 1500, 4000],

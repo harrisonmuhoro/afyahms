@@ -101,7 +101,6 @@ export function PortalBills(): JSX.Element {
               <div key={inv.id} className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm dark:border-stone-800 dark:bg-stone-900">
                 <div className="mb-4 flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-mono text-xs font-bold text-stone-400 dark:text-stone-500">{inv.public_id}</p>
                     <p className="mt-0.5 font-bold text-stone-900 dark:text-stone-100">{dateStr}</p>
                   </div>
                   <span className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusConfig.classes}`}>{statusConfig.label}</span>
